@@ -1,11 +1,15 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { useCategoryBreakdown } from '@/hooks/useDashboard';
+import { useCurrency } from '@/hooks/useCurrency';
+import { useTheme } from '@/hooks/useTheme';
 import Card from '@/components/ui/Card';
 import Spinner from '@/components/ui/Spinner';
 import { formatCurrency } from '@/utils/formatCurrency';
 
 export default function CategoryChart() {
   const { data: breakdown, isLoading } = useCategoryBreakdown();
+  const currency = useCurrency();
+  const { darkMode } = useTheme();
 
   if (isLoading) return <Spinner />;
 
@@ -30,14 +34,14 @@ export default function CategoryChart() {
                   dataKey="amount"
                   nameKey="name"
                   strokeWidth={2}
-                  stroke="#fff"
+                  stroke={darkMode ? '#1e293b' : '#fff'}
                 >
                   {breakdown.map((entry, index) => (
                     <Cell key={index} fill={entry.color} />
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(value) => [formatCurrency(Number(value))]}
+                  formatter={(value) => [formatCurrency(Number(value), currency)]}
                   contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
                 />
               </PieChart>

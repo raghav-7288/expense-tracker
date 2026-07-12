@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useRecentTransactions } from '@/hooks/useDashboard';
+import { useCurrency } from '@/hooks/useCurrency';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { formatDate } from '@/utils/formatDate';
 import Badge from '@/components/ui/Badge';
@@ -9,6 +10,7 @@ import { ArrowRight } from 'lucide-react';
 
 export default function RecentTransactions() {
   const { data: transactions, isLoading } = useRecentTransactions(5);
+  const currency = useCurrency();
 
   if (isLoading) return <Spinner />;
 
@@ -53,7 +55,7 @@ export default function RecentTransactions() {
                     t.type === 'income' ? 'text-green-600' : 'text-red-600'
                   }`}
                 >
-                  {t.type === 'income' ? '+' : '-'}{formatCurrency(Number(t.amount))}
+                  {t.type === 'income' ? '+' : '-'}{formatCurrency(Number(t.amount), currency)}
                 </span>
               </div>
             </div>

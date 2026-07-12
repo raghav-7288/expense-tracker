@@ -33,6 +33,7 @@ export function useUpdateProfile() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.profile.detail(user?.id) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
       toast.success('Profile updated');
     },
     onError: (error: Error) => {

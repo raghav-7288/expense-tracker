@@ -1,4 +1,5 @@
 import { useDashboardStats } from '@/hooks/useDashboard';
+import { useCurrency } from '@/hooks/useCurrency';
 import { formatCurrency } from '@/utils/formatCurrency';
 import StatCard from '@/components/dashboard/StatCard';
 import RecentTransactions from '@/components/dashboard/RecentTransactions';
@@ -10,6 +11,7 @@ import { Wallet, TrendingUp, TrendingDown, ArrowUpDown } from 'lucide-react';
 
 export default function DashboardPage() {
   const { data: stats, isLoading, isError, refetch } = useDashboardStats();
+  const currency = useCurrency();
 
   if (isError) {
     return (
@@ -37,27 +39,27 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
             title="Total Balance"
-            value={formatCurrency(stats?.totalBalance ?? 0)}
+            value={formatCurrency(stats?.totalBalance ?? 0, currency)}
             icon={<Wallet size={20} />}
             trend="All time"
           />
           <StatCard
             title="Monthly Income"
-            value={formatCurrency(stats?.monthlyIncome ?? 0)}
+            value={formatCurrency(stats?.monthlyIncome ?? 0, currency)}
             icon={<TrendingUp size={20} />}
             variant="success"
             trend="This month"
           />
           <StatCard
             title="Monthly Expenses"
-            value={formatCurrency(stats?.monthlyExpenses ?? 0)}
+            value={formatCurrency(stats?.monthlyExpenses ?? 0, currency)}
             icon={<TrendingDown size={20} />}
             variant="danger"
             trend="This month"
           />
           <StatCard
             title="Monthly Net"
-            value={formatCurrency((stats?.monthlyIncome ?? 0) - (stats?.monthlyExpenses ?? 0))}
+            value={formatCurrency((stats?.monthlyIncome ?? 0) - (stats?.monthlyExpenses ?? 0), currency)}
             icon={<ArrowUpDown size={20} />}
             trend="This month"
           />

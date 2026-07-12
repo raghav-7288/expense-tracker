@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { formatDate } from '@/utils/formatDate';
+import { useCurrency } from '@/hooks/useCurrency';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
@@ -16,6 +17,7 @@ interface TransactionListProps {
 export default function TransactionList({ transactions }: TransactionListProps) {
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const currency = useCurrency();
 
   const updateMutation = useUpdateTransaction();
   const deleteMutation = useDeleteTransaction();
@@ -77,7 +79,7 @@ export default function TransactionList({ transactions }: TransactionListProps) 
                   t.type === 'income' ? 'text-green-600' : 'text-red-600'
                 }`}
               >
-                {t.type === 'income' ? '+' : '-'}{formatCurrency(Number(t.amount))}
+                {t.type === 'income' ? '+' : '-'}{formatCurrency(Number(t.amount), currency)}
               </span>
               <button
                 onClick={() => setEditingTransaction(t)}

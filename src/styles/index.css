@@ -129,14 +129,14 @@ input[type="number"] {
    DARK MODE OVERRIDES — body.dark-mode
    ========================================= */
 body.dark-mode {
-  background: #0f1219 !important;
+  background: #0f172a !important;
   color: #e2e8f0 !important;
   color-scheme: dark !important;
 }
 
 /* Layout background */
 body.dark-mode .dark-layout {
-  background: #0f1219 !important;
+  background: #0f172a !important;
 }
 
 /* Nav / Sidebar */
@@ -160,8 +160,8 @@ body.dark-mode .nav-link:hover {
 }
 
 body.dark-mode .nav-link-active {
-  background: #f1f5f9 !important;
-  color: #0f172a !important;
+  background: #334155 !important;
+  color: #e2e8f0 !important;
 }
 
 /* Theme toggle in dark mode */
@@ -178,10 +178,10 @@ body.dark-mode [class*="rounded-xl"][class*="border"][class*="bg-white"],
 body.dark-mode [class*="rounded-xl"][class*="shadow-sm"] {
   background: #1e293b !important;
   border-color: #334155 !important;
-  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
 }
 
-/* Nested inner backgrounds (like stat cards) */
+/* Nested inner backgrounds (like stat card icon bg) */
 body.dark-mode [class*="bg-gray-100"] {
   background: #334155 !important;
 }
@@ -210,6 +210,10 @@ body.dark-mode [class*="text-gray-700"] {
   color: #cbd5e1 !important;
 }
 
+body.dark-mode [class*="text-gray-400"] {
+  color: #64748b !important;
+}
+
 /* Borders */
 body.dark-mode [class*="border-gray-200"],
 body.dark-mode [class*="border-gray-100"] {
@@ -225,7 +229,7 @@ body.dark-mode [class*="divide-gray-200"] > * + * {
 body.dark-mode input,
 body.dark-mode select,
 body.dark-mode textarea {
-  background: #1a2332 !important;
+  background: #0f172a !important;
   border-color: #475569 !important;
   color: #e2e8f0 !important;
 }
@@ -249,7 +253,7 @@ body.dark-mode label {
 
 /* Auth layout card */
 body.dark-mode .min-h-screen[class*="bg-gray-50"] {
-  background: #0f1219 !important;
+  background: #0f172a !important;
 }
 
 /* Hover states for list items */
@@ -263,30 +267,29 @@ body.dark-mode [class*="hover\\:bg-gray-100"]:hover {
   background: #334155 !important;
 }
 
-/* Badges */
+/* Badges — success (income) */
 body.dark-mode [class*="bg-green-100"] {
   background: #064e3b !important;
 }
 
-body.dark-mode [class*="text-green-800"] {
+body.dark-mode [class*="text-green-800"],
+body.dark-mode [class*="text-green-600"] {
   color: #6ee7b7 !important;
 }
 
+/* Badges — danger (expense) */
 body.dark-mode [class*="bg-red-100"] {
-  background: #450a0a !important;
+  background: #7f1d1d !important;
 }
 
-body.dark-mode [class*="text-red-800"] {
+body.dark-mode [class*="text-red-800"],
+body.dark-mode [class*="text-red-600"] {
   color: #fca5a5 !important;
 }
 
 /* Error states */
 body.dark-mode [class*="bg-red-50"] {
   background: #450a0a !important;
-}
-
-body.dark-mode [class*="text-red-600"] {
-  color: #fca5a5 !important;
 }
 
 /* Primary button stays unchanged, secondary/ghost adapt */
@@ -310,14 +313,19 @@ body.dark-mode [class*="bg-black/50"] {
   background: rgba(0, 0, 0, 0.7) !important;
 }
 
-/* Tooltips / recharts */
+/* Recharts */
 body.dark-mode .recharts-default-tooltip {
   background: #1e293b !important;
   border-color: #334155 !important;
+  color: #e2e8f0 !important;
 }
 
 body.dark-mode .recharts-tooltip-label {
   color: #f1f5f9 !important;
+}
+
+body.dark-mode .recharts-tooltip-item {
+  color: #cbd5e1 !important;
 }
 
 body.dark-mode .recharts-cartesian-axis-tick-value {
@@ -326,6 +334,15 @@ body.dark-mode .recharts-cartesian-axis-tick-value {
 
 body.dark-mode .recharts-legend-item-text {
   color: #94a3b8 !important;
+}
+
+body.dark-mode .recharts-cartesian-grid line {
+  stroke: #334155 !important;
+}
+
+/* Pie chart stroke adapts to card bg */
+body.dark-mode .recharts-pie-sector path {
+  stroke: #1e293b !important;
 }
 
 /* Toggle switch in dark mode */
@@ -337,14 +354,6 @@ body.dark-mode .toggle-switch.active {
   background: #60a5fa;
 }
 
-/* Toast overrides */
-body.dark-mode [data-sonner-toast],
-body.dark-mode div[role="status"] {
-  background: #1e293b !important;
-  border-color: #334155 !important;
-  color: #e2e8f0 !important;
-}
-
 /* Scrollbar (webkit) */
 body.dark-mode ::-webkit-scrollbar {
   width: 8px;
@@ -352,7 +361,7 @@ body.dark-mode ::-webkit-scrollbar {
 }
 
 body.dark-mode ::-webkit-scrollbar-track {
-  background: #0f1219;
+  background: #0f172a;
 }
 
 body.dark-mode ::-webkit-scrollbar-thumb {
@@ -362,5 +371,11 @@ body.dark-mode ::-webkit-scrollbar-thumb {
 
 body.dark-mode ::-webkit-scrollbar-thumb:hover {
   background: #475569;
+}
+
+/* Selection in dark mode */
+body.dark-mode ::selection {
+  background: #1e40af;
+  color: #e2e8f0;
 }
 

@@ -1,10 +1,13 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { useMonthlyData } from '@/hooks/useDashboard';
+import { useCurrency } from '@/hooks/useCurrency';
+import { formatCompactCurrency } from '@/utils/formatCurrency';
 import Card from '@/components/ui/Card';
 import Spinner from '@/components/ui/Spinner';
 
 export default function MonthlyChart() {
   const { data: monthlyData, isLoading } = useMonthlyData();
+  const currency = useCurrency();
 
   if (isLoading) return <Spinner />;
 
@@ -23,7 +26,7 @@ export default function MonthlyChart() {
               <YAxis tick={{ fontSize: 12 }} axisLine={false} tickLine={false} width={60} />
               <Tooltip
                 contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
-                formatter={(value) => [`$${Number(value).toFixed(2)}`]}
+                formatter={(value) => [formatCompactCurrency(Number(value), currency)]}
               />
               <Legend wrapperStyle={{ fontSize: '12px' }} />
               <Bar dataKey="income" name="Income" fill="#10b981" radius={[4, 4, 0, 0]} />
