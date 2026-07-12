@@ -1,0 +1,332 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+  --color-primary-950: #172554;
+}
+
+/* =========================================
+   BASE / LIGHT MODE
+   ========================================= */
+body {
+  background: #ffffff;
+  color: #1e293b;
+  color-scheme: light;
+  @apply antialiased;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* =========================================
+   THEME TOGGLE BUTTON (Nav)
+   ========================================= */
+.nav-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #374151;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.nav-theme-toggle:hover {
+  background: #f1f5f9;
+}
+
+/* =========================================
+   TOGGLE SWITCH (Profile page)
+   ========================================= */
+.toggle-switch {
+  position: relative;
+  width: 48px;
+  height: 26px;
+  background: #d1d5db;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.toggle-switch.active {
+  background: #0f172a;
+}
+
+.toggle-switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+}
+
+.toggle-switch.active::after {
+  transform: translateX(22px);
+}
+
+/* =========================================
+   DARK MODE OVERRIDES — body.dark-mode
+   ========================================= */
+body.dark-mode {
+  background: #0f1219 !important;
+  color: #e2e8f0 !important;
+  color-scheme: dark !important;
+}
+
+/* Layout background */
+body.dark-mode .dark-layout {
+  background: #0f1219 !important;
+}
+
+/* Nav / Sidebar */
+body.dark-mode .nav-sidebar {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.dark-mode .nav-brand {
+  color: #f1f5f9 !important;
+}
+
+body.dark-mode .nav-link {
+  color: #94a3b8 !important;
+}
+
+body.dark-mode .nav-link:hover {
+  background: #334155 !important;
+  color: #e2e8f0 !important;
+}
+
+body.dark-mode .nav-link-active {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+/* Theme toggle in dark mode */
+body.dark-mode .nav-theme-toggle {
+  color: #fbbf24;
+}
+
+body.dark-mode .nav-theme-toggle:hover {
+  background: #334155;
+}
+
+/* Cards and sections */
+body.dark-mode [class*="rounded-xl"][class*="border"][class*="bg-white"],
+body.dark-mode [class*="rounded-xl"][class*="shadow-sm"] {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Nested inner backgrounds (like stat cards) */
+body.dark-mode [class*="bg-gray-100"] {
+  background: #334155 !important;
+}
+
+body.dark-mode [class*="bg-gray-50"] {
+  background: #1a2332 !important;
+}
+
+/* Headings */
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode .section-heading,
+body.dark-mode [class*="text-gray-900"] {
+  color: #f1f5f9 !important;
+}
+
+/* Body / muted text */
+body.dark-mode [class*="text-gray-600"],
+body.dark-mode [class*="text-gray-500"],
+body.dark-mode .muted-text {
+  color: #94a3b8 !important;
+}
+
+body.dark-mode [class*="text-gray-700"] {
+  color: #cbd5e1 !important;
+}
+
+/* Borders */
+body.dark-mode [class*="border-gray-200"],
+body.dark-mode [class*="border-gray-100"] {
+  border-color: #334155 !important;
+}
+
+body.dark-mode [class*="divide-gray-100"] > * + *,
+body.dark-mode [class*="divide-gray-200"] > * + * {
+  border-color: #334155 !important;
+}
+
+/* Inputs, Selects, Textareas */
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea {
+  background: #1a2332 !important;
+  border-color: #475569 !important;
+  color: #e2e8f0 !important;
+}
+
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+  color: #64748b !important;
+}
+
+body.dark-mode input:focus,
+body.dark-mode select:focus,
+body.dark-mode textarea:focus {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15) !important;
+}
+
+/* Labels */
+body.dark-mode label {
+  color: #cbd5e1 !important;
+}
+
+/* Auth layout card */
+body.dark-mode .min-h-screen[class*="bg-gray-50"] {
+  background: #0f1219 !important;
+}
+
+/* Hover states for list items */
+body.dark-mode [class*="hover:bg-gray-50"]:hover,
+body.dark-mode [class*="hover\\:bg-gray-50"]:hover {
+  background: #1a2332 !important;
+}
+
+body.dark-mode [class*="hover:bg-gray-100"]:hover,
+body.dark-mode [class*="hover\\:bg-gray-100"]:hover {
+  background: #334155 !important;
+}
+
+/* Badges */
+body.dark-mode [class*="bg-green-100"] {
+  background: #064e3b !important;
+}
+
+body.dark-mode [class*="text-green-800"] {
+  color: #6ee7b7 !important;
+}
+
+body.dark-mode [class*="bg-red-100"] {
+  background: #450a0a !important;
+}
+
+body.dark-mode [class*="text-red-800"] {
+  color: #fca5a5 !important;
+}
+
+/* Error states */
+body.dark-mode [class*="bg-red-50"] {
+  background: #450a0a !important;
+}
+
+body.dark-mode [class*="text-red-600"] {
+  color: #fca5a5 !important;
+}
+
+/* Primary button stays unchanged, secondary/ghost adapt */
+body.dark-mode [class*="bg-white"][class*="border"][class*="text-gray-700"] {
+  background: #1a2332 !important;
+  border-color: #475569 !important;
+  color: #e2e8f0 !important;
+}
+
+/* Primary icon backgrounds in dark mode */
+body.dark-mode [class*="bg-primary-100"] {
+  background: #1e3a5f !important;
+}
+
+body.dark-mode [class*="bg-primary-50"] {
+  background: #172554 !important;
+}
+
+/* Modal backdrop */
+body.dark-mode [class*="bg-black/50"] {
+  background: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Tooltips / recharts */
+body.dark-mode .recharts-default-tooltip {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+body.dark-mode .recharts-tooltip-label {
+  color: #f1f5f9 !important;
+}
+
+body.dark-mode .recharts-cartesian-axis-tick-value {
+  fill: #94a3b8 !important;
+}
+
+body.dark-mode .recharts-legend-item-text {
+  color: #94a3b8 !important;
+}
+
+/* Toggle switch in dark mode */
+body.dark-mode .toggle-switch {
+  background: #475569;
+}
+
+body.dark-mode .toggle-switch.active {
+  background: #60a5fa;
+}
+
+/* Toast overrides */
+body.dark-mode [data-sonner-toast],
+body.dark-mode div[role="status"] {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+
+/* Scrollbar (webkit) */
+body.dark-mode ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+body.dark-mode ::-webkit-scrollbar-track {
+  background: #0f1219;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+body.dark-mode ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
