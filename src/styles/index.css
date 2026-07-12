@@ -21,7 +21,41 @@ body {
   background: #ffffff;
   color: #1e293b;
   color-scheme: light;
+  font-size: 16px;
+  line-height: 1.5;
   @apply antialiased;
+}
+
+/* Responsive typography */
+@media (min-width: 640px) {
+  body { font-size: 16px; }
+}
+
+/* Focus visible outline for keyboard users */
+:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Selection color */
+::selection {
+  background: #bfdbfe;
+  color: #1e3a8a;
 }
 
 input[type="number"]::-webkit-inner-spin-button,

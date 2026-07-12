@@ -1,14 +1,27 @@
 # ExpenseTracker
 
-Personal finance app for tracking expenses, managing categories, and visualizing spending.
+A modern personal finance app for tracking income and expenses, managing categories, and visualizing spending with interactive charts.
 
 ## Tech Stack
 
 - **Frontend:** React 19 · TypeScript · Vite 8 · Tailwind CSS v4
-- **State:** Zustand · React Router 7
+- **Data:** TanStack Query 5 · React Hook Form 7 · Zod 4
+- **Routing:** React Router 7
 - **Backend:** Supabase (Postgres + Auth + RLS)
-- **Charts:** Recharts · **Icons:** Lucide React · **Validation:** Zod
+- **Charts:** Recharts 3
+- **Icons:** Lucide React
 - **Deploy:** Vercel (static SPA)
+
+## Features
+
+- 🔐 Authentication (sign up, sign in, password reset)
+- 📊 Dashboard with balance, income/expense stats, and charts
+- 💰 Transaction management with search, filters, and sorting
+- 🏷️ Category management with color/icon customization
+- 🌙 Dark mode with system persistence
+- 👤 Profile settings with currency preference
+- 📱 Fully responsive (mobile-first)
+- ♿ Accessible (ARIA labels, keyboard navigation, focus management)
 
 ## Getting Started
 
@@ -16,25 +29,42 @@ Personal finance app for tracking expenses, managing categories, and visualizing
 
 - Node.js ≥ 20
 - npm
-- A [Supabase](https://supabase.com) project
+- A [Supabase](https://supabase.com) project (free tier works)
 
-### Setup
+### 1. Clone & Install
 
 ```bash
-# Clone and install
-git clone <repo-url> && cd expense-tracker
+git clone https://github.com/raghav-7288/expense-tracker.git
+cd expense-tracker
 npm install
+```
 
-# Configure environment
+### 2. Configure Environment
+
+```bash
 cp .env.example .env.local
-# Edit .env.local with your Supabase URL and anon key
+```
 
-# Run the database migration
-# Paste supabase/migrations/001_initial_schema.sql into the Supabase SQL Editor
+Edit `.env.local` with your Supabase credentials:
+- Go to [Supabase Dashboard](https://supabase.com/dashboard) → your project → Settings → API
+- Copy the **Project URL** and **anon/public key**
 
-# Start development
+### 3. Set Up Database
+
+Open the Supabase SQL Editor and paste the contents of:
+```
+supabase/migrations/001_initial_schema.sql
+```
+
+Click **Run**. This creates all tables, RLS policies, triggers, and default categories.
+
+### 4. Start Development
+
+```bash
 npm run dev
 ```
+
+Open [http://localhost:5173](http://localhost:5173)
 
 ### Scripts
 
@@ -45,46 +75,61 @@ npm run dev
 | `npm run lint`    | Lint TypeScript files with ESLint    |
 | `npm run preview` | Serve production build locally       |
 
+## Deploying to Vercel
+
+1. Push to GitHub
+2. Import the repo in [Vercel](https://vercel.com)
+3. Set environment variables:
+   - `VITE_SUPABASE_URL` → your Supabase project URL
+   - `VITE_SUPABASE_ANON_KEY` → your Supabase anon key
+4. Deploy — Vercel auto-detects Vite, builds with `npm run build`, serves from `dist/`
+
+The `vercel.json` handles SPA client-side routing fallback.
+
 ## Project Structure
 
 ```
 src/
-├── assets/          # Static files bundled by Vite
 ├── components/
-│   ├── auth/        # Authentication forms
-│   ├── layout/      # App shell, nav, sidebar
-│   ├── pages/       # Route-level page components
-│   └── ui/          # Reusable UI primitives
-├── context/         # React context providers
-├── data/            # Constants, enums, seed data
-├── engines/         # Business logic (calculations, aggregations)
-├── hooks/           # Custom React hooks
-├── lib/             # Third-party client init (Supabase, etc.)
-├── services/        # Data-access layer (Supabase CRUD)
-├── stores/          # Zustand state stores
-└── utils/           # Pure utility functions
+│   ├── auth/            # ProtectedRoute
+│   ├── categories/      # CategoryForm, CategoryList
+│   ├── dashboard/       # StatCard, Charts, RecentTransactions
+│   ├── transactions/    # TransactionForm, List, Filters
+│   └── ui/              # Button, Input, Modal, Card, Skeleton, etc.
+├── context/             # AuthContext, ThemeContext
+├── hooks/               # useAuth, useTransactions, useCategories, useDashboard, useProfile
+├── layouts/             # AuthLayout, DashboardLayout
+├── lib/                 # supabase.ts, queryClient.ts, queryKeys.ts
+├── pages/               # Dashboard, Transactions, Categories, Profile, Auth pages
+├── routes/              # Route definitions
+├── services/            # Supabase CRUD (profiles, categories, transactions)
+├── styles/              # Tailwind CSS + dark mode
+├── types/               # TypeScript interfaces
+└── utils/               # cn, formatCurrency, formatDate, constants
 ```
 
-## Database
+## Database Schema
 
-Three core tables with row-level security:
+Three tables with Row Level Security:
 
-- **profiles** — user metadata (auto-created on signup)
-- **categories** — user expense categories (8 defaults seeded)
-- **expenses** — individual expense records
+| Table          | Purpose                                    |
+| -------------- | ------------------------------------------ |
+| `profiles`     | User metadata (name, currency, avatar)     |
+| `categories`   | Income/expense categories per user         |
+| `transactions` | All financial transactions with date/notes |
 
-Schema: [`supabase/migrations/001_initial_schema.sql`](supabase/migrations/001_initial_schema.sql)
+- Auto-creates profile on signup (trigger)
+- Seeds 12 default categories on signup (trigger)
+- Auto-updates `updated_at` on every edit (trigger)
 
 ## Environment Variables
 
-| Variable                 | Description              |
-| ------------------------ | ------------------------ |
-| `VITE_SUPABASE_URL`      | Supabase project URL     |
-| `VITE_SUPABASE_ANON_KEY` | Supabase public anon key |
+| Variable                 | Description              | Required |
+| ------------------------ | ------------------------ | -------- |
+| `VITE_SUPABASE_URL`      | Supabase project URL     | ✅       |
+| `VITE_SUPABASE_ANON_KEY` | Supabase public anon key | ✅       |
 
-## AI-Assisted Development
-
-See [`CLAUDE.md`](CLAUDE.md) for detailed instructions optimized for Claude, Copilot, and other AI assistants.
+> ⚠️ Never use the `service_role` key in frontend code. The anon key + RLS is secure.
 
 ## License
 

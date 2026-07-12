@@ -3,6 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import { queryClient } from '@/lib/queryClient';
 import AuthProvider from '@/context/AuthContext';
 import ThemeProvider from '@/context/ThemeContext';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import AppRouter from '@/routes/index';
 
 export default function App() {
@@ -10,7 +11,9 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
-          <AppRouter />
+          <ErrorBoundary>
+            <AppRouter />
+          </ErrorBoundary>
           <Toaster
             position="top-right"
             toastOptions={{

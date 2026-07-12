@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
+import { queryKeys } from '@/lib/queryKeys';
 import { getTransactions, getMonthlyStats } from '@/services/transactions';
 import type { DashboardStats, MonthlyData, CategoryBreakdown, Transaction } from '@/types';
 import { getMonthStart, getMonthEnd, getMonthName } from '@/utils/formatDate';
@@ -8,7 +9,7 @@ export function useDashboardStats() {
   const { user } = useAuth();
 
   return useQuery({
-    queryKey: ['dashboard', 'stats', user?.id],
+    queryKey: queryKeys.dashboard.stats(user?.id),
     queryFn: async (): Promise<DashboardStats> => {
       if (!user) throw new Error('Not authenticated');
 
@@ -55,7 +56,7 @@ export function useRecentTransactions(limit = 5) {
   const { user } = useAuth();
 
   return useQuery({
-    queryKey: ['dashboard', 'recent', user?.id, limit],
+    queryKey: queryKeys.dashboard.recent(user?.id, limit),
     queryFn: async (): Promise<Transaction[]> => {
       if (!user) throw new Error('Not authenticated');
       const { data, error } = await getTransactions(user.id, {
@@ -74,7 +75,7 @@ export function useMonthlyData() {
   const year = new Date().getFullYear();
 
   return useQuery({
-    queryKey: ['dashboard', 'monthly', user?.id, year],
+    queryKey: queryKeys.dashboard.monthly(user?.id, year),
     queryFn: async (): Promise<MonthlyData[]> => {
       if (!user) throw new Error('Not authenticated');
       const { data, error } = await getMonthlyStats(user.id, year);
@@ -113,7 +114,7 @@ export function useCategoryBreakdown() {
   const { user } = useAuth();
 
   return useQuery({
-    queryKey: ['dashboard', 'categories', user?.id],
+    queryKey: queryKeys.dashboard.categories(user?.id),
     queryFn: async (): Promise<CategoryBreakdown[]> => {
       if (!user) throw new Error('Not authenticated');
 

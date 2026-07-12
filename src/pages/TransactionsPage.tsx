@@ -5,8 +5,9 @@ import TransactionFilterBar from '@/components/transactions/TransactionFilters';
 import TransactionForm from '@/components/transactions/TransactionForm';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
-import Spinner from '@/components/ui/Spinner';
 import EmptyState from '@/components/ui/EmptyState';
+import ErrorState from '@/components/ui/ErrorState';
+import { SkeletonTable } from '@/components/ui/Skeleton';
 import { Plus, Receipt } from 'lucide-react';
 import type { TransactionFilters } from '@/types';
 
@@ -17,7 +18,7 @@ export default function TransactionsPage() {
   });
   const [showForm, setShowForm] = useState(false);
 
-  const { data: transactions, isLoading } = useTransactions(filters);
+  const { data: transactions, isLoading, isError, refetch } = useTransactions(filters);
   const createMutation = useCreateTransaction();
 
   async function handleCreate(data: Record<string, unknown>) {
@@ -49,8 +50,14 @@ export default function TransactionsPage() {
 
       <TransactionFilterBar filters={filters} onChange={setFilters} />
 
-      {isLoading ? (
-        <Spinner size={32} />
+      {isError ? (
+        <ErrorState
+          title="Failed to load transactions"
+          description="We couldn't fetch your transactions. Please try again."
+          retry={() => { refetch(); }}
+        />
+      ) : isLoading ? (
+        <SkeletonTable rows={6} />
       ) : !transactions || transactions.length === 0 ? (
         <EmptyState
           icon={<Receipt size={48} />}
@@ -87,4 +94,3 @@ export default function TransactionsPage() {
     </div>
   );
 }
-
