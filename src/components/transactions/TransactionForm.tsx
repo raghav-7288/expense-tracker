@@ -2,12 +2,13 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useCategories } from '@/hooks/useCategories';
+import { useCurrency } from '@/hooks/useCurrency';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import TextArea from '@/components/ui/TextArea';
 import { getToday } from '@/utils/formatDate';
-import { DollarSign, FileText, Calendar } from 'lucide-react';
+import { FileText, Calendar, IndianRupee, DollarSign, Euro, PoundSterling, JapaneseYen } from 'lucide-react';
 import type { Transaction, TransactionType } from '@/types';
 
 const transactionSchema = z.object({
@@ -28,12 +29,23 @@ interface TransactionFormProps {
   loading?: boolean;
 }
 
+function getCurrencyIcon(currency: string) {
+  switch (currency) {
+    case 'INR': return <IndianRupee size={15} />;
+    case 'EUR': return <Euro size={15} />;
+    case 'GBP': return <PoundSterling size={15} />;
+    case 'JPY': return <JapaneseYen size={15} />;
+    default: return <DollarSign size={15} />;
+  }
+}
+
 export default function TransactionForm({
   initialData,
   onSubmit,
   onCancel,
   loading = false,
 }: TransactionFormProps) {
+  const currency = useCurrency();
   const {
     register,
     handleSubmit,
@@ -67,13 +79,13 @@ export default function TransactionForm({
         <div className="grid grid-cols-2 gap-2">
           <label className="relative cursor-pointer">
             <input type="radio" value="expense" {...register('type')} className="peer sr-only" />
-            <div className="peer-checked:border-rose-500 peer-checked:bg-rose-50 peer-checked:text-rose-700 peer-focus-visible:ring-2 peer-focus-visible:ring-rose-500/20 border border-gray-200 rounded-lg py-2.5 text-center text-sm font-medium transition-all hover:border-gray-300">
+            <div className="peer-checked:border-rose-500 peer-checked:bg-rose-500/10 peer-checked:text-rose-600 peer-focus-visible:ring-2 peer-focus-visible:ring-rose-500/20 border border-gray-200 rounded-lg py-2.5 text-center text-sm font-medium transition-all hover:border-gray-300 text-gray-600">
               Expense
             </div>
           </label>
           <label className="relative cursor-pointer">
             <input type="radio" value="income" {...register('type')} className="peer sr-only" />
-            <div className="peer-checked:border-emerald-500 peer-checked:bg-emerald-50 peer-checked:text-emerald-700 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500/20 border border-gray-200 rounded-lg py-2.5 text-center text-sm font-medium transition-all hover:border-gray-300">
+            <div className="peer-checked:border-emerald-500 peer-checked:bg-emerald-500/10 peer-checked:text-emerald-600 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500/20 border border-gray-200 rounded-lg py-2.5 text-center text-sm font-medium transition-all hover:border-gray-300 text-gray-600">
               Income
             </div>
           </label>
@@ -85,7 +97,7 @@ export default function TransactionForm({
         type="number"
         step="0.01"
         placeholder="0.00"
-        leftIcon={<DollarSign size={15} />}
+        leftIcon={getCurrencyIcon(currency)}
         error={errors.amount?.message}
         {...register('amount')}
       />

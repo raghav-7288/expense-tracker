@@ -11,7 +11,7 @@ vi.mock('@/services/profiles', () => ({
 }));
 
 describe('useCurrency', () => {
-  it('returns USD as default when profile not loaded', () => {
+  it('returns INR as default when profile not loaded', () => {
     const queryClient = createTestQueryClient();
     const authValue = createMockAuth({ user: null });
 
@@ -24,7 +24,7 @@ describe('useCurrency', () => {
     );
 
     const { result } = renderHook(() => useCurrency(), { wrapper });
-    expect(result.current).toBe('USD');
+    expect(result.current).toBe('INR');
   });
 });
 

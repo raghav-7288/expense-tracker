@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import { useCategories } from '@/hooks/useCategories';
 import Input from '@/components/ui/Input';
-import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { Search, SlidersHorizontal, X, Calendar } from 'lucide-react';
 import type { TransactionFilters } from '@/types';
 
 interface TransactionFiltersProps {
@@ -9,8 +10,13 @@ interface TransactionFiltersProps {
   resultCount?: number;
 }
 
+type DateMode = 'none' | 'single' | 'range';
+
 export default function TransactionFilterBar({ filters, onChange, resultCount }: TransactionFiltersProps) {
   const { data: categories } = useCategories();
+  const [dateMode, setDateMode] = useState<DateMode>(
+    filters.date_from && filters.date_to ? 'range' : filters.date_from ? 'single' : 'none'
+  );
 
   const categoryOptions = [
     { value: '', label: 'All Categories' },
@@ -35,9 +41,19 @@ export default function TransactionFilterBar({ filters, onChange, resultCount }:
     onChange({ ...filters, sort_by, sort_order });
   }
 
-  const hasActiveFilters = !!(filters.search || (filters.type && filters.type !== 'all') || filters.category_id || filters.date_from);
+  function handleDateModeChange(mode: DateMode) {
+    setDateMode(mode);
+    if (mode === 'none') {
+      onChange({ ...filters, date_from: undefined, date_to: undefined });
+    } else if (mode === 'single') {
+      onChange({ ...filters, date_to: undefined });
+    }
+  }
+
+  const hasActiveFilters = !!(filters.search || (filters.type && filters.type !== 'all') || filters.category_id || filters.date_from || filters.date_to);
 
   function clearFilters() {
+    setDateMode('none');
     onChange({ sort_by: filters.sort_by, sort_order: filters.sort_order });
   }
 
@@ -90,24 +106,54 @@ export default function TransactionFilterBar({ filters, onChange, resultCount }:
             ))}
           </select>
 
-          <input
-            type="date"
-            value={filters.date_from ?? ''}
-            onChange={(e) => onChange({ ...filters, date_from: e.target.value || undefined })}
-            className="px-2.5 py-1.5 text-xs border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
-          />
+          {/* Date filter mode selector */}
+          <select
+            value={dateMode}
+            onChange={(e) => handleDateModeChange(e.target.value as DateMode)}
+            className="px-2.5 py-2 sm:py-1.5 text-xs font-medium border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+          >
+            <option value="none">All Dates</option>
+            <option value="single">Specific Date</option>
+            <option value="range">Date Range</option>
+          </select>
         </div>
 
         <select
           value={`${filters.sort_by ?? 'date'}-${filters.sort_order ?? 'desc'}`}
           onChange={(e) => handleSortChange(e.target.value)}
-          className="px-2.5 py-1.5 text-xs font-medium border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+          className="px-2.5 py-2 sm:py-1.5 text-xs font-medium border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
         >
           {sortOptions.map((o) => (
             <option key={o.value} value={o.value}>{o.label}</option>
           ))}
         </select>
       </div>
+
+      {/* Date picker row - shows when date mode is single or range */}
+      {dateMode !== 'none' && (
+        <div className="px-3 py-2.5 border-t border-gray-100 flex flex-wrap items-center gap-2">
+          <Calendar size={14} className="text-gray-400 flex-shrink-0" />
+          <input
+            type="date"
+            aria-label={dateMode === 'range' ? 'From date' : 'Date'}
+            value={filters.date_from ?? ''}
+            onChange={(e) => onChange({ ...filters, date_from: e.target.value || undefined })}
+            className="px-2.5 py-1.5 text-xs border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+          />
+          {dateMode === 'range' && (
+            <>
+              <span className="text-xs text-gray-400">to</span>
+              <input
+                type="date"
+                aria-label="To date"
+                value={filters.date_to ?? ''}
+                onChange={(e) => onChange({ ...filters, date_to: e.target.value || undefined })}
+                className="px-2.5 py-1.5 text-xs border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+              />
+            </>
+          )}
+        </div>
+      )}
 
       {/* Result count */}
       {resultCount !== undefined && (
