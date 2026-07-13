@@ -58,7 +58,7 @@ export default function LoginPage() {
         <Input
           label="Email"
           type="email"
-          placeholder="[REDACTED_EMAIL_ADDRESS_1]"
+          placeholder="Enter your email"
           autoComplete="email"
           leftIcon={<Mail size={15} />}
           error={errors.email?.message}
