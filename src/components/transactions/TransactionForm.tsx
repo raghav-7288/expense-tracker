@@ -76,16 +76,16 @@ export default function TransactionForm({
       {/* Type toggle */}
       <fieldset>
         <legend className="text-sm font-medium text-gray-700 mb-2">Transaction type</legend>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="txn-type-group grid grid-cols-2 gap-1.5 p-1.5 rounded-xl bg-gray-100">
           <label className="relative cursor-pointer">
             <input type="radio" value="expense" {...register('type')} className="peer sr-only" />
-            <div className="txn-type-toggle peer-checked:border-rose-500 peer-checked:bg-rose-500/15 peer-checked:text-rose-500 peer-focus-visible:ring-2 peer-focus-visible:ring-rose-500/20 border border-gray-300 rounded-lg py-2.5 text-center text-sm font-semibold transition-all hover:border-gray-400">
+            <div className="txn-type-option txn-type-expense rounded-lg py-2.5 text-center text-sm font-bold transition-all peer-checked:bg-rose-500 peer-checked:text-white peer-checked:shadow-md peer-focus-visible:ring-2 peer-focus-visible:ring-rose-500/40">
               Expense
             </div>
           </label>
           <label className="relative cursor-pointer">
             <input type="radio" value="income" {...register('type')} className="peer sr-only" />
-            <div className="txn-type-toggle peer-checked:border-emerald-500 peer-checked:bg-emerald-500/15 peer-checked:text-emerald-500 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500/20 border border-gray-300 rounded-lg py-2.5 text-center text-sm font-semibold transition-all hover:border-gray-400">
+            <div className="txn-type-option txn-type-income rounded-lg py-2.5 text-center text-sm font-bold transition-all peer-checked:bg-emerald-500 peer-checked:text-white peer-checked:shadow-md peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500/40">
               Income
             </div>
           </label>

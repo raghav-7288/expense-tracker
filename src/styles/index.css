@@ -88,33 +88,34 @@ input[type="number"] {
 }
 
 /* =========================================
-   TRANSACTION TYPE TOGGLE
+   TRANSACTION TYPE TOGGLE (Segmented Control)
    ========================================= */
-.txn-type-toggle {
+.txn-type-option {
   color: #6b7280;
 }
 
-body.dark-mode .txn-type-toggle {
-  color: #94a3b8 !important;
-  border-color: #475569 !important;
+/* Dark mode: track background */
+body.dark-mode .txn-type-group {
+  background: #1e293b !important;
 }
 
-body.dark-mode .txn-type-toggle:hover {
-  border-color: #64748b !important;
+/* Dark mode: unselected option text */
+body.dark-mode .txn-type-option {
+  color: #64748b !important;
 }
 
-/* When checked, the peer-checked Tailwind classes apply color.
-   We need to NOT override them in dark mode. */
-body.dark-mode .peer:checked ~ .txn-type-toggle[class*="text-rose"] {
-  color: #fb7185 !important;
-  border-color: #f43f5e !important;
-  background: rgba(244, 63, 94, 0.15) !important;
+/* Dark mode: selected expense — solid red */
+body.dark-mode .peer:checked ~ .txn-type-expense {
+  background: #e11d48 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.4) !important;
 }
 
-body.dark-mode .peer:checked ~ .txn-type-toggle[class*="text-emerald"] {
-  color: #6ee7b7 !important;
-  border-color: #10b981 !important;
-  background: rgba(16, 185, 129, 0.15) !important;
+/* Dark mode: selected income — solid green */
+body.dark-mode .peer:checked ~ .txn-type-income {
+  background: #059669 !important;
+  color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.4) !important;
 }
 
 /* =========================================
