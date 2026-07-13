@@ -22,5 +22,8 @@ export const queryKeys = {
     categories: (userId: string | undefined) =>
       ['dashboard', 'categories', userId] as const,
   },
+  analytics: {
+    all: (userId: string | undefined) => ['analytics', userId] as const,
+  },
 } as const;
 

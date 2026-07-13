@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/hooks/useTheme';
 import {
   LayoutDashboard,
+  BarChart3,
   ArrowLeftRight,
   Tag,
   User,
@@ -18,6 +19,7 @@ import { cn } from '@/utils/cn';
 
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/analytics', icon: BarChart3, label: 'Analytics' },
   { to: '/transactions', icon: ArrowLeftRight, label: 'Transactions' },
   { to: '/categories', icon: Tag, label: 'Categories' },
   { to: '/profile', icon: User, label: 'Profile' },
