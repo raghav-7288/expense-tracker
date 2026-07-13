@@ -15,14 +15,14 @@ import { useCategories } from '@/hooks/useCategories';
 const mockUseCategories = vi.mocked(useCategories);
 
 describe('CategoriesPage', () => {
-  it('shows spinner when loading', () => {
+  it('shows skeleton when loading', () => {
     mockUseCategories.mockReturnValue({
       data: undefined,
       isLoading: true,
     } as never);
 
     const { container } = renderWithProviders(<CategoriesPage />);
-    expect(container.querySelector('.animate-spin')).toBeInTheDocument();
+    expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
   });
 
   it('shows empty state when no categories', () => {
@@ -32,7 +32,7 @@ describe('CategoriesPage', () => {
     } as never);
 
     renderWithProviders(<CategoriesPage />);
-    expect(screen.getByText('No categories found')).toBeInTheDocument();
+    expect(screen.getByText('Organize with categories')).toBeInTheDocument();
   });
 
   it('renders category list when data available', () => {

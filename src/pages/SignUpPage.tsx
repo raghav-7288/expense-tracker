@@ -6,7 +6,10 @@ import { z } from 'zod';
 import { useAuth } from '@/hooks/useAuth';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
+import FormAlert from '@/components/ui/FormAlert';
+import AnimatedPage from '@/components/ui/AnimatedPage';
 import toast from 'react-hot-toast';
+import { User, Mail, Lock } from 'lucide-react';
 
 const signUpSchema = z.object({
   fullName: z.string().min(2, 'Name must be at least 2 characters'),
@@ -45,20 +48,20 @@ export default function SignUpPage() {
   }
 
   return (
-    <div>
-      <h2 className="text-xl font-semibold text-gray-900 mb-1">Create an account</h2>
-      <p className="text-sm text-gray-500 mb-6">Get started with expense tracking</p>
+    <AnimatedPage>
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold text-gray-900">Create an account</h2>
+        <p className="text-sm text-gray-500 mt-1">Start tracking your finances in seconds</p>
+      </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {errors.root && (
-          <div className="p-3 rounded-lg bg-red-50 text-sm text-red-600">
-            {errors.root.message}
-          </div>
-        )}
+        {errors.root && <FormAlert message={errors.root.message} />}
 
         <Input
           label="Full Name"
           placeholder="John Doe"
+          autoComplete="name"
+          leftIcon={<User size={15} />}
           error={errors.fullName?.message}
           {...register('fullName')}
         />
@@ -67,6 +70,8 @@ export default function SignUpPage() {
           label="Email"
           type="email"
           placeholder="[REDACTED_EMAIL_ADDRESS_1]"
+          autoComplete="email"
+          leftIcon={<Mail size={15} />}
           error={errors.email?.message}
           {...register('email')}
         />
@@ -74,7 +79,10 @@ export default function SignUpPage() {
         <Input
           label="Password"
           type="password"
-          placeholder="••••••••"
+          placeholder="Create a strong password"
+          autoComplete="new-password"
+          leftIcon={<Lock size={15} />}
+          helperText="At least 6 characters"
           error={errors.password?.message}
           {...register('password')}
         />
@@ -82,14 +90,18 @@ export default function SignUpPage() {
         <Input
           label="Confirm Password"
           type="password"
-          placeholder="••••••••"
+          placeholder="Re-enter your password"
+          autoComplete="new-password"
+          leftIcon={<Lock size={15} />}
           error={errors.confirmPassword?.message}
           {...register('confirmPassword')}
         />
 
-        <Button type="submit" loading={loading} className="w-full">
-          Create Account
-        </Button>
+        <div className="pt-1">
+          <Button type="submit" loading={loading} className="w-full" size="lg">
+            Create Account
+          </Button>
+        </div>
       </form>
 
       <p className="mt-6 text-center text-sm text-gray-500">
@@ -98,7 +110,6 @@ export default function SignUpPage() {
           Sign in
         </Link>
       </p>
-    </div>
+    </AnimatedPage>
   );
 }
-

@@ -3,6 +3,7 @@ import { useUpdateCategory, useDeleteCategory } from '@/hooks/useCategories';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
+import Avatar from '@/components/ui/Avatar';
 import CategoryForm from '@/components/categories/CategoryForm';
 import { Edit, Trash2 } from 'lucide-react';
 import type { Category } from '@/types';
@@ -38,40 +39,33 @@ export default function CategoryList({ categories }: CategoryListProps) {
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {categories.map((category) => (
           <div
             key={category.id}
-            className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 flex items-center gap-3"
+            className="group bg-white rounded-xl border border-gray-200 shadow-sm p-4 flex items-center gap-3 transition-all duration-150 hover:shadow-md hover:border-gray-300"
           >
-            <div
-              className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-              style={{ backgroundColor: category.color }}
-            >
-              <span className="text-white text-sm font-bold">
-                {category.name.charAt(0).toUpperCase()}
-              </span>
-            </div>
+            <Avatar name={category.name} color={category.color} />
 
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-900 truncate">{category.name}</p>
               <Badge type={category.type} />
             </div>
 
-            <div className="flex items-center gap-1 flex-shrink-0">
+            <div className="flex items-center gap-0.5 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
               <button
                 onClick={() => setEditingCategory(category)}
                 className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100"
                 aria-label={`Edit ${category.name}`}
               >
-                <Edit size={16} />
+                <Edit size={14} />
               </button>
               <button
                 onClick={() => setDeletingId(category.id)}
                 className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50"
                 aria-label={`Delete ${category.name}`}
               >
-                <Trash2 size={16} />
+                <Trash2 size={14} />
               </button>
             </div>
           </div>

@@ -4,8 +4,11 @@ import CategoryList from '@/components/categories/CategoryList';
 import CategoryForm from '@/components/categories/CategoryForm';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
-import Spinner from '@/components/ui/Spinner';
 import EmptyState from '@/components/ui/EmptyState';
+import AnimatedPage from '@/components/ui/AnimatedPage';
+import PageHeader from '@/components/ui/PageHeader';
+import { SkeletonCategoryGrid } from '@/components/ui/Skeleton';
+import { cn } from '@/utils/cn';
 import { Plus, Tag } from 'lucide-react';
 import type { TransactionType } from '@/types';
 
@@ -27,63 +30,52 @@ export default function CategoriesPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Categories</h1>
-          <p className="text-sm text-gray-500 mt-1">Organize your transactions with categories</p>
-        </div>
-        <Button onClick={() => setShowForm(true)}>
-          <Plus size={16} />
-          Add Category
-        </Button>
-      </div>
+    <AnimatedPage className="space-y-6">
+      <PageHeader
+        title="Categories"
+        description="Organize your transactions with categories"
+        action={
+          <Button onClick={() => setShowForm(true)} className="w-full sm:w-auto">
+            <Plus size={16} />
+            Add Category
+          </Button>
+        }
+      />
 
       {/* Type filter */}
-      <div className="flex gap-2">
-        <button
-          onClick={() => setFilterType(undefined)}
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-            filterType === undefined
-              ? 'bg-primary-100 text-primary-700'
-              : 'text-gray-600 hover:bg-gray-100'
-          }`}
-        >
-          All
-        </button>
-        <button
-          onClick={() => setFilterType('expense')}
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-            filterType === 'expense'
-              ? 'bg-red-100 text-red-700'
-              : 'text-gray-600 hover:bg-gray-100'
-          }`}
-        >
-          Expense
-        </button>
-        <button
-          onClick={() => setFilterType('income')}
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-            filterType === 'income'
-              ? 'bg-green-100 text-green-700'
-              : 'text-gray-600 hover:bg-gray-100'
-          }`}
-        >
-          Income
-        </button>
+      <div className="flex gap-2" role="group" aria-label="Filter by type">
+        {([
+          { value: undefined, label: 'All', activeClass: 'bg-primary-100 text-primary-700' },
+          { value: 'expense' as const, label: 'Expense', activeClass: 'bg-red-50 text-red-700' },
+          { value: 'income' as const, label: 'Income', activeClass: 'bg-green-50 text-green-700' },
+        ] as const).map((filter) => (
+          <button
+            key={filter.label}
+            onClick={() => setFilterType(filter.value)}
+            aria-pressed={filterType === filter.value}
+            className={cn(
+              'px-3 py-2 sm:py-1.5 rounded-lg text-sm font-medium transition-colors',
+              filterType === filter.value
+                ? filter.activeClass
+                : 'text-gray-500 hover:bg-gray-100',
+            )}
+          >
+            {filter.label}
+          </button>
+        ))}
       </div>
 
       {isLoading ? (
-        <Spinner size={32} />
+        <SkeletonCategoryGrid />
       ) : !categories || categories.length === 0 ? (
         <EmptyState
-          icon={<Tag size={48} />}
-          title="No categories found"
-          description="Create categories to organize your transactions"
+          icon={<Tag size={28} />}
+          title="Organize with categories"
+          description="Create custom categories like Food, Transport, or Entertainment to keep your transactions neatly organized."
           action={
             <Button onClick={() => setShowForm(true)}>
               <Plus size={16} />
-              Add Category
+              Create Your First Category
             </Button>
           }
         />
@@ -98,7 +90,7 @@ export default function CategoriesPage() {
           loading={createMutation.isPending}
         />
       </Modal>
-    </div>
+    </AnimatedPage>
   );
 }
 

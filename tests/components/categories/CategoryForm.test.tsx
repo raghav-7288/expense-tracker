@@ -26,7 +26,7 @@ describe('CategoryForm', () => {
     };
     renderWithProviders(<CategoryForm initialData={initialData} onSubmit={onSubmit} onCancel={onCancel} />);
     expect(screen.queryByLabelText('Type')).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Update Category/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Save Changes/i })).toBeInTheDocument();
   });
 
   it('shows validation error for empty name', async () => {
@@ -46,7 +46,7 @@ describe('CategoryForm', () => {
 
   it('renders color palette buttons', () => {
     renderWithProviders(<CategoryForm onSubmit={onSubmit} onCancel={onCancel} />);
-    const colorButtons = screen.getAllByLabelText(/Select color/);
+    const colorButtons = screen.getAllByLabelText(/Color \d/);
     expect(colorButtons.length).toBe(16);
   });
 

@@ -10,16 +10,16 @@ import { useRecentTransactions } from '@/hooks/useDashboard';
 const mockUseRecentTransactions = vi.mocked(useRecentTransactions);
 
 describe('RecentTransactions', () => {
-  it('shows spinner when loading', () => {
+  it('shows skeleton when loading', () => {
     mockUseRecentTransactions.mockReturnValue({ data: undefined, isLoading: true } as never);
     const { container } = renderWithProviders(<RecentTransactions />);
-    expect(container.querySelector('.animate-spin')).toBeInTheDocument();
+    expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
   });
 
   it('shows empty message when no transactions', () => {
     mockUseRecentTransactions.mockReturnValue({ data: [], isLoading: false } as never);
     renderWithProviders(<RecentTransactions />);
-    expect(screen.getByText(/No transactions yet/)).toBeInTheDocument();
+    expect(screen.getByText(/No activity yet/)).toBeInTheDocument();
   });
 
   it('renders transactions', () => {

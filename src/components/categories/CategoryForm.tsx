@@ -1,10 +1,12 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { cn } from '@/utils/cn';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import { CATEGORY_COLORS, CATEGORY_ICONS } from '@/utils/constants';
+import { Tag } from 'lucide-react';
 import type { Category } from '@/types';
 
 const categorySchema = z.object({
@@ -58,10 +60,11 @@ export default function CategoryForm({
   }));
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <Input
         label="Name"
-        placeholder="e.g. Groceries"
+        placeholder="e.g. Groceries, Salary"
+        leftIcon={<Tag size={15} />}
         error={errors.name?.message}
         {...register('name')}
       />
@@ -82,34 +85,47 @@ export default function CategoryForm({
         {...register('icon')}
       />
 
-      <div className="space-y-1">
-        <label className="block text-sm font-medium text-gray-700">Color</label>
-        <div className="grid grid-cols-8 gap-2">
-          {CATEGORY_COLORS.map((color) => (
+      <div className="space-y-2">
+        <label id="color-label" className="block text-sm font-medium text-gray-700">Color</label>
+        <div className="grid grid-cols-8 gap-2" role="radiogroup" aria-labelledby="color-label">
+          {CATEGORY_COLORS.map((color, index) => (
             <button
               key={color}
               type="button"
-              className={`w-8 h-8 rounded-full border-2 transition-transform ${
-                selectedColor === color ? 'border-gray-900 scale-110' : 'border-transparent'
-              }`}
+              role="radio"
+              className={cn(
+                'w-8 h-8 rounded-full transition-all duration-150',
+                'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500',
+                selectedColor === color
+                  ? 'ring-2 ring-offset-2 ring-gray-900 scale-110'
+                  : 'hover:scale-110',
+              )}
               style={{ backgroundColor: color }}
               onClick={() => setValue('color', color)}
-              aria-label={`Select color ${color}`}
+              aria-label={`Color ${index + 1}`}
+              aria-checked={selectedColor === color}
             />
           ))}
         </div>
-        {errors.color && <p className="text-sm text-red-600">{errors.color.message}</p>}
+        {errors.color && (
+          <p className="text-xs text-red-600 flex items-center gap-1" role="alert">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="flex-shrink-0">
+              <circle cx="6" cy="6" r="6" fill="currentColor" opacity="0.15" />
+              <path d="M6 3.5V6.5M6 8.5V8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+            </svg>
+            {errors.color.message}
+          </p>
+        )}
       </div>
 
-      <div className="flex gap-3 pt-2">
+      <div className="flex gap-3 pt-3 border-t border-gray-100">
         <Button type="button" variant="secondary" onClick={onCancel} className="flex-1">
           Cancel
         </Button>
         <Button type="submit" loading={loading} className="flex-1">
-          {initialData ? 'Update' : 'Create'} Category
+          {initialData ? 'Save Changes' : 'Create Category'}
         </Button>
       </div>
     </form>
   );
 }
-

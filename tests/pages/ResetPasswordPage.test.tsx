@@ -11,16 +11,16 @@ vi.mock('react-hot-toast', () => ({
 describe('ResetPasswordPage', () => {
   it('renders reset password form', () => {
     renderWithProviders(<ResetPasswordPage />, { auth: { user: null } });
-    expect(screen.getByText('Reset password')).toBeInTheDocument();
+    expect(screen.getByText('Set new password')).toBeInTheDocument();
     expect(screen.getByLabelText('New Password')).toBeInTheDocument();
-    expect(screen.getByLabelText('Confirm New Password')).toBeInTheDocument();
+    expect(screen.getByLabelText('Confirm Password')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Update Password' })).toBeInTheDocument();
   });
 
   it('validates minimum password length', async () => {
     renderWithProviders(<ResetPasswordPage />, { auth: { user: null } });
     await userEvent.type(screen.getByLabelText('New Password'), '12');
-    await userEvent.type(screen.getByLabelText('Confirm New Password'), '12');
+    await userEvent.type(screen.getByLabelText('Confirm Password'), '12');
     await userEvent.click(screen.getByRole('button', { name: 'Update Password' }));
     await waitFor(() => {
       expect(screen.getByText('Password must be at least 6 characters')).toBeInTheDocument();
@@ -30,7 +30,7 @@ describe('ResetPasswordPage', () => {
   it('validates password match', async () => {
     renderWithProviders(<ResetPasswordPage />, { auth: { user: null } });
     await userEvent.type(screen.getByLabelText('New Password'), 'pass123');
-    await userEvent.type(screen.getByLabelText('Confirm New Password'), 'different');
+    await userEvent.type(screen.getByLabelText('Confirm Password'), 'different');
     await userEvent.click(screen.getByRole('button', { name: 'Update Password' }));
     await waitFor(() => {
       expect(screen.getByText('Passwords do not match')).toBeInTheDocument();
@@ -41,7 +41,7 @@ describe('ResetPasswordPage', () => {
     const updatePassword = vi.fn().mockResolvedValue({ error: null });
     renderWithProviders(<ResetPasswordPage />, { auth: { user: null, updatePassword } });
     await userEvent.type(screen.getByLabelText('New Password'), 'newpass123');
-    await userEvent.type(screen.getByLabelText('Confirm New Password'), 'newpass123');
+    await userEvent.type(screen.getByLabelText('Confirm Password'), 'newpass123');
     await userEvent.click(screen.getByRole('button', { name: 'Update Password' }));
     await waitFor(() => {
       expect(updatePassword).toHaveBeenCalledWith('newpass123');
@@ -52,7 +52,7 @@ describe('ResetPasswordPage', () => {
     const updatePassword = vi.fn().mockResolvedValue({ error: new Error('Token expired') });
     renderWithProviders(<ResetPasswordPage />, { auth: { user: null, updatePassword } });
     await userEvent.type(screen.getByLabelText('New Password'), 'newpass123');
-    await userEvent.type(screen.getByLabelText('Confirm New Password'), 'newpass123');
+    await userEvent.type(screen.getByLabelText('Confirm Password'), 'newpass123');
     await userEvent.click(screen.getByRole('button', { name: 'Update Password' }));
     await waitFor(() => {
       expect(screen.getByText('Token expired')).toBeInTheDocument();

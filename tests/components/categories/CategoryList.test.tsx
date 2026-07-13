@@ -65,7 +65,9 @@ describe('CategoryList', () => {
     renderWithProviders(<CategoryList categories={categories} />);
     await userEvent.click(screen.getByLabelText('Delete Food'));
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
-    expect(screen.queryByText('Delete Category')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByText('Delete Category')).not.toBeInTheDocument();
+    });
   });
 
   it('closes edit modal on cancel within form', async () => {
@@ -74,7 +76,9 @@ describe('CategoryList', () => {
     await userEvent.click(screen.getByLabelText('Edit Food'));
     expect(screen.getByText('Edit Category')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
-    expect(screen.queryByText('Edit Category')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByText('Edit Category')).not.toBeInTheDocument();
+    });
   });
 
   it('renders category badge type', () => {

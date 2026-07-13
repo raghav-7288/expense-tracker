@@ -11,7 +11,7 @@ export default function Card({ children, className, padding = true }: CardProps)
   return (
     <div
       className={cn(
-        'rounded-xl border border-gray-200 bg-white shadow-sm',
+        'rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow duration-200',
         padding && 'p-6',
         className,
       )}
@@ -20,4 +20,3 @@ export default function Card({ children, className, padding = true }: CardProps)
     </div>
   );
 }
-

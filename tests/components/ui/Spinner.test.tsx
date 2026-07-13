@@ -8,11 +8,11 @@ describe('Spinner', () => {
     expect(container.querySelector('.animate-spin')).toBeInTheDocument();
   });
 
-  it('uses default size of 24', () => {
+  it('uses default size of 20', () => {
     const { container } = render(<Spinner />);
     const svg = container.querySelector('svg');
-    expect(svg).toHaveAttribute('width', '24');
-    expect(svg).toHaveAttribute('height', '24');
+    expect(svg).toHaveAttribute('width', '20');
+    expect(svg).toHaveAttribute('height', '20');
   });
 
   it('uses custom size', () => {

@@ -1,14 +1,15 @@
 import { useCategories } from '@/hooks/useCategories';
 import Input from '@/components/ui/Input';
-import Select from '@/components/ui/Select';
+import { Search, SlidersHorizontal, X } from 'lucide-react';
 import type { TransactionFilters } from '@/types';
 
 interface TransactionFiltersProps {
   filters: TransactionFilters;
   onChange: (filters: TransactionFilters) => void;
+  resultCount?: number;
 }
 
-export default function TransactionFilterBar({ filters, onChange }: TransactionFiltersProps) {
+export default function TransactionFilterBar({ filters, onChange, resultCount }: TransactionFiltersProps) {
   const { data: categories } = useCategories();
 
   const categoryOptions = [
@@ -34,38 +35,88 @@ export default function TransactionFilterBar({ filters, onChange }: TransactionF
     onChange({ ...filters, sort_by, sort_order });
   }
 
+  const hasActiveFilters = !!(filters.search || (filters.type && filters.type !== 'all') || filters.category_id || filters.date_from);
+
+  function clearFilters() {
+    onChange({ sort_by: filters.sort_by, sort_order: filters.sort_order });
+  }
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-      <Input
-        placeholder="Search transactions..."
-        value={filters.search ?? ''}
-        onChange={(e) => onChange({ ...filters, search: e.target.value })}
-      />
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+      {/* Search row */}
+      <div className="p-3 border-b border-gray-100">
+        <div className="flex items-center gap-2">
+          <div className="flex-1">
+            <Input
+              placeholder="Search transactions..."
+              value={filters.search ?? ''}
+              onChange={(e) => onChange({ ...filters, search: e.target.value })}
+              leftIcon={<Search size={15} />}
+            />
+          </div>
+          {hasActiveFilters && (
+            <button
+              onClick={clearFilters}
+              className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <X size={12} />
+              Clear
+            </button>
+          )}
+        </div>
+      </div>
 
-      <Select
-        options={typeOptions}
-        value={filters.type ?? 'all'}
-        onChange={(e) => onChange({ ...filters, type: e.target.value as TransactionFilters['type'] })}
-      />
+      {/* Filters row */}
+      <div className="px-3 py-2.5 flex flex-wrap items-center gap-2 overflow-x-auto">
+        <SlidersHorizontal size={14} className="text-gray-400 flex-shrink-0 hidden sm:block" />
+        <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0">
+          <select
+            value={filters.type ?? 'all'}
+            onChange={(e) => onChange({ ...filters, type: e.target.value as TransactionFilters['type'] })}
+            className="px-2.5 py-2 sm:py-1.5 text-xs font-medium border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+          >
+            {typeOptions.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
 
-      <Select
-        options={categoryOptions}
-        value={filters.category_id ?? ''}
-        onChange={(e) => onChange({ ...filters, category_id: e.target.value || undefined })}
-      />
+          <select
+            value={filters.category_id ?? ''}
+            onChange={(e) => onChange({ ...filters, category_id: e.target.value || undefined })}
+            className="px-2.5 py-2 sm:py-1.5 text-xs font-medium border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all max-w-[140px]"
+          >
+            {categoryOptions.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
 
-      <Input
-        type="date"
-        value={filters.date_from ?? ''}
-        onChange={(e) => onChange({ ...filters, date_from: e.target.value || undefined })}
-        placeholder="From date"
-      />
+          <input
+            type="date"
+            value={filters.date_from ?? ''}
+            onChange={(e) => onChange({ ...filters, date_from: e.target.value || undefined })}
+            className="px-2.5 py-1.5 text-xs border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+          />
+        </div>
 
-      <Select
-        options={sortOptions}
-        value={`${filters.sort_by ?? 'date'}-${filters.sort_order ?? 'desc'}`}
-        onChange={(e) => handleSortChange(e.target.value)}
-      />
+        <select
+          value={`${filters.sort_by ?? 'date'}-${filters.sort_order ?? 'desc'}`}
+          onChange={(e) => handleSortChange(e.target.value)}
+          className="px-2.5 py-1.5 text-xs font-medium border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+        >
+          {sortOptions.map((o) => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Result count */}
+      {resultCount !== undefined && (
+        <div className="px-4 py-2 border-t border-gray-100">
+          <span className="text-[11px] text-gray-400">
+            {resultCount} transaction{resultCount !== 1 ? 's' : ''}
+          </span>
+        </div>
+      )}
     </div>
   );
 }

@@ -12,7 +12,7 @@ export default function TopCategories({ data, loading, currency }: TopCategories
   const top = data.slice(0, 8);
 
   return (
-    <ChartCard title="Top Spending Categories" loading={loading} empty={top.length === 0}>
+    <ChartCard title="Top Spending Categories" loading={loading} empty={top.length === 0} emptyMessage="Categorize your expenses to see which areas you spend most on">
       <div className="space-y-3">
         {top.map((cat, i) => (
           <div key={cat.name} className="flex items-center gap-3">

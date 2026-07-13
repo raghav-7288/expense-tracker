@@ -19,16 +19,16 @@ import { useCategoryBreakdown } from '@/hooks/useDashboard';
 const mockUseCategoryBreakdown = vi.mocked(useCategoryBreakdown);
 
 describe('CategoryChart', () => {
-  it('shows spinner when loading', () => {
+  it('shows skeleton when loading', () => {
     mockUseCategoryBreakdown.mockReturnValue({ data: undefined, isLoading: true } as never);
     const { container } = renderWithProviders(<CategoryChart />);
-    expect(container.querySelector('.animate-spin')).toBeInTheDocument();
+    expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
   });
 
   it('shows empty message when no data', () => {
     mockUseCategoryBreakdown.mockReturnValue({ data: [], isLoading: false } as never);
     renderWithProviders(<CategoryChart />);
-    expect(screen.getByText('No expense data this month')).toBeInTheDocument();
+    expect(screen.getByText('No expenses yet')).toBeInTheDocument();
   });
 
   it('renders chart with data', () => {

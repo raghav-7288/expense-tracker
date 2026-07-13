@@ -60,8 +60,8 @@ export default function ExpenseHeatmap({ data, loading, currency }: ExpenseHeatm
   }
 
   return (
-    <ChartCard title="Expense Heatmap" description="365-day activity overview" loading={loading} empty={data.length === 0}>
-      <div className="overflow-x-auto">
+    <ChartCard title="Expense Heatmap" description="365-day activity overview" loading={loading} empty={data.length === 0} emptyMessage="Start logging expenses to see your daily spending activity over time">
+      <div className="overflow-x-auto -mx-2 px-2 sm:mx-0 sm:px-0 pb-2">
         {/* Month labels */}
         <div className="flex ml-8 mb-1">
           {monthPositions.map((mp) => (

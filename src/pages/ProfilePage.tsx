@@ -9,7 +9,10 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
-import Spinner from '@/components/ui/Spinner';
+import FormAlert from '@/components/ui/FormAlert';
+import AnimatedPage from '@/components/ui/AnimatedPage';
+import { SkeletonProfile } from '@/components/ui/Skeleton';
+import { cn } from '@/utils/cn';
 import { CURRENCIES } from '@/utils/constants';
 import { User, Moon, Sun } from 'lucide-react';
 
@@ -83,22 +86,22 @@ export default function ProfilePage() {
     setPasswordLoading(false);
   }
 
-  if (isLoading) return <Spinner size={32} />;
+  if (isLoading) return <SkeletonProfile />;
 
   const currencyOptions = CURRENCIES.map((c) => ({ value: c.value, label: c.label }));
 
   return (
-    <div className="space-y-6 max-w-2xl">
+    <AnimatedPage className="space-y-6 max-w-2xl">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Profile</h1>
-        <p className="text-sm text-gray-500 mt-1">Manage your account settings</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">Profile</h1>
+        <p className="text-sm text-gray-500 mt-0.5">Manage your account settings</p>
       </div>
 
       {/* Profile Info */}
       <Card>
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-16 h-16 rounded-full bg-primary-100 flex items-center justify-center">
-            <User size={28} className="text-primary-600" />
+          <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
+            <User size={24} className="text-white" />
           </div>
           <div>
             <p className="font-medium text-gray-900">{profile?.full_name || 'User'}</p>
@@ -128,10 +131,10 @@ export default function ProfilePage() {
 
       {/* Appearance */}
       <Card>
-        <h3 className="font-semibold text-gray-900 mb-4 section-heading">Appearance</h3>
+        <h3 className="text-sm font-semibold text-gray-900 mb-4 section-heading">Appearance</h3>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            {darkMode ? <Moon size={20} className="text-gray-500" /> : <Sun size={20} className="text-gray-500" />}
+            {darkMode ? <Moon size={18} className="text-gray-400" aria-hidden="true" /> : <Sun size={18} className="text-gray-400" aria-hidden="true" />}
             <div>
               <p className="text-sm font-medium text-gray-900 section-heading">Dark Mode</p>
               <p className="text-xs text-gray-500 muted-text">
@@ -141,7 +144,7 @@ export default function ProfilePage() {
           </div>
           <button
             type="button"
-            className={`toggle-switch ${darkMode ? 'active' : ''}`}
+            className={cn('toggle-switch', darkMode && 'active')}
             onClick={() => setDarkMode(!darkMode)}
             aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
             role="switch"
@@ -152,12 +155,10 @@ export default function ProfilePage() {
 
       {/* Change Password */}
       <Card>
-        <h3 className="font-semibold text-gray-900 mb-4">Change Password</h3>
+        <h3 className="text-sm font-semibold text-gray-900 mb-4">Change Password</h3>
         <form onSubmit={handlePasswordSubmit(onPasswordSubmit)} className="space-y-4">
           {passwordErrors.root && (
-            <div className="p-3 rounded-lg bg-red-50 text-sm text-red-600">
-              {passwordErrors.root.message}
-            </div>
+            <FormAlert message={passwordErrors.root.message} />
           )}
 
           <Input
@@ -181,7 +182,7 @@ export default function ProfilePage() {
           </Button>
         </form>
       </Card>
-    </div>
+    </AnimatedPage>
   );
 }
 

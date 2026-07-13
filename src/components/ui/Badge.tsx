@@ -10,10 +10,10 @@ export default function Badge({ type, className }: BadgeProps) {
   return (
     <span
       className={cn(
-        'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium',
+        'inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide',
         type === 'income'
-          ? 'bg-green-100 text-green-800'
-          : 'bg-red-100 text-red-800',
+          ? 'bg-green-50 text-green-700'
+          : 'bg-red-50 text-red-700',
         className,
       )}
     >
@@ -21,4 +21,3 @@ export default function Badge({ type, className }: BadgeProps) {
     </span>
   );
 }
-

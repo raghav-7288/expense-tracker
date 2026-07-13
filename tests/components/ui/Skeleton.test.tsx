@@ -42,13 +42,14 @@ describe('SkeletonCard', () => {
 describe('SkeletonTable', () => {
   it('renders default 5 rows', () => {
     const { container } = render(<SkeletonTable />);
-    const rows = container.querySelectorAll('.flex.items-center.gap-3.p-4');
+    const rows = container.querySelectorAll('.flex.items-center.gap-3');
+    // Subtract 1 for the header row
     expect(rows).toHaveLength(5);
   });
 
   it('renders custom number of rows', () => {
     const { container } = render(<SkeletonTable rows={3} />);
-    const rows = container.querySelectorAll('.flex.items-center.gap-3.p-4');
+    const rows = container.querySelectorAll('.flex.items-center.gap-3');
     expect(rows).toHaveLength(3);
   });
 });

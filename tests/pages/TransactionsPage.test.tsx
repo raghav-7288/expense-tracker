@@ -56,7 +56,7 @@ describe('TransactionsPage', () => {
     } as never);
 
     renderWithProviders(<TransactionsPage />);
-    expect(screen.getByText('No transactions found')).toBeInTheDocument();
+    expect(screen.getByText('Start tracking your money')).toBeInTheDocument();
   });
 
   it('renders transaction list when data available', () => {
@@ -74,7 +74,7 @@ describe('TransactionsPage', () => {
     } as never);
 
     renderWithProviders(<TransactionsPage />);
-    expect(screen.getByText('Groceries')).toBeInTheDocument();
+    expect(screen.getAllByText('Groceries').length).toBeGreaterThanOrEqual(1);
   });
 
   it('opens modal when Add Transaction is clicked', async () => {

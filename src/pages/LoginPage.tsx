@@ -6,6 +6,9 @@ import { z } from 'zod';
 import { useAuth } from '@/hooks/useAuth';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
+import FormAlert from '@/components/ui/FormAlert';
+import AnimatedPage from '@/components/ui/AnimatedPage';
+import { Mail, Lock } from 'lucide-react';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email'),
@@ -37,21 +40,21 @@ export default function LoginPage() {
   }
 
   return (
-    <div>
-      <h2 className="text-xl font-semibold text-gray-900 mb-1">Welcome back</h2>
-      <p className="text-sm text-gray-500 mb-6">Sign in to your account to continue</p>
+    <AnimatedPage>
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold text-gray-900">Welcome back</h2>
+        <p className="text-sm text-gray-500 mt-1">Sign in to your account to continue</p>
+      </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {errors.root && (
-          <div className="p-3 rounded-lg bg-red-50 text-sm text-red-600">
-            {errors.root.message}
-          </div>
-        )}
+        {errors.root && <FormAlert message={errors.root.message} />}
 
         <Input
           label="Email"
           type="email"
-          placeholder="you@example.com"
+          placeholder="[REDACTED_EMAIL_ADDRESS_1]"
+          autoComplete="email"
+          leftIcon={<Mail size={15} />}
           error={errors.email?.message}
           {...register('email')}
         />
@@ -59,18 +62,20 @@ export default function LoginPage() {
         <Input
           label="Password"
           type="password"
-          placeholder="••••••••"
+          placeholder="Enter your password"
+          autoComplete="current-password"
+          leftIcon={<Lock size={15} />}
           error={errors.password?.message}
           {...register('password')}
         />
 
         <div className="flex justify-end">
-          <Link to="/forgot-password" className="text-sm text-primary-600 hover:text-primary-700">
+          <Link to="/forgot-password" className="text-xs text-primary-600 hover:text-primary-700 font-medium">
             Forgot password?
           </Link>
         </div>
 
-        <Button type="submit" loading={loading} className="w-full">
+        <Button type="submit" loading={loading} className="w-full" size="lg">
           Sign In
         </Button>
       </form>
@@ -81,7 +86,6 @@ export default function LoginPage() {
           Sign up
         </Link>
       </p>
-    </div>
+    </AnimatedPage>
   );
 }
-

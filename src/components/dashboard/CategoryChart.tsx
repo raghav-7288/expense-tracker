@@ -2,35 +2,44 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { useCategoryBreakdown } from '@/hooks/useDashboard';
 import { useCurrency } from '@/hooks/useCurrency';
 import { useTheme } from '@/hooks/useTheme';
-import Card from '@/components/ui/Card';
-import Spinner from '@/components/ui/Spinner';
+import { SkeletonPieChart } from '@/components/ui/Skeleton';
 import { formatCurrency } from '@/utils/formatCurrency';
+import { PieChart as PieChartIcon } from 'lucide-react';
 
 export default function CategoryChart() {
   const { data: breakdown, isLoading } = useCategoryBreakdown();
   const currency = useCurrency();
   const { darkMode } = useTheme();
 
-  if (isLoading) return <Spinner />;
+  if (isLoading) return <SkeletonPieChart />;
 
   return (
-    <Card>
-      <h3 className="font-semibold text-gray-900 mb-4">Expenses by Category</h3>
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 h-full">
+      <div className="mb-4">
+        <h3 className="text-sm font-semibold text-gray-900">Expenses by Category</h3>
+        <p className="text-xs text-gray-400 mt-0.5">This month's breakdown</p>
+      </div>
       {!breakdown || breakdown.length === 0 ? (
-        <div className="h-64 flex items-center justify-center text-sm text-gray-500">
-          No expense data this month
+        <div className="h-56 flex flex-col items-center justify-center text-center">
+          <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center mb-3">
+            <PieChartIcon size={20} className="text-gray-300" />
+          </div>
+          <p className="text-sm font-medium text-gray-500 mb-1">No expenses yet</p>
+          <p className="text-xs text-gray-400 max-w-[180px]">
+            Track an expense to see your category breakdown
+          </p>
         </div>
       ) : (
-        <div className="flex flex-col lg:flex-row items-center gap-4">
-          <div className="h-48 w-48 flex-shrink-0">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-40 w-40 flex-shrink-0">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={breakdown}
                   cx="50%"
                   cy="50%"
-                  innerRadius={45}
-                  outerRadius={75}
+                  innerRadius={42}
+                  outerRadius={68}
                   dataKey="amount"
                   nameKey="name"
                   strokeWidth={2}
@@ -42,20 +51,25 @@ export default function CategoryChart() {
                 </Pie>
                 <Tooltip
                   formatter={(value) => [formatCurrency(Number(value), currency)]}
-                  contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
+                  contentStyle={{
+                    borderRadius: '10px',
+                    border: 'none',
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                    fontSize: '12px',
+                  }}
                 />
               </PieChart>
             </ResponsiveContainer>
           </div>
-          <div className="flex-1 w-full space-y-2">
+          <div className="w-full space-y-2.5">
             {breakdown.slice(0, 5).map((item) => (
-              <div key={item.name} className="flex items-center gap-2">
+              <div key={item.name} className="flex items-center gap-2.5">
                 <div
-                  className="w-3 h-3 rounded-full flex-shrink-0"
+                  className="w-2 h-2 rounded-full flex-shrink-0"
                   style={{ backgroundColor: item.color }}
                 />
-                <span className="text-sm text-gray-600 flex-1 truncate">{item.name}</span>
-                <span className="text-sm font-medium text-gray-900">
+                <span className="text-xs text-gray-600 flex-1 truncate">{item.name}</span>
+                <span className="text-xs font-semibold text-gray-900 tabular-nums">
                   {item.percentage}%
                 </span>
               </div>
@@ -63,8 +77,6 @@ export default function CategoryChart() {
           </div>
         </div>
       )}
-    </Card>
+    </div>
   );
 }
-
-

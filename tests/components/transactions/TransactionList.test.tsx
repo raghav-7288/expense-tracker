@@ -28,8 +28,9 @@ describe('TransactionList', () => {
       buildTransaction({ id: '2', description: 'Salary', amount: 5000, type: 'income' }),
     ];
     renderWithProviders(<TransactionList transactions={transactions} />);
-    expect(screen.getByText('Groceries')).toBeInTheDocument();
-    expect(screen.getByText('Salary')).toBeInTheDocument();
+    // Rendered in both desktop table and mobile cards
+    expect(screen.getAllByText('Groceries').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Salary').length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows formatted amounts with +/- prefix', () => {
@@ -38,21 +39,22 @@ describe('TransactionList', () => {
       buildTransaction({ id: '2', description: 'Exp', amount: 50, type: 'expense' }),
     ];
     renderWithProviders(<TransactionList transactions={transactions} />);
-    expect(screen.getByText('+$100.00')).toBeInTheDocument();
-    expect(screen.getByText('-$50.00')).toBeInTheDocument();
+    expect(screen.getAllByText('+$100.00').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('-$50.00').length).toBeGreaterThanOrEqual(1);
   });
 
   it('has edit and delete buttons', () => {
     const transactions = [buildTransaction({ id: '1', description: 'Test' })];
     renderWithProviders(<TransactionList transactions={transactions} />);
-    expect(screen.getByLabelText('Edit transaction')).toBeInTheDocument();
+    expect(screen.getAllByLabelText('Edit transaction').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByLabelText('Delete transaction')).toBeInTheDocument();
   });
 
   it('opens edit modal on edit click', async () => {
     const transactions = [buildTransaction({ id: '1', description: 'Test', amount: 10, type: 'expense', date: '2024-01-01' })];
     renderWithProviders(<TransactionList transactions={transactions} />);
-    await userEvent.click(screen.getByLabelText('Edit transaction'));
+    const editButtons = screen.getAllByLabelText('Edit transaction');
+    await userEvent.click(editButtons[0]!);
     expect(screen.getByText('Edit Transaction')).toBeInTheDocument();
   });
 
@@ -79,7 +81,9 @@ describe('TransactionList', () => {
     renderWithProviders(<TransactionList transactions={transactions} />);
     await userEvent.click(screen.getByLabelText('Delete transaction'));
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
-    expect(screen.queryByText('Delete Transaction')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByText('Delete Transaction')).not.toBeInTheDocument();
+    });
   });
 
   it('shows category name when available', () => {
@@ -88,13 +92,12 @@ describe('TransactionList', () => {
       categories: { id: 'c1', user_id: 'u1', name: 'Food', type: 'expense', color: '#ef4444', icon: 'utensils', created_at: '', updated_at: '' },
     })];
     renderWithProviders(<TransactionList transactions={transactions} />);
-    expect(screen.getByText('Food')).toBeInTheDocument();
+    expect(screen.getAllByText('Food').length).toBeGreaterThanOrEqual(1);
   });
 
   it('displays formatted date', () => {
     const transactions = [buildTransaction({ id: '1', description: 'Test', date: '2024-06-15' })];
     renderWithProviders(<TransactionList transactions={transactions} />);
-    expect(screen.getByText('Jun 15, 2024')).toBeInTheDocument();
+    expect(screen.getAllByText('Jun 15, 2024').length).toBeGreaterThanOrEqual(1);
   });
 });
-

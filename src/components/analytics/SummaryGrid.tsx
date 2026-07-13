@@ -32,9 +32,9 @@ function SummaryCard({ title, value, icon, change, subtitle, variant = 'default'
   const isPositive = (change ?? 0) > 0;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 hover:shadow-md transition-shadow group">
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-3 sm:p-4 hover:shadow-md transition-shadow group overflow-hidden">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">{title}</span>
+        <span className="text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wide truncate">{title}</span>
         <div
           className={cn('p-1.5 rounded-lg transition-colors', {
             'bg-gray-100 text-gray-500 group-hover:bg-gray-200': variant === 'default',
@@ -77,7 +77,7 @@ interface SummaryGridProps {
 
 export default function SummaryGrid({ summary, currency }: SummaryGridProps) {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
       <SummaryCard
         title="Balance"
         value={formatCompactCurrency(summary.currentBalance, currency)}

@@ -58,6 +58,6 @@ describe('ForgotPasswordPage', () => {
 
   it('has back to sign in link', () => {
     renderWithProviders(<ForgotPasswordPage />, { auth: { user: null } });
-    expect(screen.getByText('Back to sign in')).toBeInTheDocument();
+    expect(screen.getByText(/Back to sign in/i)).toBeInTheDocument();
   });
 });

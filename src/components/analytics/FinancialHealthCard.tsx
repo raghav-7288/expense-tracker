@@ -16,8 +16,8 @@ export default function FinancialHealthCard({ data, loading }: FinancialHealthCa
     <ChartCard title="Financial Health" description="Overall financial wellness score" loading={loading}>
       <div className="flex flex-col items-center gap-4">
         {/* Circular gauge */}
-        <div className="relative w-32 h-32">
-          <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+        <div className="relative w-32 h-32" role="img" aria-label={`Financial health score: ${data.score} out of 100, grade ${data.grade}`}>
+          <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100" aria-hidden="true">
             <circle cx="50" cy="50" r="45" fill="none" stroke="#e5e7eb" strokeWidth="8" className="opacity-30" />
             <circle
               cx="50"
@@ -57,7 +57,14 @@ export default function FinancialHealthCard({ data, loading }: FinancialHealthCa
                   {factor.score}/{factor.maxScore}
                 </span>
               </div>
-              <div className="w-full bg-gray-100 rounded-full h-1.5">
+              <div
+                className="w-full bg-gray-100 rounded-full h-1.5"
+                role="progressbar"
+                aria-valuenow={factor.score}
+                aria-valuemin={0}
+                aria-valuemax={factor.maxScore}
+                aria-label={`${factor.name}: ${factor.score} of ${factor.maxScore}`}
+              >
                 <div
                   className="h-1.5 rounded-full transition-all"
                   style={{

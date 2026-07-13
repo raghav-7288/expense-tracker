@@ -9,6 +9,7 @@ import { getTransactions } from '@/services/transactions';
 
 import PageHeader from '@/components/ui/PageHeader';
 import ErrorState from '@/components/ui/ErrorState';
+import AnimatedPage from '@/components/ui/AnimatedPage';
 import TimeRangeFilter from '@/components/analytics/TimeRangeFilter';
 import SummaryGrid from '@/components/analytics/SummaryGrid';
 import { AnalyticsSkeleton } from '@/components/analytics/AnalyticsSkeleton';
@@ -85,7 +86,7 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <AnimatedPage className="space-y-6">
       {/* Header */}
       <PageHeader
         title="Analytics"
@@ -107,7 +108,7 @@ export default function AnalyticsPage() {
 
       {/* Section: Trends */}
       <section>
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">Trends</h2>
+        <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">Trends</h2>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="lg:col-span-2">
             <IncomeVsExpenseChart data={analytics.monthlySeries} currency={currency} />
@@ -122,8 +123,8 @@ export default function AnalyticsPage() {
 
       {/* Section: Category Analysis */}
       <section>
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">Category Analysis</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">Category Analysis</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <CategoryPieChart data={analytics.expenseCategories} type="expense" currency={currency} />
           <CategoryPieChart data={analytics.incomeCategories} type="income" currency={currency} />
           <CategoryComparisonChart data={analytics.expenseCategories} currency={currency} />
@@ -132,7 +133,7 @@ export default function AnalyticsPage() {
 
       {/* Section: Spending Over Time */}
       <section>
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">Spending Over Time</h2>
+        <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">Spending Over Time</h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <DailySpendingChart data={analytics.dailySeries} currency={currency} />
           <ExpenseTrendChart data={analytics.dailySeries} currency={currency} />
@@ -145,13 +146,13 @@ export default function AnalyticsPage() {
 
       {/* Section: Activity Heatmap */}
       <section>
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">Activity</h2>
+        <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">Activity</h2>
         <ExpenseHeatmap data={analytics.heatmapData} currency={currency} />
       </section>
 
       {/* Section: Rankings & Top Categories */}
       <section>
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">Rankings</h2>
+        <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">Rankings</h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <TopCategories data={analytics.expenseCategories} currency={currency} />
           <LargestTransactions
@@ -164,7 +165,7 @@ export default function AnalyticsPage() {
 
       {/* Section: Insights & Patterns */}
       <section>
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">Insights & Patterns</h2>
+        <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">Insights & Patterns</h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <SmartInsights data={analytics.insights} />
           <SpendingPatterns data={analytics.spendingPatterns} currency={currency} />
@@ -173,7 +174,7 @@ export default function AnalyticsPage() {
 
       {/* Section: Reports */}
       <section>
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">Reports</h2>
+        <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">Reports</h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <MonthlyReport data={analytics.monthlyReport} currency={currency} />
           <YearlyReport data={analytics.yearlyReport} currency={currency} />
@@ -182,10 +183,10 @@ export default function AnalyticsPage() {
 
       {/* Section: Detailed Breakdown */}
       <section>
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">Detailed Breakdown</h2>
+        <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">Detailed Breakdown</h2>
         <CategoryBreakdownTable data={analytics.expenseCategories} currency={currency} />
       </section>
-    </div>
+    </AnimatedPage>
   );
 }
 

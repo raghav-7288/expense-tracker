@@ -11,6 +11,7 @@ vi.mock('recharts', () => ({
   XAxis: () => <div />,
   YAxis: () => <div />,
   Tooltip: () => <div />,
+  CartesianGrid: () => <div />,
   ResponsiveContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Legend: () => <div />,
 }));
@@ -19,10 +20,10 @@ import { useMonthlyData } from '@/hooks/useDashboard';
 const mockUseMonthlyData = vi.mocked(useMonthlyData);
 
 describe('MonthlyChart', () => {
-  it('shows spinner when loading', () => {
+  it('shows skeleton when loading', () => {
     mockUseMonthlyData.mockReturnValue({ data: undefined, isLoading: true } as never);
     const { container } = renderWithProviders(<MonthlyChart />);
-    expect(container.querySelector('.animate-spin')).toBeInTheDocument();
+    expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
   });
 
   it('shows empty message when all zero', () => {
@@ -31,7 +32,7 @@ describe('MonthlyChart', () => {
       isLoading: false,
     } as never);
     renderWithProviders(<MonthlyChart />);
-    expect(screen.getByText('No data available for this year')).toBeInTheDocument();
+    expect(screen.getByText('No data yet')).toBeInTheDocument();
   });
 
   it('renders chart with data', () => {

@@ -16,15 +16,15 @@ describe('Badge', () => {
   it('applies green classes for income', () => {
     render(<Badge type="income" />);
     const badge = screen.getByText('Income');
-    expect(badge.className).toContain('bg-green-100');
-    expect(badge.className).toContain('text-green-800');
+    expect(badge.className).toContain('bg-green-50');
+    expect(badge.className).toContain('text-green-700');
   });
 
   it('applies red classes for expense', () => {
     render(<Badge type="expense" />);
     const badge = screen.getByText('Expense');
-    expect(badge.className).toContain('bg-red-100');
-    expect(badge.className).toContain('text-red-800');
+    expect(badge.className).toContain('bg-red-50');
+    expect(badge.className).toContain('text-red-700');
   });
 
   it('accepts custom className', () => {

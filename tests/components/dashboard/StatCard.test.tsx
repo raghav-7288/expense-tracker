@@ -14,19 +14,27 @@ describe('StatCard', () => {
     expect(screen.getByText('This month')).toBeInTheDocument();
   });
 
-  it('applies success variant', () => {
+  it('applies success variant with gradient', () => {
     const { container } = render(<StatCard title="Income" value="$500" icon={<span>📈</span>} variant="success" />);
-    expect(container.querySelector('.bg-green-100')).toBeInTheDocument();
+    const card = container.firstElementChild;
+    expect(card?.className).toContain('from-emerald-500');
   });
 
-  it('applies danger variant', () => {
+  it('applies danger variant with gradient', () => {
     const { container } = render(<StatCard title="Expenses" value="$500" icon={<span>📉</span>} variant="danger" />);
-    expect(container.querySelector('.bg-red-100')).toBeInTheDocument();
+    const card = container.firstElementChild;
+    expect(card?.className).toContain('from-rose-500');
   });
 
-  it('applies default variant', () => {
+  it('applies default variant with white bg', () => {
     const { container } = render(<StatCard title="Balance" value="$500" icon={<span>💰</span>} />);
-    expect(container.querySelector('.bg-gray-100')).toBeInTheDocument();
+    const card = container.firstElementChild;
+    expect(card?.className).toContain('bg-white');
+  });
+
+  it('applies info variant', () => {
+    const { container } = render(<StatCard title="Balance" value="$500" icon={<span>💰</span>} variant="info" />);
+    const card = container.firstElementChild;
+    expect(card?.className).toContain('from-primary-500');
   });
 });
-

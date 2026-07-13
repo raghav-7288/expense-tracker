@@ -6,7 +6,10 @@ import { z } from 'zod';
 import { useAuth } from '@/hooks/useAuth';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
+import FormAlert from '@/components/ui/FormAlert';
+import AnimatedPage from '@/components/ui/AnimatedPage';
 import toast from 'react-hot-toast';
+import { Mail, CheckCircle2 } from 'lucide-react';
 
 const forgotSchema = z.object({
   email: z.string().email('Please enter a valid email'),
@@ -42,49 +45,56 @@ export default function ForgotPasswordPage() {
 
   if (sent) {
     return (
-      <div className="text-center">
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Check your email</h2>
-        <p className="text-sm text-gray-500 mb-6">
-          We&apos;ve sent a password reset link to your email address.
+      <AnimatedPage className="text-center py-4">
+        <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-4">
+          <CheckCircle2 size={24} className="text-green-600" />
+        </div>
+        <h2 className="text-lg font-semibold text-gray-900 mb-2">Check your email</h2>
+        <p className="text-sm text-gray-500 mb-6 max-w-xs mx-auto">
+          We&apos;ve sent a password reset link to your email address. It may take a minute to arrive.
         </p>
-        <Link to="/login" className="text-primary-600 font-medium hover:text-primary-700 text-sm">
-          Back to sign in
+        <Link
+          to="/login"
+          className="inline-flex items-center gap-1 text-sm text-primary-600 font-medium hover:text-primary-700"
+        >
+          ← Back to sign in
         </Link>
-      </div>
+      </AnimatedPage>
     );
   }
 
   return (
-    <div>
-      <h2 className="text-xl font-semibold text-gray-900 mb-1">Forgot password?</h2>
-      <p className="text-sm text-gray-500 mb-6">Enter your email and we&apos;ll send a reset link</p>
+    <AnimatedPage>
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold text-gray-900">Forgot password?</h2>
+        <p className="text-sm text-gray-500 mt-1">No worries, we&apos;ll send you reset instructions</p>
+      </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {errors.root && (
-          <div className="p-3 rounded-lg bg-red-50 text-sm text-red-600">
-            {errors.root.message}
-          </div>
-        )}
+        {errors.root && <FormAlert message={errors.root.message} />}
 
         <Input
           label="Email"
           type="email"
-          placeholder="[REDACTED_EMAIL_ADDRESS_1]"
+          placeholder="Enter your email address"
+          autoComplete="email"
+          leftIcon={<Mail size={15} />}
           error={errors.email?.message}
           {...register('email')}
         />
 
-        <Button type="submit" loading={loading} className="w-full">
-          Send Reset Link
-        </Button>
+        <div className="pt-1">
+          <Button type="submit" loading={loading} className="w-full" size="lg">
+            Send Reset Link
+          </Button>
+        </div>
       </form>
 
       <p className="mt-6 text-center text-sm text-gray-500">
         <Link to="/login" className="text-primary-600 font-medium hover:text-primary-700">
-          Back to sign in
+          ← Back to sign in
         </Link>
       </p>
-    </div>
+    </AnimatedPage>
   );
 }
-

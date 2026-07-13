@@ -40,8 +40,10 @@ describe('Modal', () => {
   it('calls onClose when backdrop is clicked', async () => {
     const onClose = vi.fn();
     render(<Modal open={true} onClose={onClose} title="Test">Content</Modal>);
-    const backdrop = screen.getByRole('dialog');
-    await userEvent.click(backdrop);
+    // The backdrop is the absolute div behind the content
+    const dialog = screen.getByRole('dialog');
+    const backdrop = dialog.querySelector('.absolute');
+    if (backdrop) await userEvent.click(backdrop);
     expect(onClose).toHaveBeenCalled();
   });
 

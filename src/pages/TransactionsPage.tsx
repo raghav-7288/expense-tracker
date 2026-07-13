@@ -7,6 +7,8 @@ import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import EmptyState from '@/components/ui/EmptyState';
 import ErrorState from '@/components/ui/ErrorState';
+import AnimatedPage from '@/components/ui/AnimatedPage';
+import PageHeader from '@/components/ui/PageHeader';
 import { SkeletonTable } from '@/components/ui/Skeleton';
 import { Plus, Receipt } from 'lucide-react';
 import type { TransactionFilters } from '@/types';
@@ -34,21 +36,23 @@ export default function TransactionsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Transactions</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Manage your income and expenses
-          </p>
-        </div>
-        <Button onClick={() => setShowForm(true)}>
-          <Plus size={16} />
-          Add Transaction
-        </Button>
-      </div>
+    <AnimatedPage className="space-y-6">
+      <PageHeader
+        title="Transactions"
+        description="Manage your income and expenses"
+        action={
+          <Button onClick={() => setShowForm(true)} className="w-full sm:w-auto">
+            <Plus size={16} />
+            Add Transaction
+          </Button>
+        }
+      />
 
-      <TransactionFilterBar filters={filters} onChange={setFilters} />
+      <TransactionFilterBar
+        filters={filters}
+        onChange={setFilters}
+        resultCount={transactions?.length}
+      />
 
       {isError ? (
         <ErrorState
@@ -60,18 +64,26 @@ export default function TransactionsPage() {
         <SkeletonTable rows={6} />
       ) : !transactions || transactions.length === 0 ? (
         <EmptyState
-          icon={<Receipt size={48} />}
-          title="No transactions found"
+          icon={<Receipt size={28} />}
+          title={
+            filters.search || (filters.type && filters.type !== 'all') || filters.category_id
+              ? 'No matching transactions'
+              : 'Start tracking your money'
+          }
           description={
-            filters.search || filters.type !== undefined || filters.category_id
-              ? 'Try adjusting your filters'
-              : "You haven't added any transactions yet. Start tracking your finances!"
+            filters.search || (filters.type && filters.type !== 'all') || filters.category_id
+              ? 'Try changing your search term or removing some filters to see results.'
+              : "Add your first income or expense to begin building your financial picture. It only takes a few seconds!"
           }
           action={
-            !filters.search && (
+            filters.search || (filters.type && filters.type !== 'all') || filters.category_id ? (
+              <Button variant="secondary" size="sm" onClick={() => setFilters({ sort_by: 'date', sort_order: 'desc' })}>
+                Clear Filters
+              </Button>
+            ) : (
               <Button onClick={() => setShowForm(true)}>
                 <Plus size={16} />
-                Add Transaction
+                Add Your First Transaction
               </Button>
             )
           }
@@ -91,6 +103,6 @@ export default function TransactionsPage() {
           loading={createMutation.isPending}
         />
       </Modal>
-    </div>
+    </AnimatedPage>
   );
 }

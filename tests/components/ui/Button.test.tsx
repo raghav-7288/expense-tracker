@@ -59,7 +59,7 @@ describe('Button', () => {
 
   it('applies lg size classes', () => {
     render(<Button size="lg">Click</Button>);
-    expect(screen.getByRole('button').className).toContain('px-6');
+    expect(screen.getByRole('button').className).toContain('px-5');
   });
 
   it('merges custom className', () => {

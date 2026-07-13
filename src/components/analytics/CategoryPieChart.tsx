@@ -14,7 +14,9 @@ interface CategoryPieChartProps {
 export default function CategoryPieChart({ data, type, loading, currency }: CategoryPieChartProps) {
   const { darkMode } = useTheme();
   const title = type === 'expense' ? 'Spending by Category' : 'Income by Category';
-  const emptyMessage = type === 'expense' ? 'No expense data' : 'No income data';
+  const emptyMessage = type === 'expense'
+    ? 'Add expenses with categories to see your spending breakdown'
+    : 'Add income with categories to see your earnings breakdown';
 
   return (
     <ChartCard title={title} loading={loading} empty={data.length === 0} emptyMessage={emptyMessage}>

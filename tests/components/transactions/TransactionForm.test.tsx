@@ -49,7 +49,7 @@ describe('TransactionForm', () => {
       created_at: '', updated_at: '', categories: null,
     };
     renderWithProviders(<TransactionForm initialData={initialData} onSubmit={onSubmit} onCancel={onCancel} />);
-    expect(screen.getByRole('button', { name: /Update Transaction/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Save Changes/i })).toBeInTheDocument();
   });
 
   it('disables submit button when loading', () => {

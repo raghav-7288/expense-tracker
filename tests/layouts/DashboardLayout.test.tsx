@@ -14,7 +14,8 @@ describe('DashboardLayout', () => {
       </Routes>,
       { route: '/dashboard' }
     );
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
+    // Dashboard appears in nav + breadcrumb
+    expect(screen.getAllByText('Dashboard').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('Transactions')).toBeInTheDocument();
     expect(screen.getByText('Categories')).toBeInTheDocument();
     expect(screen.getByText('Profile')).toBeInTheDocument();
@@ -69,7 +70,7 @@ describe('DashboardLayout', () => {
     expect(toggles.length).toBeGreaterThanOrEqual(1);
   });
 
-  it('displays user email in sidebar', () => {
+  it('displays user info in sidebar', () => {
     renderWithProviders(
       <Routes>
         <Route element={<DashboardLayout />}>
@@ -78,9 +79,9 @@ describe('DashboardLayout', () => {
       </Routes>,
       { route: '/dashboard' }
     );
-    // The email renders in the sidebar
-    const emailEl = screen.getByText((content) => content.includes('test@'));
-    expect(emailEl).toBeInTheDocument();
+    // The user name or email renders in the sidebar footer
+    const userEl = screen.getByText((content) => content.includes('Test User') || content.includes('test@'));
+    expect(userEl).toBeInTheDocument();
   });
 });
 

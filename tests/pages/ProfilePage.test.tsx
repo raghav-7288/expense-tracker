@@ -16,10 +16,10 @@ import { useProfile } from '@/hooks/useProfile';
 const mockUseProfile = vi.mocked(useProfile);
 
 describe('ProfilePage', () => {
-  it('shows spinner when loading', () => {
+  it('shows skeleton when loading', () => {
     mockUseProfile.mockReturnValue({ data: undefined, isLoading: true } as never);
     const { container } = renderWithProviders(<ProfilePage />);
-    expect(container.querySelector('.animate-spin')).toBeInTheDocument();
+    expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
   });
 
   it('renders profile form with user data', () => {

@@ -16,18 +16,17 @@ export default function ErrorState({
   retry,
 }: ErrorStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center py-12 text-center">
-      <div className="text-red-400 mb-4">
-        {icon ?? <AlertCircle size={48} />}
+    <div className="flex flex-col items-center justify-center py-16 text-center">
+      <div className="text-gray-300 mb-4">
+        {icon ?? <AlertCircle size={40} />}
       </div>
-      <h3 className="text-lg font-medium text-gray-900 mb-1">{title}</h3>
-      <p className="text-sm text-gray-500 mb-6 max-w-sm">{description}</p>
+      <h3 className="text-base font-medium text-gray-900 mb-1">{title}</h3>
+      <p className="text-sm text-gray-500 mb-6 max-w-xs">{description}</p>
       {retry && (
-        <Button onClick={retry} variant="secondary">
+        <Button onClick={retry} variant="secondary" size="sm">
           Try Again
         </Button>
       )}
     </div>
   );
 }
-
