@@ -315,6 +315,16 @@ body.dark-mode .min-h-screen[class*="bg-gray-50"] { background: #0f172a !importa
 /* ── Modal ── */
 body.dark-mode [class*="bg-black/40"] { background: rgba(0, 0, 0, 0.65) !important; }
 
+body.dark-mode .modal-content {
+  background: #1e293b !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+}
+
+body.dark-mode .modal-header {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+
 /* ── Skeleton loading ── */
 body.dark-mode [class*="bg-gray-200\\/70"],
 body.dark-mode [class*="bg-gray-200"] { background: #334155 !important; }

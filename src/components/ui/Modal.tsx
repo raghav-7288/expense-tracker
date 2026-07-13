@@ -67,7 +67,7 @@ export default function Modal({ open, onClose, title, children, size = 'md' }: M
             exit={{ opacity: 0, y: 10, scale: 0.98 }}
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
             className={cn(
-              'relative w-full bg-white shadow-xl max-h-[85vh] sm:max-h-[90vh] overflow-y-auto',
+              'modal-content relative w-full bg-white shadow-xl max-h-[85vh] sm:max-h-[90vh] overflow-y-auto',
               'focus:outline-none',
               'rounded-t-xl sm:rounded-xl',
               {
@@ -77,7 +77,7 @@ export default function Modal({ open, onClose, title, children, size = 'md' }: M
               },
             )}
           >
-            <div className="flex items-center justify-between px-4 sm:px-5 py-3.5 sm:py-4 border-b border-gray-100 sticky top-0 bg-white z-10">
+            <div className="modal-header flex items-center justify-between px-4 sm:px-5 py-3.5 sm:py-4 border-b border-gray-100 sticky top-0 bg-white z-10">
               <h2 id="modal-title" className="text-base font-semibold text-gray-900">
                 {title}
               </h2>
