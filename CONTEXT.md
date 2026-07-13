@@ -1,6 +1,6 @@
 # ExpenseTracker — Project Context
 
-> Updated 2026-07-13 | ~8,000+ source lines | [https://expense-tracker-raghav.vercel.app/](https://expense-tracker-raghav.vercel.app/)
+> Updated 2026-07-13 | ~8,000+ source lines | [https://expense-tracker-rg.vercel.app](https://expense-tracker-rg.vercel.app)
 
 ---
 
