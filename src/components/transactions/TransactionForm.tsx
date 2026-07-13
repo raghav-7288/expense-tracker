@@ -79,13 +79,13 @@ export default function TransactionForm({
         <div className="grid grid-cols-2 gap-2">
           <label className="relative cursor-pointer">
             <input type="radio" value="expense" {...register('type')} className="peer sr-only" />
-            <div className="peer-checked:border-rose-500 peer-checked:bg-rose-500/10 peer-checked:text-rose-600 peer-focus-visible:ring-2 peer-focus-visible:ring-rose-500/20 border border-gray-200 rounded-lg py-2.5 text-center text-sm font-medium transition-all hover:border-gray-300 text-gray-600">
+            <div className="txn-type-toggle peer-checked:border-rose-500 peer-checked:bg-rose-500/15 peer-checked:text-rose-500 peer-focus-visible:ring-2 peer-focus-visible:ring-rose-500/20 border border-gray-300 rounded-lg py-2.5 text-center text-sm font-semibold transition-all hover:border-gray-400">
               Expense
             </div>
           </label>
           <label className="relative cursor-pointer">
             <input type="radio" value="income" {...register('type')} className="peer sr-only" />
-            <div className="peer-checked:border-emerald-500 peer-checked:bg-emerald-500/10 peer-checked:text-emerald-600 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500/20 border border-gray-200 rounded-lg py-2.5 text-center text-sm font-medium transition-all hover:border-gray-300 text-gray-600">
+            <div className="txn-type-toggle peer-checked:border-emerald-500 peer-checked:bg-emerald-500/15 peer-checked:text-emerald-500 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500/20 border border-gray-300 rounded-lg py-2.5 text-center text-sm font-semibold transition-all hover:border-gray-400">
               Income
             </div>
           </label>

@@ -186,26 +186,6 @@ export default function DashboardLayout() {
             <div className="hidden lg:flex items-center gap-2 flex-1">
               <span className="text-sm font-medium text-gray-900">{currentTitle}</span>
             </div>
-
-            {/* Desktop theme toggle */}
-            <button
-              type="button"
-              className="hidden lg:flex nav-theme-toggle"
-              onClick={() => setDarkMode(!darkMode)}
-              aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-            >
-              {darkMode ? <Sun size={17} aria-hidden="true" /> : <Moon size={17} aria-hidden="true" />}
-            </button>
-
-            {/* Mobile theme toggle */}
-            <button
-              type="button"
-              className="lg:hidden nav-theme-toggle"
-              onClick={() => setDarkMode(!darkMode)}
-              aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-            >
-              {darkMode ? <Sun size={17} aria-hidden="true" /> : <Moon size={17} aria-hidden="true" />}
-            </button>
           </div>
         </header>
 

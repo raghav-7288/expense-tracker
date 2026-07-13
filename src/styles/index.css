@@ -88,6 +88,36 @@ input[type="number"] {
 }
 
 /* =========================================
+   TRANSACTION TYPE TOGGLE
+   ========================================= */
+.txn-type-toggle {
+  color: #6b7280;
+}
+
+body.dark-mode .txn-type-toggle {
+  color: #94a3b8 !important;
+  border-color: #475569 !important;
+}
+
+body.dark-mode .txn-type-toggle:hover {
+  border-color: #64748b !important;
+}
+
+/* When checked, the peer-checked Tailwind classes apply color.
+   We need to NOT override them in dark mode. */
+body.dark-mode .peer:checked ~ .txn-type-toggle[class*="text-rose"] {
+  color: #fb7185 !important;
+  border-color: #f43f5e !important;
+  background: rgba(244, 63, 94, 0.15) !important;
+}
+
+body.dark-mode .peer:checked ~ .txn-type-toggle[class*="text-emerald"] {
+  color: #6ee7b7 !important;
+  border-color: #10b981 !important;
+  background: rgba(16, 185, 129, 0.15) !important;
+}
+
+/* =========================================
    THEME TOGGLE BUTTON (Nav)
    ========================================= */
 .nav-theme-toggle {
