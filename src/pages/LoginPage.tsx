@@ -8,6 +8,8 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import FormAlert from '@/components/ui/FormAlert';
 import AnimatedPage from '@/components/ui/AnimatedPage';
+import Divider from '@/components/ui/Divider';
+import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
 import { Mail, Lock } from 'lucide-react';
 
 const loginSchema = z.object({
@@ -18,7 +20,7 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const { signIn } = useAuth();
+  const { signIn, signInWithGoogle } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const {
@@ -45,6 +47,10 @@ export default function LoginPage() {
         <h2 className="text-lg font-semibold text-gray-900">Welcome back</h2>
         <p className="text-sm text-gray-500 mt-1">Sign in to your account to continue</p>
       </div>
+
+      <GoogleSignInButton onClick={signInWithGoogle} />
+
+      <Divider />
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {errors.root && <FormAlert message={errors.root.message} />}

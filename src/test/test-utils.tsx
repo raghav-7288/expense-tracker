@@ -35,6 +35,7 @@ export function createMockAuth(overrides: Partial<AuthContextType> = {}): AuthCo
     loading: false,
     signUp: vi.fn().mockResolvedValue({ error: null }),
     signIn: vi.fn().mockResolvedValue({ error: null }),
+    signInWithGoogle: vi.fn().mockResolvedValue({ error: null }),
     signOut: vi.fn().mockResolvedValue(undefined),
     resetPassword: vi.fn().mockResolvedValue({ error: null }),
     updatePassword: vi.fn().mockResolvedValue({ error: null }),

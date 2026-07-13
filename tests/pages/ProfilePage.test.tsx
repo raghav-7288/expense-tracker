@@ -24,7 +24,7 @@ describe('ProfilePage', () => {
 
   it('renders profile form with user data', () => {
     mockUseProfile.mockReturnValue({
-      data: { id: 'u1', email: '[REDACTED_EMAIL_ADDRESS_3]', full_name: 'Test', currency: 'USD', avatar_url: null, created_at: '', updated_at: '' },
+      data: { id: 'u1', email: 'test@example.com', full_name: 'Test', currency: 'USD', avatar_url: null, created_at: '', updated_at: '' },
       isLoading: false,
     } as never);
 
@@ -35,7 +35,7 @@ describe('ProfilePage', () => {
 
   it('renders appearance section with dark mode toggle', () => {
     mockUseProfile.mockReturnValue({
-      data: { id: 'u1', email: '[REDACTED_EMAIL_ADDRESS_3]', full_name: 'Test', currency: 'USD', avatar_url: null, created_at: '', updated_at: '' },
+      data: { id: 'u1', email: 'test@example.com', full_name: 'Test', currency: 'USD', avatar_url: null, created_at: '', updated_at: '' },
       isLoading: false,
     } as never);
 
@@ -46,7 +46,7 @@ describe('ProfilePage', () => {
 
   it('renders change password section', () => {
     mockUseProfile.mockReturnValue({
-      data: { id: 'u1', email: '[REDACTED_EMAIL_ADDRESS_3]', full_name: 'Test', currency: 'USD', avatar_url: null, created_at: '', updated_at: '' },
+      data: { id: 'u1', email: 'test@example.com', full_name: 'Test', currency: 'USD', avatar_url: null, created_at: '', updated_at: '' },
       isLoading: false,
     } as never);
 

@@ -12,7 +12,7 @@ export function resetFactoryIds() {
 export function buildProfile(overrides: Partial<Profile> = {}): Profile {
   return {
     id: 'user-123',
-    email: '[REDACTED_EMAIL_ADDRESS_2]',
+    email: 'user@example.com',
     full_name: 'Test User',
     avatar_url: null,
     currency: 'USD',

@@ -8,6 +8,8 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import FormAlert from '@/components/ui/FormAlert';
 import AnimatedPage from '@/components/ui/AnimatedPage';
+import Divider from '@/components/ui/Divider';
+import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
 import toast from 'react-hot-toast';
 import { User, Mail, Lock } from 'lucide-react';
 
@@ -24,7 +26,7 @@ const signUpSchema = z.object({
 type SignUpFormData = z.infer<typeof signUpSchema>;
 
 export default function SignUpPage() {
-  const { signUp } = useAuth();
+  const { signUp, signInWithGoogle } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const {
@@ -54,6 +56,10 @@ export default function SignUpPage() {
         <p className="text-sm text-gray-500 mt-1">Start tracking your finances in seconds</p>
       </div>
 
+      <GoogleSignInButton onClick={signInWithGoogle} />
+
+      <Divider />
+
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {errors.root && <FormAlert message={errors.root.message} />}
 
@@ -69,7 +75,7 @@ export default function SignUpPage() {
         <Input
           label="Email"
           type="email"
-          placeholder="[REDACTED_EMAIL_ADDRESS_1]"
+          placeholder="you@example.com"
           autoComplete="email"
           leftIcon={<Mail size={15} />}
           error={errors.email?.message}

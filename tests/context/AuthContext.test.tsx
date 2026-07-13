@@ -67,12 +67,12 @@ describe('AuthContext', () => {
   });
 
   it('sets user from initial session', async () => {
-    const session = { user: { email: '[REDACTED_EMAIL_ADDRESS_3]' } };
+    const session = { user: { email: 'test@example.com' } };
     mockGetSession.mockResolvedValue({ data: { session } });
 
     renderWithWrapper(<TestConsumer />);
     await waitFor(() => {
-      expect(screen.getByTestId('user')).toHaveTextContent('[REDACTED_EMAIL_ADDRESS_3]');
+      expect(screen.getByTestId('user')).toHaveTextContent('test@example.com');
     });
   });
 });
