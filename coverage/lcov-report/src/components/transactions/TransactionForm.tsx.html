@@ -193,7 +193,12 @@
 <a name='L128'></a><a href='#L128'>128</a>
 <a name='L129'></a><a href='#L129'>129</a>
 <a name='L130'></a><a href='#L130'>130</a>
-<a name='L131'></a><a href='#L131'>131</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -323,6 +328,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -332,6 +340,7 @@ import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import TextArea from '@/components/ui/TextArea';
 import { getToday } from '@/utils/formatDate';
+import { DollarSign, FileText, Calendar } from 'lucide-react';
 import type { Transaction, TransactionType } from '@/types';
 &nbsp;
 const transactionSchema = z.object({
@@ -384,34 +393,40 @@ export default function TransactionForm({
   }));
 &nbsp;
   return (
-    &lt;form onSubmit={<span class="fstat-no" title="function not covered" >handleSubmit((d</span>ata) =&gt; <span class="cstat-no" title="statement not covered" >onSubmit(data))</span>} className="space-y-4"&gt;
-      &lt;div className="grid grid-cols-2 gap-3"&gt;
-        &lt;label className="relative"&gt;
-          &lt;input type="radio" value="expense" {...register('type')} className="peer sr-only" /&gt;
-          &lt;div className="peer-checked:border-red-500 peer-checked:bg-red-50 peer-checked:text-red-700 border border-gray-300 rounded-lg py-2.5 text-center text-sm font-medium cursor-pointer transition-colors hover:bg-gray-50"&gt;
-            Expense
-          &lt;/div&gt;
-        &lt;/label&gt;
-        &lt;label className="relative"&gt;
-          &lt;input type="radio" value="income" {...register('type')} className="peer sr-only" /&gt;
-          &lt;div className="peer-checked:border-green-500 peer-checked:bg-green-50 peer-checked:text-green-700 border border-gray-300 rounded-lg py-2.5 text-center text-sm font-medium cursor-pointer transition-colors hover:bg-gray-50"&gt;
-            Income
-          &lt;/div&gt;
-        &lt;/label&gt;
-      &lt;/div&gt;
+    &lt;form onSubmit={<span class="fstat-no" title="function not covered" >handleSubmit((d</span>ata) =&gt; <span class="cstat-no" title="statement not covered" >onSubmit(data))</span>} className="space-y-5"&gt;
+      {/* Type toggle */}
+      &lt;fieldset&gt;
+        &lt;legend className="text-sm font-medium text-gray-700 mb-2"&gt;Transaction type&lt;/legend&gt;
+        &lt;div className="grid grid-cols-2 gap-2"&gt;
+          &lt;label className="relative cursor-pointer"&gt;
+            &lt;input type="radio" value="expense" {...register('type')} className="peer sr-only" /&gt;
+            &lt;div className="peer-checked:border-rose-500 peer-checked:bg-rose-50 peer-checked:text-rose-700 peer-focus-visible:ring-2 peer-focus-visible:ring-rose-500/20 border border-gray-200 rounded-lg py-2.5 text-center text-sm font-medium transition-all hover:border-gray-300"&gt;
+              Expense
+            &lt;/div&gt;
+          &lt;/label&gt;
+          &lt;label className="relative cursor-pointer"&gt;
+            &lt;input type="radio" value="income" {...register('type')} className="peer sr-only" /&gt;
+            &lt;div className="peer-checked:border-emerald-500 peer-checked:bg-emerald-50 peer-checked:text-emerald-700 peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500/20 border border-gray-200 rounded-lg py-2.5 text-center text-sm font-medium transition-all hover:border-gray-300"&gt;
+              Income
+            &lt;/div&gt;
+          &lt;/label&gt;
+        &lt;/div&gt;
+      &lt;/fieldset&gt;
 &nbsp;
       &lt;Input
         label="Amount"
         type="number"
         step="0.01"
         placeholder="0.00"
+        leftIcon={&lt;DollarSign size={15} /&gt;}
         error={errors.amount?.message}
         {...register('amount')}
       /&gt;
 &nbsp;
       &lt;Input
         label="Description"
-        placeholder="e.g. Grocery shopping"
+        placeholder="e.g. Grocery shopping at Trader Joe's"
+        leftIcon={&lt;FileText size={15} /&gt;}
         error={errors.description?.message}
         {...register('description')}
       /&gt;
@@ -427,32 +442,29 @@ export default function TransactionForm({
       &lt;Input
         label="Date"
         type="date"
+        leftIcon={&lt;Calendar size={15} /&gt;}
         error={errors.date?.message}
         {...register('date')}
       /&gt;
 &nbsp;
       &lt;TextArea
-        label="Notes (optional)"
-        placeholder="Additional details..."
+        label="Notes"
+        placeholder="Add any additional details..."
         error={errors.notes?.message}
         {...register('notes')}
       /&gt;
 &nbsp;
-      &lt;div className="flex gap-3 pt-2"&gt;
+      &lt;div className="flex gap-3 pt-3 border-t border-gray-100"&gt;
         &lt;Button type="button" variant="secondary" onClick={onCancel} className="flex-1"&gt;
           Cancel
         &lt;/Button&gt;
         &lt;Button type="submit" loading={loading} className="flex-1"&gt;
-          {initialData ? 'Update' : 'Add'} Transaction
+          {initialData ? 'Save Changes' : 'Add Transaction'}
         &lt;/Button&gt;
       &lt;/div&gt;
     &lt;/form&gt;
   );
 }
-&nbsp;
-&nbsp;
-&nbsp;
-&nbsp;
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -460,7 +472,7 @@ export default function TransactionForm({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-07-12T19:25:53.014Z
+                at 2026-07-13T09:27:46.041Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

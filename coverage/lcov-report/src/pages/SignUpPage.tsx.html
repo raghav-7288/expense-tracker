@@ -167,7 +167,21 @@
 <a name='L102'></a><a href='#L102'>102</a>
 <a name='L103'></a><a href='#L103'>103</a>
 <a name='L104'></a><a href='#L104'>104</a>
-<a name='L105'></a><a href='#L105'>105</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -271,6 +285,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -279,7 +301,10 @@ import { z } from 'zod';
 import { useAuth } from '@/hooks/useAuth';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
+import FormAlert from '@/components/ui/FormAlert';
+import AnimatedPage from '@/components/ui/AnimatedPage';
 import toast from 'react-hot-toast';
+import { User, Mail, Lock } from 'lucide-react';
 &nbsp;
 const signUpSchema = z.object({
   fullName: z.string().min(2, 'Name must be at least 2 characters'),
@@ -318,20 +343,20 @@ export default function SignUpPage() {
   }
 &nbsp;
   return (
-    &lt;div&gt;
-      &lt;h2 className="text-xl font-semibold text-gray-900 mb-1"&gt;Create an account&lt;/h2&gt;
-      &lt;p className="text-sm text-gray-500 mb-6"&gt;Get started with expense tracking&lt;/p&gt;
+    &lt;AnimatedPage&gt;
+      &lt;div className="mb-6"&gt;
+        &lt;h2 className="text-lg font-semibold text-gray-900"&gt;Create an account&lt;/h2&gt;
+        &lt;p className="text-sm text-gray-500 mt-1"&gt;Start tracking your finances in seconds&lt;/p&gt;
+      &lt;/div&gt;
 &nbsp;
       &lt;form onSubmit={handleSubmit(onSubmit)} className="space-y-4"&gt;
-        {errors.root &amp;&amp; (
-          &lt;div className="p-3 rounded-lg bg-red-50 text-sm text-red-600"&gt;
-            {errors.root.message}
-          &lt;/div&gt;
-        )}
+        {errors.root &amp;&amp; &lt;FormAlert message={errors.root.message} /&gt;}
 &nbsp;
         &lt;Input
           label="Full Name"
           placeholder="John Doe"
+          autoComplete="name"
+          leftIcon={&lt;User size={15} /&gt;}
           error={errors.fullName?.message}
           {...register('fullName')}
         /&gt;
@@ -340,6 +365,8 @@ export default function SignUpPage() {
           label="Email"
           type="email"
           placeholder="[REDACTED_EMAIL_ADDRESS_1]"
+          autoComplete="email"
+          leftIcon={&lt;Mail size={15} /&gt;}
           error={errors.email?.message}
           {...register('email')}
         /&gt;
@@ -347,7 +374,10 @@ export default function SignUpPage() {
         &lt;Input
           label="Password"
           type="password"
-          placeholder="••••••••"
+          placeholder="Create a strong password"
+          autoComplete="new-password"
+          leftIcon={&lt;Lock size={15} /&gt;}
+          helperText="At least 6 characters"
           error={errors.password?.message}
           {...register('password')}
         /&gt;
@@ -355,14 +385,18 @@ export default function SignUpPage() {
         &lt;Input
           label="Confirm Password"
           type="password"
-          placeholder="••••••••"
+          placeholder="Re-enter your password"
+          autoComplete="new-password"
+          leftIcon={&lt;Lock size={15} /&gt;}
           error={errors.confirmPassword?.message}
           {...register('confirmPassword')}
         /&gt;
 &nbsp;
-        &lt;Button type="submit" loading={loading} className="w-full"&gt;
-          Create Account
-        &lt;/Button&gt;
+        &lt;div className="pt-1"&gt;
+          &lt;Button type="submit" loading={loading} className="w-full" size="lg"&gt;
+            Create Account
+          &lt;/Button&gt;
+        &lt;/div&gt;
       &lt;/form&gt;
 &nbsp;
       &lt;p className="mt-6 text-center text-sm text-gray-500"&gt;
@@ -371,10 +405,9 @@ export default function SignUpPage() {
           Sign in
         &lt;/Link&gt;
       &lt;/p&gt;
-    &lt;/div&gt;
+    &lt;/AnimatedPage&gt;
   );
 }
-&nbsp;
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -382,7 +415,7 @@ export default function SignUpPage() {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-07-12T19:25:53.014Z
+                at 2026-07-13T09:27:46.041Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

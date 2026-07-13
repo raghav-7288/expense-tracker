@@ -131,7 +131,12 @@
 <a name='L66'></a><a href='#L66'>66</a>
 <a name='L67'></a><a href='#L67'>67</a>
 <a name='L68'></a><a href='#L68'>68</a>
-<a name='L69'></a><a href='#L69'>69</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -148,6 +153,18 @@
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -190,75 +207,70 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { Link } from 'react-router-dom';
 import { useRecentTransactions } from '@/hooks/useDashboard';
 import { useCurrency } from '@/hooks/useCurrency';
 import { formatCurrency } from '@/utils/formatCurrency';
-import { formatDate } from '@/utils/formatDate';
-import Badge from '@/components/ui/Badge';
+import { formatDateShort } from '@/utils/formatDate';
+import { cn } from '@/utils/cn';
 import Card from '@/components/ui/Card';
-import Spinner from '@/components/ui/Spinner';
-import { ArrowRight } from 'lucide-react';
+import Avatar from '@/components/ui/Avatar';
+import { SkeletonRecentTransactions } from '@/components/ui/Skeleton';
+import { ArrowRight, Receipt } from 'lucide-react';
 &nbsp;
 export default function RecentTransactions() {
   const { data: transactions, isLoading } = useRecentTransactions(5);
   const currency = useCurrency();
 &nbsp;
-  if (isLoading) return &lt;Spinner /&gt;;
+  if (isLoading) return &lt;SkeletonRecentTransactions /&gt;;
 &nbsp;
   return (
     &lt;Card padding={false}&gt;
-      &lt;div className="flex items-center justify-between p-4 border-b border-gray-200"&gt;
-        &lt;h3 className="font-semibold text-gray-900"&gt;Recent Transactions&lt;/h3&gt;
+      &lt;div className="flex items-center justify-between px-5 py-4 border-b border-gray-100"&gt;
+        &lt;h3 className="text-sm font-semibold text-gray-900"&gt;Recent Transactions&lt;/h3&gt;
         &lt;Link
           to="/transactions"
-          className="text-sm text-primary-600 hover:text-primary-700 flex items-center gap-1"
+          className="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1 transition-colors"
         &gt;
-          View all &lt;ArrowRight size={14} /&gt;
+          View all &lt;ArrowRight size={12} /&gt;
         &lt;/Link&gt;
       &lt;/div&gt;
 &nbsp;
       {!transactions || transactions.length === 0 ? (
-        &lt;div className="p-6 text-center text-sm text-gray-500"&gt;
-          No transactions yet. Start by adding one!
+        &lt;div className="flex flex-col items-center justify-center py-10 text-center px-4"&gt;
+          &lt;div className="w-11 h-11 rounded-xl bg-gray-50 flex items-center justify-center mb-3"&gt;
+            &lt;Receipt size={18} className="text-gray-300" /&gt;
+          &lt;/div&gt;
+          &lt;p className="text-sm font-medium text-gray-500 mb-1"&gt;No activity yet&lt;/p&gt;
+          &lt;p className="text-xs text-gray-400 mb-4 max-w-[200px]"&gt;
+            Your recent transactions will appear here once you start tracking
+          &lt;/p&gt;
+          &lt;Link
+            to="/transactions"
+            className="text-xs font-medium text-primary-600 hover:text-primary-700 transition-colors"
+          &gt;
+            Add your first transaction →
+          &lt;/Link&gt;
         &lt;/div&gt;
       ) : (
-        &lt;div className="divide-y divide-gray-100"&gt;
+        &lt;div className="divide-y divide-gray-50"&gt;
           {transactions.map((t) =&gt; (
-            &lt;div key={t.id} className="flex items-center justify-between px-4 py-3"&gt;
+            &lt;div key={t.id} className="flex items-center justify-between px-5 py-3 hover:bg-gray-50/50 transition-colors"&gt;
               &lt;div className="flex items-center gap-3 min-w-0"&gt;
-                &lt;div
-                  className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-                  style={{ backgroundColor: t.categories?.color ?? <span class="branch-1 cbranch-no" title="branch not covered" >'#6b7280' }</span>}
-                &gt;
-                  &lt;span className="text-white text-xs font-medium"&gt;
-                    {t.description.charAt(0).toUpperCase()}
-                  &lt;/span&gt;
-                &lt;/div&gt;
+                &lt;Avatar name={t.description} color={t.categories?.color ?? <span class="branch-1 cbranch-no" title="branch not covered" >'#6b7280'} s</span>ize="sm" /&gt;
                 &lt;div className="min-w-0"&gt;
                   &lt;p className="text-sm font-medium text-gray-900 truncate"&gt;{t.description}&lt;/p&gt;
-                  &lt;p className="text-xs text-gray-500"&gt;{formatDate(t.date)}&lt;/p&gt;
+                  &lt;p className="text-[11px] text-gray-400"&gt;{formatDateShort(t.date)}&lt;/p&gt;
                 &lt;/div&gt;
               &lt;/div&gt;
-              &lt;div className="flex items-center gap-3 flex-shrink-0"&gt;
-                &lt;Badge type={t.type} /&gt;
-                &lt;span
-                  className={`text-sm font-semibold ${
-                    t.type === 'income' ? <span class="branch-0 cbranch-no" title="branch not covered" >'text-green-600' : '</span>text-red-600'
-                  }`}
-                &gt;
-                  {t.type === 'income' ? <span class="branch-0 cbranch-no" title="branch not covered" >'+' : '</span>-'}{formatCurrency(Number(t.amount), currency)}
-                &lt;/span&gt;
-              &lt;/div&gt;
+              &lt;span
+                className={cn(
+                  'text-sm font-semibold tabular-nums flex-shrink-0',
+                  t.type === 'income' ? <span class="branch-0 cbranch-no" title="branch not covered" >'text-emerald-600' : '</span>text-red-600',
+                )}
+              &gt;
+                {t.type === 'income' ? <span class="branch-0 cbranch-no" title="branch not covered" >'+' : '</span>-'}{formatCurrency(Number(t.amount), currency)}
+              &lt;/span&gt;
             &lt;/div&gt;
           ))}
         &lt;/div&gt;
@@ -274,7 +286,7 @@ export default function RecentTransactions() {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-07-12T19:25:53.014Z
+                at 2026-07-13T09:27:46.041Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

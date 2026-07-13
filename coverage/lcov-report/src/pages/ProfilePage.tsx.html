@@ -250,7 +250,11 @@
 <a name='L185'></a><a href='#L185'>185</a>
 <a name='L186'></a><a href='#L186'>186</a>
 <a name='L187'></a><a href='#L187'>187</a>
-<a name='L188'></a><a href='#L188'>188</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -435,8 +439,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -448,7 +450,10 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
-import Spinner from '@/components/ui/Spinner';
+import FormAlert from '@/components/ui/FormAlert';
+import AnimatedPage from '@/components/ui/AnimatedPage';
+import { SkeletonProfile } from '@/components/ui/Skeleton';
+import { cn } from '@/utils/cn';
 import { CURRENCIES } from '@/utils/constants';
 import { User, Moon, Sun } from 'lucide-react';
 &nbsp;
@@ -522,22 +527,22 @@ export default function ProfilePage() {
 <span class="cstat-no" title="statement not covered" >    setPasswordLoading(false);</span>
   }
 &nbsp;
-  if (isLoading) return &lt;Spinner size={32} /&gt;;
+  if (isLoading) return &lt;SkeletonProfile /&gt;;
 &nbsp;
   const currencyOptions = CURRENCIES.map((c) =&gt; ({ value: c.value, label: c.label }));
 &nbsp;
   return (
-    &lt;div className="space-y-6 max-w-2xl"&gt;
+    &lt;AnimatedPage className="space-y-6 max-w-2xl"&gt;
       &lt;div&gt;
-        &lt;h1 className="text-2xl font-bold text-gray-900"&gt;Profile&lt;/h1&gt;
-        &lt;p className="text-sm text-gray-500 mt-1"&gt;Manage your account settings&lt;/p&gt;
+        &lt;h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight"&gt;Profile&lt;/h1&gt;
+        &lt;p className="text-sm text-gray-500 mt-0.5"&gt;Manage your account settings&lt;/p&gt;
       &lt;/div&gt;
 &nbsp;
       {/* Profile Info */}
       &lt;Card&gt;
         &lt;div className="flex items-center gap-4 mb-6"&gt;
-          &lt;div className="w-16 h-16 rounded-full bg-primary-100 flex items-center justify-center"&gt;
-            &lt;User size={28} className="text-primary-600" /&gt;
+          &lt;div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center"&gt;
+            &lt;User size={24} className="text-white" /&gt;
           &lt;/div&gt;
           &lt;div&gt;
             &lt;p className="font-medium text-gray-900"&gt;{profile?.full_name || <span class="branch-1 cbranch-no" title="branch not covered" >'User'}&lt;/p&gt;</span>
@@ -567,10 +572,10 @@ export default function ProfilePage() {
 &nbsp;
       {/* Appearance */}
       &lt;Card&gt;
-        &lt;h3 className="font-semibold text-gray-900 mb-4 section-heading"&gt;Appearance&lt;/h3&gt;
+        &lt;h3 className="text-sm font-semibold text-gray-900 mb-4 section-heading"&gt;Appearance&lt;/h3&gt;
         &lt;div className="flex items-center justify-between"&gt;
           &lt;div className="flex items-center gap-3"&gt;
-            {darkMode ? <span class="branch-0 cbranch-no" title="branch not covered" >&lt;Moon size={20} className="text-gray-500" /&gt; : &lt;S</span>un size={20} className="text-gray-500" /&gt;}
+            {darkMode ? <span class="branch-0 cbranch-no" title="branch not covered" >&lt;Moon size={18} className="text-gray-400" aria-hidden="true" /&gt; : &lt;S</span>un size={18} className="text-gray-400" aria-hidden="true" /&gt;}
             &lt;div&gt;
               &lt;p className="text-sm font-medium text-gray-900 section-heading"&gt;Dark Mode&lt;/p&gt;
               &lt;p className="text-xs text-gray-500 muted-text"&gt;
@@ -580,7 +585,7 @@ export default function ProfilePage() {
           &lt;/div&gt;
           &lt;button
             type="button"
-            className={`toggle-switch ${darkMode ? <span class="branch-0 cbranch-no" title="branch not covered" >'active' : '</span>'}`}
+            className={cn('toggle-switch', darkMode &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >'active')</span>}
 <span class="fstat-no" title="function not covered" >            onClick={() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etDarkMode(!darkMode)}</span>
             aria-label={darkMode ? <span class="branch-0 cbranch-no" title="branch not covered" >'Switch to light mode' : '</span>Switch to dark mode'}
             role="switch"
@@ -591,12 +596,10 @@ export default function ProfilePage() {
 &nbsp;
       {/* Change Password */}
       &lt;Card&gt;
-        &lt;h3 className="font-semibold text-gray-900 mb-4"&gt;Change Password&lt;/h3&gt;
+        &lt;h3 className="text-sm font-semibold text-gray-900 mb-4"&gt;Change Password&lt;/h3&gt;
         &lt;form onSubmit={handlePasswordSubmit(onPasswordSubmit)} className="space-y-4"&gt;
           {passwordErrors.root &amp;&amp; (
-<span class="branch-1 cbranch-no" title="branch not covered" >            &lt;div className="p-3 rounded-lg bg-red-50 text-sm text-red-600"&gt;</span>
-              {passwordErrors.root.message}
-            &lt;/div&gt;
+<span class="branch-1 cbranch-no" title="branch not covered" >            &lt;FormAlert message={passwordErrors.root.message} /&gt;</span>
           )}
 &nbsp;
           &lt;Input
@@ -620,7 +623,7 @@ export default function ProfilePage() {
           &lt;/Button&gt;
         &lt;/form&gt;
       &lt;/Card&gt;
-    &lt;/div&gt;
+    &lt;/AnimatedPage&gt;
   );
 }
 &nbsp;
@@ -631,7 +634,7 @@ export default function ProfilePage() {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-07-12T19:25:53.014Z
+                at 2026-07-13T09:27:46.041Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

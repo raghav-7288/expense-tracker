@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">42.85% </span>
+                <span class="strong">53.84% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>6/14</span>
+                <span class='fraction'>7/13</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">75% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>9/12</span>
+                <span class='fraction'>8/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">22.22% </span>
+                <span class="strong">37.5% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>2/9</span>
+                <span class='fraction'>3/8</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">42.85% </span>
+                <span class="strong">53.84% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>6/14</span>
+                <span class='fraction'>7/13</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line medium'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -159,15 +159,10 @@
 <a name='L94'></a><a href='#L94'>94</a>
 <a name='L95'></a><a href='#L95'>95</a>
 <a name='L96'></a><a href='#L96'>96</a>
-<a name='L97'></a><a href='#L97'>97</a>
-<a name='L98'></a><a href='#L98'>98</a>
-<a name='L99'></a><a href='#L99'>99</a>
-<a name='L100'></a><a href='#L100'>100</a>
-<a name='L101'></a><a href='#L101'>101</a>
-<a name='L102'></a><a href='#L102'>102</a>
-<a name='L103'></a><a href='#L103'>103</a>
-<a name='L104'></a><a href='#L104'>104</a>
-<a name='L105'></a><a href='#L105'>105</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L97'></a><a href='#L97'>97</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -196,7 +191,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">6x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -211,27 +205,17 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">18x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -277,8 +261,11 @@ import CategoryList from '@/components/categories/CategoryList';
 import CategoryForm from '@/components/categories/CategoryForm';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
-import Spinner from '@/components/ui/Spinner';
 import EmptyState from '@/components/ui/EmptyState';
+import AnimatedPage from '@/components/ui/AnimatedPage';
+import PageHeader from '@/components/ui/PageHeader';
+import { SkeletonCategoryGrid } from '@/components/ui/Skeleton';
+import { cn } from '@/utils/cn';
 import { Plus, Tag } from 'lucide-react';
 import type { TransactionType } from '@/types';
 &nbsp;
@@ -300,63 +287,52 @@ export default function CategoriesPage() {
   }
 &nbsp;
   return (
-    &lt;div className="space-y-6"&gt;
-      &lt;div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"&gt;
-        &lt;div&gt;
-          &lt;h1 className="text-2xl font-bold text-gray-900"&gt;Categories&lt;/h1&gt;
-          &lt;p className="text-sm text-gray-500 mt-1"&gt;Organize your transactions with categories&lt;/p&gt;
-        &lt;/div&gt;
-        &lt;Button onClick={() =&gt; setShowForm(true)}&gt;
-          &lt;Plus size={16} /&gt;
-          Add Category
-        &lt;/Button&gt;
-      &lt;/div&gt;
+    &lt;AnimatedPage className="space-y-6"&gt;
+      &lt;PageHeader
+        title="Categories"
+        description="Organize your transactions with categories"
+        action={
+          &lt;Button onClick={() =&gt; setShowForm(true)} className="w-full sm:w-auto"&gt;
+            &lt;Plus size={16} /&gt;
+            Add Category
+          &lt;/Button&gt;
+        }
+      /&gt;
 &nbsp;
       {/* Type filter */}
-      &lt;div className="flex gap-2"&gt;
-        &lt;button
-<span class="fstat-no" title="function not covered" >          onClick={() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etFilterType(undefined)}</span>
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-            filterType === undefined
-              ? 'bg-primary-100 text-primary-700'
-              : <span class="branch-1 cbranch-no" title="branch not covered" >'text-gray-600 hover:bg-gray-100'</span>
-          }`}
-        &gt;
-          All
-        &lt;/button&gt;
-        &lt;button
-<span class="fstat-no" title="function not covered" >          onClick={() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etFilterType('expense')}</span>
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-            filterType === 'expense'
-              ? <span class="branch-0 cbranch-no" title="branch not covered" >'bg-red-100 text-red-700'</span>
-              : 'text-gray-600 hover:bg-gray-100'
-          }`}
-        &gt;
-          Expense
-        &lt;/button&gt;
-        &lt;button
-<span class="fstat-no" title="function not covered" >          onClick={() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etFilterType('income')}</span>
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-            filterType === 'income'
-              ? <span class="branch-0 cbranch-no" title="branch not covered" >'bg-green-100 text-green-700'</span>
-              : 'text-gray-600 hover:bg-gray-100'
-          }`}
-        &gt;
-          Income
-        &lt;/button&gt;
+      &lt;div className="flex gap-2" role="group" aria-label="Filter by type"&gt;
+        {([
+          { value: undefined, label: 'All', activeClass: 'bg-primary-100 text-primary-700' },
+          { value: 'expense' as const, label: 'Expense', activeClass: 'bg-red-50 text-red-700' },
+          { value: 'income' as const, label: 'Income', activeClass: 'bg-green-50 text-green-700' },
+        ] as const).map((filter) =&gt; (
+          &lt;button
+            key={filter.label}
+<span class="fstat-no" title="function not covered" >            onClick={() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etFilterType(filter.value)}</span>
+            aria-pressed={filterType === filter.value}
+            className={cn(
+              'px-3 py-2 sm:py-1.5 rounded-lg text-sm font-medium transition-colors',
+              filterType === filter.value
+                ? filter.activeClass
+                : 'text-gray-500 hover:bg-gray-100',
+            )}
+          &gt;
+            {filter.label}
+          &lt;/button&gt;
+        ))}
       &lt;/div&gt;
 &nbsp;
       {isLoading ? (
-        &lt;Spinner size={32} /&gt;
+        &lt;SkeletonCategoryGrid /&gt;
       ) : !categories || categories.length === 0 ? (
         &lt;EmptyState
-          icon={&lt;Tag size={48} /&gt;}
-          title="No categories found"
-          description="Create categories to organize your transactions"
+          icon={&lt;Tag size={28} /&gt;}
+          title="Organize with categories"
+          description="Create custom categories like Food, Transport, or Entertainment to keep your transactions neatly organized."
           action={
             &lt;Button <span class="fstat-no" title="function not covered" >onClick={() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etShowForm(true)}&gt;</span>
               &lt;Plus size={16} /&gt;
-              Add Category
+              Create Your First Category
             &lt;/Button&gt;
           }
         /&gt;
@@ -371,7 +347,7 @@ export default function CategoriesPage() {
           loading={createMutation.isPending}
         /&gt;
       &lt;/Modal&gt;
-    &lt;/div&gt;
+    &lt;/AnimatedPage&gt;
   );
 }
 &nbsp;
@@ -382,7 +358,7 @@ export default function CategoriesPage() {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-07-12T19:25:53.014Z
+                at 2026-07-13T09:27:46.041Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
