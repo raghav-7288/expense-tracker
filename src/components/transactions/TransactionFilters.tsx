@@ -18,11 +18,13 @@ export default function TransactionFilterBar({ filters, onChange, resultCount }:
 
   // Derive dateMode from filters, but allow local override for user interactions
   const derivedDateMode: DateMode =
-    filters.date_from && filters.date_to ? 'range' : filters.date_from ? 'single' : 'none';
-  // If filters are cleared externally (derivedDateMode = none) but we had an override, reset it
-  const dateMode = derivedDateMode === 'none' && dateModeOverride !== null
-    ? 'none'
-    : (dateModeOverride ?? derivedDateMode);
+    filters.date_from && filters.date_to && filters.date_from !== filters.date_to
+      ? 'range'
+      : filters.date_from
+        ? 'single'
+        : 'none';
+  // Use the user's explicit selection if set, otherwise fall back to derived
+  const dateMode = dateModeOverride ?? derivedDateMode;
 
   const categoryOptions = [
     { value: '', label: 'All Categories' },
@@ -52,7 +54,9 @@ export default function TransactionFilterBar({ filters, onChange, resultCount }:
     if (mode === 'none') {
       onChange({ ...filters, date_from: undefined, date_to: undefined });
     } else if (mode === 'single') {
-      onChange({ ...filters, date_to: undefined });
+      // Single date: set both from & to to same value to filter exact day
+      const date = filters.date_from;
+      onChange({ ...filters, date_from: date, date_to: date });
     }
   }
 
@@ -143,7 +147,14 @@ export default function TransactionFilterBar({ filters, onChange, resultCount }:
             type="date"
             aria-label={dateMode === 'range' ? 'From date' : 'Date'}
             value={filters.date_from ?? ''}
-            onChange={(e) => onChange({ ...filters, date_from: e.target.value || undefined })}
+            onChange={(e) => {
+              const val = e.target.value || undefined;
+              if (dateMode === 'single') {
+                onChange({ ...filters, date_from: val, date_to: val });
+              } else {
+                onChange({ ...filters, date_from: val });
+              }
+            }}
             className="px-2.5 py-1.5 text-xs border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
           />
           {dateMode === 'range' && (
