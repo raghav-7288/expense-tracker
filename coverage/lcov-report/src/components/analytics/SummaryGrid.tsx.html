@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">81.81% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/22</span>
+                <span class='fraction'>18/22</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -251,12 +251,10 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">60x</span>
+<span class="cline-any cline-yes">60x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">60x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -299,7 +297,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -408,11 +408,11 @@ interface SummaryCardProps {
   variant?: 'default' | 'success' | 'danger' | 'info';
 }
 &nbsp;
-function <span class="fstat-no" title="function not covered" >SummaryCard({</span> title, value, icon, change, subtitle, variant = <span class="branch-0 cbranch-no" title="branch not covered" >'default' }: SummaryCardProps) {</span>
-  const hasChange = <span class="cstat-no" title="statement not covered" >change !== undefined &amp;&amp; change !== 0;</span>
-  const <span class="cstat-no" title="statement not covered" >isPositive = (change ?? 0) &gt; 0;</span>
+function SummaryCard({ title, value, icon, change, subtitle, variant = 'default' }: SummaryCardProps) {
+  const hasChange = change !== undefined &amp;&amp; change !== 0;
+  const isPositive = (change ?? 0) &gt; 0;
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return (</span>
+  return (
     &lt;div className="bg-white rounded-xl border border-gray-200 shadow-sm p-3 sm:p-4 hover:shadow-md transition-shadow group overflow-hidden"&gt;
       &lt;div className="flex items-center justify-between mb-2"&gt;
         &lt;span className="text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wide truncate"&gt;{title}&lt;/span&gt;
@@ -437,7 +437,7 @@ function <span class="fstat-no" title="function not covered" >SummaryCard({</spa
             })}
           &gt;
             {isPositive ? &lt;ArrowUpRight size={12} /&gt; : &lt;ArrowDownRight size={12} /&gt;}
-            {Math.abs(change ?? 0)}%
+            {Math.abs(change ?? <span class="branch-1 cbranch-no" title="branch not covered" >0)</span>}%
           &lt;/span&gt;
         )}
         {!hasChange &amp;&amp; change === 0 &amp;&amp; (
@@ -456,8 +456,8 @@ interface SummaryGridProps {
   currency: string;
 }
 &nbsp;
-export default function <span class="fstat-no" title="function not covered" >SummaryGrid({</span> summary, currency }: SummaryGridProps) {
-<span class="cstat-no" title="statement not covered" >  return (</span>
+export default function SummaryGrid({ summary, currency }: SummaryGridProps) {
+  return (
     &lt;div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3"&gt;
       &lt;SummaryCard
         title="Balance"
@@ -494,7 +494,7 @@ export default function <span class="fstat-no" title="function not covered" >Sum
         title="Savings Rate"
         value={`${summary.savingsRate}%`}
         icon={&lt;Percent size={16} /&gt;}
-        variant={summary.savingsRate &gt;= 20 ? 'success' : summary.savingsRate &gt;= 0 ? 'info' : 'danger'}
+        variant={summary.savingsRate &gt;= 20 ? 'success' : <span class="branch-1 cbranch-no" title="branch not covered" >summary.savingsRate &gt;= 0 ? 'info' : 'danger'}</span>
         subtitle="of income"
       /&gt;
       &lt;SummaryCard
@@ -544,7 +544,7 @@ export default function <span class="fstat-no" title="function not covered" >Sum
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-07-13T09:27:46.041Z
+                at 2026-07-15T11:53:47.431Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">16.66% </span>
+                <span class="strong">83.33% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>1/6</span>
+                <span class='fraction'>5/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">58.33% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>7/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">80% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/5</span>
+                <span class='fraction'>4/5</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">16.66% </span>
+                <span class="strong">83.33% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>1/6</span>
+                <span class='fraction'>5/6</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -153,6 +153,28 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">50x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -167,15 +189,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -184,20 +197,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -246,16 +246,16 @@ const PRESETS: { value: TimeRangePreset; label: string }[] = [
   { value: 'custom', label: 'Custom' },
 ];
 &nbsp;
-export default function <span class="fstat-no" title="function not covered" >TimeRangeFilter({</span> value, customRange, onChange }: TimeRangeFilterProps) {
-<span class="cstat-no" title="statement not covered" >  return (</span>
+export default function TimeRangeFilter({ value, customRange, onChange }: TimeRangeFilterProps) {
+  return (
     &lt;div className="flex flex-col gap-3"&gt;
       &lt;div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none" role="group" aria-label="Time range"&gt;
         &lt;div className="flex gap-1.5 min-w-max sm:min-w-0 sm:flex-wrap"&gt;
-          {PRESETS.<span class="fstat-no" title="function not covered" >map((p</span>reset) =&gt; (
-<span class="cstat-no" title="statement not covered" >            &lt;button</span>
+          {PRESETS.map((preset) =&gt; (
+            &lt;button
               key={preset.value}
               type="button"
-<span class="fstat-no" title="function not covered" >              onClick={() =&gt; <span class="cstat-no" title="statement not covered" >o</span>nChange(preset.value)}</span>
+              onClick={() =&gt; onChange(preset.value)}
               aria-pressed={value === preset.value}
               className={cn(
                 'px-3 py-2 sm:py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap',
@@ -275,11 +275,11 @@ export default function <span class="fstat-no" title="function not covered" >Tim
           &lt;input
             type="date"
             aria-label="Start date"
-            value={customRange?.startDate ?? ''}
-<span class="fstat-no" title="function not covered" >            onChange={(e</span>) =&gt;
-<span class="cstat-no" title="statement not covered" >              onChange('custom', {</span>
+            value={customRange?.startDate ?? <span class="branch-1 cbranch-no" title="branch not covered" >''}</span>
+            onChange={(e) =&gt;
+              onChange('custom', {
                 startDate: e.target.value,
-                endDate: customRange?.endDate ?? e.target.value,
+                endDate: customRange?.endDate ?? <span class="branch-1 cbranch-no" title="branch not covered" >e.target.value,</span>
               })
             }
             className="border border-gray-200 rounded-lg px-2.5 py-2 text-xs flex-1 min-w-[120px]"
@@ -288,7 +288,7 @@ export default function <span class="fstat-no" title="function not covered" >Tim
           &lt;input
             type="date"
             aria-label="End date"
-            value={customRange?.endDate ?? ''}
+            value={customRange?.endDate ?? <span class="branch-1 cbranch-no" title="branch not covered" >''}</span>
 <span class="fstat-no" title="function not covered" >            onChange={(e</span>) =&gt;
 <span class="cstat-no" title="statement not covered" >              onChange('custom', {</span>
                 startDate: customRange?.startDate ?? e.target.value,
@@ -310,7 +310,7 @@ export default function <span class="fstat-no" title="function not covered" >Tim
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-07-13T09:27:46.041Z
+                at 2026-07-15T11:53:47.431Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

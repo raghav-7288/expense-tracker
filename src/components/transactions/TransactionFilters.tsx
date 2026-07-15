@@ -14,9 +14,15 @@ type DateMode = 'none' | 'single' | 'range';
 
 export default function TransactionFilterBar({ filters, onChange, resultCount }: TransactionFiltersProps) {
   const { data: categories } = useCategories();
-  const [dateMode, setDateMode] = useState<DateMode>(
-    filters.date_from && filters.date_to ? 'range' : filters.date_from ? 'single' : 'none'
-  );
+  const [dateModeOverride, setDateModeOverride] = useState<DateMode | null>(null);
+
+  // Derive dateMode from filters, but allow local override for user interactions
+  const derivedDateMode: DateMode =
+    filters.date_from && filters.date_to ? 'range' : filters.date_from ? 'single' : 'none';
+  // If filters are cleared externally (derivedDateMode = none) but we had an override, reset it
+  const dateMode = derivedDateMode === 'none' && dateModeOverride !== null
+    ? 'none'
+    : (dateModeOverride ?? derivedDateMode);
 
   const categoryOptions = [
     { value: '', label: 'All Categories' },
@@ -42,7 +48,7 @@ export default function TransactionFilterBar({ filters, onChange, resultCount }:
   }
 
   function handleDateModeChange(mode: DateMode) {
-    setDateMode(mode);
+    setDateModeOverride(mode);
     if (mode === 'none') {
       onChange({ ...filters, date_from: undefined, date_to: undefined });
     } else if (mode === 'single') {
@@ -53,7 +59,7 @@ export default function TransactionFilterBar({ filters, onChange, resultCount }:
   const hasActiveFilters = !!(filters.search || (filters.type && filters.type !== 'all') || filters.category_id || filters.date_from || filters.date_to);
 
   function clearFilters() {
-    setDateMode('none');
+    setDateModeOverride(null);
     onChange({ sort_by: filters.sort_by, sort_order: filters.sort_order });
   }
 

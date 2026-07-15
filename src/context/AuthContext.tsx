@@ -23,9 +23,15 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+    supabase.auth.getSession().then(({ data: { session: currentSession }, error }) => {
+      if (error) {
+        console.error('Failed to get session:', error.message);
+      }
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
+      setLoading(false);
+    }).catch(() => {
+      // Network error or unexpected failure
       setLoading(false);
     });
 

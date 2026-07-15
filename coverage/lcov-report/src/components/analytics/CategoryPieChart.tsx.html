@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">85.71% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/7</span>
+                <span class='fraction'>6/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">83.33% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/6</span>
+                <span class='fraction'>5/6</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">75% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>3/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">85.71% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/7</span>
+                <span class='fraction'>6/7</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -139,17 +139,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -163,19 +159,23 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -200,14 +200,14 @@ interface CategoryPieChartProps {
   currency: string;
 }
 &nbsp;
-export default function <span class="fstat-no" title="function not covered" >CategoryPieChart({</span> data, type, loading, currency }: CategoryPieChartProps) {
-  const { darkMode } = <span class="cstat-no" title="statement not covered" >useTheme()</span>;
-  const title = <span class="cstat-no" title="statement not covered" >type === 'expense' ? 'Spending by Category' : 'Income by Category';</span>
-  const emptyMessage = <span class="cstat-no" title="statement not covered" >type === 'expense'</span>
+export default function CategoryPieChart({ data, type, loading, currency }: CategoryPieChartProps) {
+  const { darkMode } = useTheme();
+  const title = type === 'expense' ? 'Spending by Category' : 'Income by Category';
+  const emptyMessage = type === 'expense'
     ? 'Add expenses with categories to see your spending breakdown'
     : 'Add income with categories to see your earnings breakdown';
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return (</span>
+  return (
     &lt;ChartCard title={title} loading={loading} empty={data.length === 0} emptyMessage={emptyMessage}&gt;
       &lt;div className="flex flex-col items-center gap-4"&gt;
         &lt;div className="h-44 w-44 flex-shrink-0"&gt;
@@ -222,10 +222,10 @@ export default function <span class="fstat-no" title="function not covered" >Cat
                 dataKey="amount"
                 nameKey="name"
                 strokeWidth={2}
-                stroke={darkMode ? '#1e293b' : '#fff'}
+                stroke={darkMode ? <span class="branch-0 cbranch-no" title="branch not covered" >'#1e293b' : '</span>#fff'}
               &gt;
-                {data.<span class="fstat-no" title="function not covered" >map((e</span>ntry, i) =&gt; (
-<span class="cstat-no" title="statement not covered" >                  &lt;Cell key={i} fill={entry.color} /&gt;</span>
+                {data.map((entry, i) =&gt; (
+                  &lt;Cell key={i} fill={entry.color} /&gt;
                 ))}
               &lt;/Pie&gt;
               &lt;Tooltip
@@ -236,8 +236,8 @@ export default function <span class="fstat-no" title="function not covered" >Cat
           &lt;/ResponsiveContainer&gt;
         &lt;/div&gt;
         &lt;div className="w-full space-y-1.5"&gt;
-          {data.slice(0, 6).<span class="fstat-no" title="function not covered" >map((i</span>tem) =&gt; (
-<span class="cstat-no" title="statement not covered" >            &lt;div key={item.name} className="flex items-center gap-2 text-xs"&gt;</span>
+          {data.slice(0, 6).map((item) =&gt; (
+            &lt;div key={item.name} className="flex items-center gap-2 text-xs"&gt;
               &lt;div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: item.color }} /&gt;
               &lt;span className="text-gray-600 flex-1 truncate"&gt;{item.name}&lt;/span&gt;
               &lt;span className="font-medium text-gray-900"&gt;{item.percentage}%&lt;/span&gt;
@@ -256,7 +256,7 @@ export default function <span class="fstat-no" title="function not covered" >Cat
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-07-13T09:27:46.041Z
+                at 2026-07-15T11:53:47.431Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

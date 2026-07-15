@@ -554,7 +554,7 @@ export function generateInsights(
   const weekendAvg = weekendExpenses.length > 0 ? weekendTotal / weekendExpenses.length : 0;
   const weekdayAvg = weekdayExpenses.length > 0 ? weekdayTotal / weekdayExpenses.length : 0;
 
-  if (weekendAvg > weekdayAvg * 1.3 && weekendExpenses.length > 0) {
+  if (weekendAvg > weekdayAvg * 1.3 && weekendExpenses.length > 0 && weekdayAvg > 0) {
     insights.push({
       id: String(insights.length + 1),
       type: 'info',
