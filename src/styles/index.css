@@ -310,7 +310,7 @@ body.dark-mode select,
 body.dark-mode textarea {
   background: #0f172a !important;
   border-color: #3d4a5c !important;
-  color: #e2e8f0 !important;
+  color: #ffffff !important;
 }
 body.dark-mode input::placeholder,
 body.dark-mode textarea::placeholder { color: #64748b !important; }

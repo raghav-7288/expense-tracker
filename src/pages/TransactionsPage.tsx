@@ -3,6 +3,7 @@ import { useTransactions, useCreateTransaction } from '@/hooks/useTransactions';
 import TransactionList from '@/components/transactions/TransactionList';
 import TransactionFilterBar from '@/components/transactions/TransactionFilters';
 import TransactionForm from '@/components/transactions/TransactionForm';
+import CSVImportModal from '@/components/transactions/CSVImportModal';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import EmptyState from '@/components/ui/EmptyState';
@@ -10,7 +11,7 @@ import ErrorState from '@/components/ui/ErrorState';
 import AnimatedPage from '@/components/ui/AnimatedPage';
 import PageHeader from '@/components/ui/PageHeader';
 import { SkeletonTable } from '@/components/ui/Skeleton';
-import { Plus, Receipt } from 'lucide-react';
+import { Plus, Upload, Receipt } from 'lucide-react';
 import type { TransactionFilters } from '@/types';
 
 export default function TransactionsPage() {
@@ -19,6 +20,7 @@ export default function TransactionsPage() {
     sort_order: 'desc',
   });
   const [showForm, setShowForm] = useState(false);
+  const [showImport, setShowImport] = useState(false);
 
   const { data: transactions, isLoading, isError, refetch } = useTransactions(filters);
   const createMutation = useCreateTransaction();
@@ -41,10 +43,16 @@ export default function TransactionsPage() {
         title="Transactions"
         description="Manage your income and expenses"
         action={
-          <Button onClick={() => setShowForm(true)} className="w-full sm:w-auto">
-            <Plus size={16} />
-            Add Transaction
-          </Button>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <Button variant="secondary" size="sm" onClick={() => setShowImport(true)} className="w-full sm:w-auto">
+              <Upload size={14} />
+              Import CSV
+            </Button>
+            <Button onClick={() => setShowForm(true)} className="w-full sm:w-auto">
+              <Plus size={16} />
+              Add Transaction
+            </Button>
+          </div>
         }
       />
 
@@ -103,6 +111,11 @@ export default function TransactionsPage() {
           loading={createMutation.isPending}
         />
       </Modal>
+
+      <CSVImportModal
+        open={showImport}
+        onClose={() => setShowImport(false)}
+      />
     </AnimatedPage>
   );
 }
