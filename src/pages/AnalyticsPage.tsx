@@ -1,11 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useAnalytics, useCurrency } from '@/hooks/useAnalytics';
-import { filterTransactions, getDateRange } from '@/engines/analytics';
 import type { AnalyticsFilters, TimeRangePreset, DateRange } from '@/types/analytics';
-import { useAuth } from '@/hooks/useAuth';
-import { useQuery } from '@tanstack/react-query';
-import { queryKeys } from '@/lib/queryKeys';
-import { getTransactions } from '@/services/transactions';
 
 import PageHeader from '@/components/ui/PageHeader';
 import ErrorState from '@/components/ui/ErrorState';
@@ -31,7 +26,6 @@ import SpendingPatterns from '@/components/analytics/SpendingPatterns';
 import MonthlyReport from '@/components/analytics/MonthlyReport';
 import YearlyReport from '@/components/analytics/YearlyReport';
 import CategoryBreakdownTable from '@/components/analytics/CategoryBreakdownTable';
-import ExportButton from '@/components/analytics/ExportButton';
 
 export default function AnalyticsPage() {
   const [filters, setFilters] = useState<AnalyticsFilters>({
@@ -42,29 +36,12 @@ export default function AnalyticsPage() {
   const currency = useCurrency();
   const analytics = useAnalytics(filters);
 
-  const { user } = useAuth();
-  const { data: allTxns } = useQuery({
-    queryKey: queryKeys.analytics.all(user?.id),
-    queryFn: async () => {
-      if (!user) throw new Error('Not authenticated');
-      const { data, error } = await getTransactions(user.id);
-      if (error) throw error;
-      return data ?? [];
-    },
-    enabled: !!user,
-    staleTime: 5 * 60 * 1000,
-  });
-
   const handlePresetChange = useCallback(
     (preset: TimeRangePreset, customRange?: DateRange) => {
       setFilters((prev) => ({ ...prev, preset, customRange }));
     },
     [],
   );
-
-  // Get filtered transactions for export
-  const dateRange = getDateRange(filters.preset, filters.customRange);
-  const exportTransactions = filterTransactions(allTxns ?? [], dateRange, filters);
 
   if (analytics.isError) {
     return (
@@ -91,7 +68,6 @@ export default function AnalyticsPage() {
       <PageHeader
         title="Analytics"
         description="Deep insights into your financial behavior"
-        action={<ExportButton transactions={exportTransactions} />}
       />
 
       {/* Time Range */}
