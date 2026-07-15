@@ -6,9 +6,13 @@ import CategoriesPage from '@/pages/CategoriesPage';
 
 vi.mock('@/hooks/useCategories', () => ({
   useCategories: vi.fn(),
+  useHiddenCategories: () => ({ data: [], isLoading: false }),
   useCreateCategory: () => ({ mutateAsync: vi.fn(), isPending: false }),
   useUpdateCategory: () => ({ mutateAsync: vi.fn(), isPending: false }),
   useDeleteCategory: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  useHideCategory: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  useCopyCategory: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  useRestoreCategory: () => ({ mutateAsync: vi.fn(), isPending: false }),
 }));
 
 import { useCategories } from '@/hooks/useCategories';
@@ -32,15 +36,17 @@ describe('CategoriesPage', () => {
     } as never);
 
     renderWithProviders(<CategoriesPage />);
-    expect(screen.getByText('Organize with categories')).toBeInTheDocument();
+    expect(screen.getByText('No categories found')).toBeInTheDocument();
   });
 
   it('renders category list when data available', () => {
     mockUseCategories.mockReturnValue({
       data: [
         {
-          id: '1', user_id: 'u1', name: 'Food', type: 'expense',
-          color: '#ef4444', icon: 'utensils', created_at: '', updated_at: '',
+          id: '1', name: 'Food', type: 'expense',
+          color: '#ef4444', icon: 'utensils',
+          source: 'user', isDefault: false, isCustom: true,
+          editable: true, deletable: true, source_category_id: null,
         },
       ],
       isLoading: false,
@@ -50,14 +56,14 @@ describe('CategoriesPage', () => {
     expect(screen.getByText('Food')).toBeInTheDocument();
   });
 
-  it('opens create modal when Add Category clicked', async () => {
+  it('opens create modal when Add Custom Category clicked', async () => {
     mockUseCategories.mockReturnValue({
       data: [],
       isLoading: false,
     } as never);
 
     renderWithProviders(<CategoriesPage />);
-    await userEvent.click(screen.getAllByRole('button', { name: /Add Category/i })[0]!);
+    await userEvent.click(screen.getAllByRole('button', { name: /Custom Category/i })[0]!);
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
@@ -73,7 +79,7 @@ describe('CategoriesPage', () => {
     expect(screen.getByText('All')).toBeInTheDocument();
     expect(screen.getByText('Expense')).toBeInTheDocument();
     expect(screen.getByText('Income')).toBeInTheDocument();
+    expect(screen.getByText('Default')).toBeInTheDocument();
+    expect(screen.getByText('Custom')).toBeInTheDocument();
   });
 });
-
-

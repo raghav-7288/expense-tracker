@@ -11,16 +11,24 @@ vi.mock('react-hot-toast', () => ({
   default: { success: vi.fn(), error: vi.fn() },
 }));
 
-const mockGetCategories = vi.fn();
-const mockCreateCategory = vi.fn();
-const mockUpdateCategory = vi.fn();
-const mockDeleteCategory = vi.fn();
+const mockGetMergedCategories = vi.fn();
+const mockCreateUserCategory = vi.fn();
+const mockUpdateUserCategory = vi.fn();
+const mockDeleteUserCategory = vi.fn();
+const mockGetHiddenSystemCategories = vi.fn();
+const mockHideSystemCategory = vi.fn();
+const mockRestoreSystemCategory = vi.fn();
+const mockCopySystemCategory = vi.fn();
 
 vi.mock('@/services/categories', () => ({
-  getCategories: (...args: unknown[]) => mockGetCategories(...args),
-  createCategory: (...args: unknown[]) => mockCreateCategory(...args),
-  updateCategory: (...args: unknown[]) => mockUpdateCategory(...args),
-  deleteCategory: (...args: unknown[]) => mockDeleteCategory(...args),
+  getMergedCategories: (...args: unknown[]) => mockGetMergedCategories(...args),
+  createUserCategory: (...args: unknown[]) => mockCreateUserCategory(...args),
+  updateUserCategory: (...args: unknown[]) => mockUpdateUserCategory(...args),
+  deleteUserCategory: (...args: unknown[]) => mockDeleteUserCategory(...args),
+  getHiddenSystemCategories: (...args: unknown[]) => mockGetHiddenSystemCategories(...args),
+  hideSystemCategory: (...args: unknown[]) => mockHideSystemCategory(...args),
+  restoreSystemCategory: (...args: unknown[]) => mockRestoreSystemCategory(...args),
+  copySystemCategory: (...args: unknown[]) => mockCopySystemCategory(...args),
 }));
 
 function createWrapper() {
@@ -44,9 +52,9 @@ describe('useCategories', () => {
     vi.clearAllMocks();
   });
 
-  it('fetches categories when user is authenticated', async () => {
-    const data = [{ id: '1', name: 'Food' }];
-    mockGetCategories.mockResolvedValue({ data, error: null });
+  it('fetches merged categories when user is authenticated', async () => {
+    const data = [{ id: '1', name: 'Food', source: 'system' }];
+    mockGetMergedCategories.mockResolvedValue({ data, error: null });
 
     const { result } = renderHook(() => useCategories(), { wrapper: createWrapper() });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
@@ -68,19 +76,18 @@ describe('useCategories', () => {
       );
     };
     const { result } = renderHook(() => useCategories(), { wrapper });
-    // Query is disabled when no user
     expect(result.current.data).toBeUndefined();
   });
 
   it('passes type filter to service', async () => {
-    mockGetCategories.mockResolvedValue({ data: [], error: null });
+    mockGetMergedCategories.mockResolvedValue({ data: [], error: null });
     const { result } = renderHook(() => useCategories('expense'), { wrapper: createWrapper() });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(mockGetCategories).toHaveBeenCalledWith('user-123', 'expense');
+    expect(mockGetMergedCategories).toHaveBeenCalledWith('user-123', 'expense');
   });
 
   it('throws on service error', async () => {
-    mockGetCategories.mockResolvedValue({ data: null, error: { message: 'DB error' } });
+    mockGetMergedCategories.mockResolvedValue({ data: null, error: { message: 'DB error' } });
     const { result } = renderHook(() => useCategories(), { wrapper: createWrapper() });
     await waitFor(() => expect(result.current.isError).toBe(true));
   });
@@ -92,14 +99,14 @@ describe('useCreateCategory', () => {
   });
 
   it('creates a category', async () => {
-    mockCreateCategory.mockResolvedValue({ data: { id: '1', name: 'New' }, error: null });
+    mockCreateUserCategory.mockResolvedValue({ data: { id: '1', name: 'New' }, error: null });
     const { result } = renderHook(() => useCreateCategory(), { wrapper: createWrapper() });
     await result.current.mutateAsync({ name: 'New', type: 'expense', color: '#000', icon: 'tag' });
-    expect(mockCreateCategory).toHaveBeenCalledWith(expect.objectContaining({ name: 'New', user_id: 'user-123' }));
+    expect(mockCreateUserCategory).toHaveBeenCalledWith(expect.objectContaining({ name: 'New', user_id: 'user-123' }));
   });
 
   it('handles error', async () => {
-    mockCreateCategory.mockResolvedValue({ data: null, error: { message: 'Failed' } });
+    mockCreateUserCategory.mockResolvedValue({ data: null, error: { message: 'Failed' } });
     const { result } = renderHook(() => useCreateCategory(), { wrapper: createWrapper() });
     await expect(
       result.current.mutateAsync({ name: 'X', type: 'expense', color: '#000', icon: 'tag' })
@@ -113,10 +120,10 @@ describe('useUpdateCategory', () => {
   });
 
   it('updates a category', async () => {
-    mockUpdateCategory.mockResolvedValue({ data: { id: '1', name: 'Updated' }, error: null });
+    mockUpdateUserCategory.mockResolvedValue({ data: { id: '1', name: 'Updated' }, error: null });
     const { result } = renderHook(() => useUpdateCategory(), { wrapper: createWrapper() });
     await result.current.mutateAsync({ id: '1', input: { name: 'Updated' } });
-    expect(mockUpdateCategory).toHaveBeenCalledWith('1', { name: 'Updated' });
+    expect(mockUpdateUserCategory).toHaveBeenCalledWith('1', 'user-123', { name: 'Updated' });
   });
 });
 
@@ -126,16 +133,15 @@ describe('useDeleteCategory', () => {
   });
 
   it('deletes a category', async () => {
-    mockDeleteCategory.mockResolvedValue({ error: null });
+    mockDeleteUserCategory.mockResolvedValue({ error: null });
     const { result } = renderHook(() => useDeleteCategory(), { wrapper: createWrapper() });
     await result.current.mutateAsync('1');
-    expect(mockDeleteCategory).toHaveBeenCalledWith('1');
+    expect(mockDeleteUserCategory).toHaveBeenCalledWith('1', 'user-123');
   });
 
   it('handles delete error', async () => {
-    mockDeleteCategory.mockResolvedValue({ error: { message: 'Cannot delete' } });
+    mockDeleteUserCategory.mockResolvedValue({ error: { message: 'Cannot delete' } });
     const { result } = renderHook(() => useDeleteCategory(), { wrapper: createWrapper() });
     await expect(result.current.mutateAsync('1')).rejects.toThrow('Cannot delete');
   });
 });
-

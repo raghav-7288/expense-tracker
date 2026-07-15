@@ -21,6 +21,48 @@ export interface Category {
   updated_at: string;
 }
 
+/** System category (global, immutable) */
+export interface SystemCategory {
+  id: string;
+  name: string;
+  type: TransactionType;
+  color: string;
+  icon: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/** User-created custom category */
+export interface UserCategory {
+  id: string;
+  user_id: string;
+  name: string;
+  type: TransactionType;
+  color: string;
+  icon: string;
+  source_category_id: string | null;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+}
+
+/** Merged category as displayed in the UI */
+export interface MergedCategory {
+  id: string;
+  name: string;
+  type: TransactionType;
+  color: string;
+  icon: string;
+  source: 'system' | 'user';
+  isDefault: boolean;
+  isCustom: boolean;
+  editable: boolean;
+  deletable: boolean;
+  source_category_id: string | null;
+}
+
+export type CategorySource = 'system' | 'user';
+
 export interface Transaction {
   id: string;
   user_id: string;
@@ -60,6 +102,7 @@ export interface CreateCategoryInput {
   type: TransactionType;
   color: string;
   icon: string;
+  source_category_id?: string | null;
 }
 
 export interface UpdateCategoryInput {
@@ -67,6 +110,14 @@ export interface UpdateCategoryInput {
   color?: string;
   icon?: string;
 }
+
+export interface HiddenCategory {
+  user_id: string;
+  category_id: string;
+  hidden_at: string;
+}
+
+export type CategoryFilter = 'all' | 'expense' | 'income' | 'custom' | 'default';
 
 export interface UpdateProfileInput {
   full_name?: string | null;

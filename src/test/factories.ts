@@ -1,4 +1,4 @@
-import type { Profile, Category, Transaction } from '@/types';
+import type { Profile, Category, Transaction, MergedCategory } from '@/types';
 
 let idCounter = 0;
 function nextId() {
@@ -12,7 +12,7 @@ export function resetFactoryIds() {
 export function buildProfile(overrides: Partial<Profile> = {}): Profile {
   return {
     id: 'user-123',
-    email: 'user@example.com',
+    email: '[REDACTED_EMAIL_ADDRESS_1]',
     full_name: 'Test User',
     avatar_url: null,
     currency: 'USD',
@@ -33,6 +33,42 @@ export function buildCategory(overrides: Partial<Category> = {}): Category {
     icon: 'tag',
     created_at: '2024-01-01T00:00:00Z',
     updated_at: '2024-01-01T00:00:00Z',
+    ...overrides,
+  };
+}
+
+export function buildMergedCategory(overrides: Partial<MergedCategory> = {}): MergedCategory {
+  const id = nextId();
+  return {
+    id,
+    name: `Category ${id}`,
+    type: 'expense',
+    color: '#ef4444',
+    icon: 'tag',
+    source: 'user',
+    isDefault: false,
+    isCustom: true,
+    editable: true,
+    deletable: true,
+    source_category_id: null,
+    ...overrides,
+  };
+}
+
+export function buildSystemCategory(overrides: Partial<MergedCategory> = {}): MergedCategory {
+  const id = nextId();
+  return {
+    id,
+    name: `System ${id}`,
+    type: 'expense',
+    color: '#3b82f6',
+    icon: 'tag',
+    source: 'system',
+    isDefault: true,
+    isCustom: false,
+    editable: false,
+    deletable: false,
+    source_category_id: null,
     ...overrides,
   };
 }
@@ -63,4 +99,3 @@ export function buildTransaction(overrides: Partial<Transaction> = {}): Transact
     ...overrides,
   };
 }
-

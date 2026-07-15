@@ -8,6 +8,8 @@ export const queryKeys = {
     all: ['categories'] as const,
     list: (userId: string | undefined, type?: string) =>
       ['categories', userId, type] as const,
+    hidden: (userId: string | undefined) =>
+      ['categories', 'hidden', userId] as const,
   },
   profile: {
     detail: (userId: string | undefined) => ['profile', userId] as const,
