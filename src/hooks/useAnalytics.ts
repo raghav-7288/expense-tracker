@@ -67,6 +67,31 @@ export function useAnalytics(filters: AnalyticsFilters): AnalyticsData {
     return computeSummary(currentTransactions, prevTransactions, allTransactions, dateRange);
   }, [currentTransactions, prevTransactions, allTransactions, dateRange]);
 
+  // For monthly trend charts (Income vs Expenses, Cash Flow, Savings Trend),
+  // always show at least 6 months so the trend is meaningful even when
+  // a short time range like "This Month" is selected.
+  const trendRange: DateRange = useMemo(() => {
+    const start = new Date(dateRange.startDate + 'T00:00:00');
+    const end = new Date(dateRange.endDate + 'T00:00:00');
+    const monthSpan =
+      (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth()) + 1;
+    if (monthSpan >= 6) return dateRange;
+    const now = new Date();
+    const trendStart = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+    const fmt = (d: Date) => {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    };
+    return { startDate: fmt(trendStart), endDate: fmt(now) };
+  }, [dateRange]);
+
+  const trendTransactions = useMemo(
+    () => filterTransactions(allTransactions ?? [], trendRange),
+    [allTransactions, trendRange],
+  );
+
   const dailySeries = useMemo(
     () => computeDailySeries(currentTransactions, dateRange),
     [currentTransactions, dateRange],
@@ -78,13 +103,13 @@ export function useAnalytics(filters: AnalyticsFilters): AnalyticsData {
   );
 
   const monthlySeries = useMemo(
-    () => computeMonthlySeries(currentTransactions, dateRange),
-    [currentTransactions, dateRange],
+    () => computeMonthlySeries(trendTransactions, trendRange),
+    [trendTransactions, trendRange],
   );
 
   const savingsTrend = useMemo(
-    () => computeSavingsTrend(allTransactions ?? [], dateRange),
-    [allTransactions, dateRange],
+    () => computeSavingsTrend(allTransactions ?? [], trendRange),
+    [allTransactions, trendRange],
   );
 
   const expenseCategories = useMemo(

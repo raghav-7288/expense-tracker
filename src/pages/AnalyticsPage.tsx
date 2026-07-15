@@ -1,6 +1,10 @@
 import { useState, useCallback } from 'react';
 import { useAnalytics, useCurrency } from '@/hooks/useAnalytics';
 import type { AnalyticsFilters, TimeRangePreset, DateRange } from '@/types/analytics';
+import { useAuth } from '@/hooks/useAuth';
+import { useQuery } from '@tanstack/react-query';
+import { queryKeys } from '@/lib/queryKeys';
+import { getTransactions } from '@/services/transactions';
 
 import PageHeader from '@/components/ui/PageHeader';
 import ErrorState from '@/components/ui/ErrorState';
@@ -26,6 +30,7 @@ import SpendingPatterns from '@/components/analytics/SpendingPatterns';
 import MonthlyReport from '@/components/analytics/MonthlyReport';
 import YearlyReport from '@/components/analytics/YearlyReport';
 import CategoryBreakdownTable from '@/components/analytics/CategoryBreakdownTable';
+import InvestmentTracker from '@/components/analytics/InvestmentTracker';
 
 export default function AnalyticsPage() {
   const [filters, setFilters] = useState<AnalyticsFilters>({
@@ -35,6 +40,19 @@ export default function AnalyticsPage() {
 
   const currency = useCurrency();
   const analytics = useAnalytics(filters);
+
+  const { user } = useAuth();
+  const { data: allTransactions } = useQuery({
+    queryKey: queryKeys.analytics.all(user?.id),
+    queryFn: async () => {
+      if (!user) throw new Error('Not authenticated');
+      const { data, error } = await getTransactions(user.id);
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
+  });
 
   const handlePresetChange = useCallback(
     (preset: TimeRangePreset, customRange?: DateRange) => {
@@ -95,6 +113,12 @@ export default function AnalyticsPage() {
           <CashFlowChart data={analytics.monthlySeries} currency={currency} />
           <SavingsTrendChart data={analytics.savingsTrend} currency={currency} />
         </div>
+      </section>
+
+      {/* Section: Investments */}
+      <section>
+        <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">Investments</h2>
+        <InvestmentTracker transactions={allTransactions ?? []} currency={currency} />
       </section>
 
       {/* Section: Category Analysis */}
