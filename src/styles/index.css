@@ -311,14 +311,31 @@ body.dark-mode textarea {
   background: #0f172a !important;
   border-color: #3d4a5c !important;
   color: #ffffff !important;
+  caret-color: #ffffff !important;
+  color-scheme: dark !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 body.dark-mode input::placeholder,
-body.dark-mode textarea::placeholder { color: #64748b !important; }
+body.dark-mode textarea::placeholder {
+  color: #64748b !important;
+  -webkit-text-fill-color: #64748b !important;
+}
 body.dark-mode input:focus,
 body.dark-mode select:focus,
 body.dark-mode textarea:focus {
   border-color: #60a5fa !important;
   box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.12) !important;
+}
+body.dark-mode select option {
+  background: #1e293b !important;
+  color: #ffffff !important;
+}
+body.dark-mode input:-webkit-autofill,
+body.dark-mode input:-webkit-autofill:hover,
+body.dark-mode input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #ffffff !important;
+  -webkit-box-shadow: 0 0 0px 1000px #0f172a inset !important;
+  transition: background-color 5000s ease-in-out 0s;
 }
 body.dark-mode label { color: #cbd5e1 !important; }
 
