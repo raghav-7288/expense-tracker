@@ -13,9 +13,7 @@ dist-ssr
 *.local
 package-lock.json
 coverage
-SUGGESTIONS.md
-CLAUDE.md
-CONTEXT.md
+docs/*
 
 # Editor directories and files
 .vscode/*
