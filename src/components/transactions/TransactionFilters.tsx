@@ -93,13 +93,13 @@ export default function TransactionFilterBar({ filters, onChange, resultCount }:
       </div>
 
       {/* Filters row */}
-      <div className="px-3 py-2.5 flex flex-wrap items-center gap-2 overflow-x-auto">
+      <div className="px-3 py-2.5 flex flex-wrap items-center gap-2">
         <SlidersHorizontal size={14} className="text-gray-400 flex-shrink-0 hidden sm:block" />
-        <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0">
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 w-full sm:w-auto sm:flex-1 min-w-0">
           <select
             value={filters.type ?? 'all'}
             onChange={(e) => onChange({ ...filters, type: e.target.value as TransactionFilters['type'] })}
-            className="px-2.5 py-2 sm:py-1.5 text-xs font-medium border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+            className="w-full sm:w-auto px-2.5 py-2 sm:py-1.5 text-xs font-medium border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
           >
             {typeOptions.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
@@ -109,7 +109,7 @@ export default function TransactionFilterBar({ filters, onChange, resultCount }:
           <select
             value={filters.category_id ?? ''}
             onChange={(e) => onChange({ ...filters, category_id: e.target.value || undefined })}
-            className="px-2.5 py-2 sm:py-1.5 text-xs font-medium border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all max-w-[140px]"
+            className="w-full sm:w-auto px-2.5 py-2 sm:py-1.5 text-xs font-medium border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all sm:max-w-[140px] truncate"
           >
             {categoryOptions.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
@@ -120,23 +120,23 @@ export default function TransactionFilterBar({ filters, onChange, resultCount }:
           <select
             value={dateMode}
             onChange={(e) => handleDateModeChange(e.target.value as DateMode)}
-            className="px-2.5 py-2 sm:py-1.5 text-xs font-medium border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+            className="w-full sm:w-auto px-2.5 py-2 sm:py-1.5 text-xs font-medium border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
           >
             <option value="none">All Dates</option>
             <option value="single">Specific Date</option>
             <option value="range">Date Range</option>
           </select>
-        </div>
 
-        <select
-          value={`${filters.sort_by ?? 'date'}-${filters.sort_order ?? 'desc'}`}
-          onChange={(e) => handleSortChange(e.target.value)}
-          className="px-2.5 py-2 sm:py-1.5 text-xs font-medium border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
-        >
-          {sortOptions.map((o) => (
-            <option key={o.value} value={o.value}>{o.label}</option>
-          ))}
-        </select>
+          <select
+            value={`${filters.sort_by ?? 'date'}-${filters.sort_order ?? 'desc'}`}
+            onChange={(e) => handleSortChange(e.target.value)}
+            className="w-full sm:w-auto px-2.5 py-2 sm:py-1.5 text-xs font-medium border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+          >
+            {sortOptions.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Date picker row - shows when date mode is single or range */}
@@ -155,7 +155,7 @@ export default function TransactionFilterBar({ filters, onChange, resultCount }:
                 onChange({ ...filters, date_from: val });
               }
             }}
-            className="px-2.5 py-1.5 text-xs border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+            className="flex-1 min-w-[130px] px-2.5 py-1.5 text-xs border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
           />
           {dateMode === 'range' && (
             <>
@@ -165,7 +165,7 @@ export default function TransactionFilterBar({ filters, onChange, resultCount }:
                 aria-label="To date"
                 value={filters.date_to ?? ''}
                 onChange={(e) => onChange({ ...filters, date_to: e.target.value || undefined })}
-                className="px-2.5 py-1.5 text-xs border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+                className="flex-1 min-w-[130px] px-2.5 py-1.5 text-xs border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
               />
             </>
           )}

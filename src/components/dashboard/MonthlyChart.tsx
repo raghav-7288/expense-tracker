@@ -12,8 +12,8 @@ export default function MonthlyChart() {
   if (isLoading) return <SkeletonChart />;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
-      <div className="flex items-center justify-between mb-5">
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-5 overflow-hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-5">
         <div>
           <h3 className="text-sm font-semibold text-gray-900">Monthly Overview</h3>
           <p className="text-xs text-gray-400 mt-0.5">Income vs expenses this year</p>
@@ -42,19 +42,19 @@ export default function MonthlyChart() {
       ) : (
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={monthlyData} margin={{ top: 5, right: 5, left: -10, bottom: 0 }}>
+            <BarChart data={monthlyData} margin={{ top: 5, right: 5, left: -15, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
               <XAxis
                 dataKey="month"
-                tick={{ fontSize: 11, fill: '#94a3b8' }}
+                tick={{ fontSize: 10, fill: '#94a3b8' }}
                 axisLine={false}
                 tickLine={false}
               />
               <YAxis
-                tick={{ fontSize: 11, fill: '#94a3b8' }}
+                tick={{ fontSize: 10, fill: '#94a3b8' }}
                 axisLine={false}
                 tickLine={false}
-                width={55}
+                width={45}
               />
               <Tooltip
                 contentStyle={{

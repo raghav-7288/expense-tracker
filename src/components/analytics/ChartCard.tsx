@@ -30,7 +30,7 @@ export default function ChartCard({
   return (
     <div
       className={cn(
-        'rounded-xl border border-gray-200 bg-white shadow-sm p-5 flex flex-col',
+        'rounded-xl border border-gray-200 bg-white shadow-sm p-4 sm:p-5 flex flex-col overflow-hidden min-w-0',
         className,
       )}
     >

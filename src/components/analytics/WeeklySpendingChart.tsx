@@ -22,12 +22,12 @@ export default function WeeklySpendingChart({ data, loading, currency }: WeeklyS
 
   return (
     <ChartCard title="Weekly Spending" description="Expense totals by week" loading={loading} empty={empty}>
-      <div className="h-64">
+      <div className="h-52 sm:h-64">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+          <BarChart data={data} margin={{ top: 5, right: 5, left: -5, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
             <XAxis dataKey="label" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} width={55} />
+            <YAxis tick={{ fontSize: 10 }} axisLine={false} tickLine={false} width={45} />
             <Tooltip
               contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '12px' }}
               formatter={(value) => [formatCompactCurrency(Number(value), currency), 'Spent']}

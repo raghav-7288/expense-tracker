@@ -85,18 +85,18 @@ export default function TransactionsPage() {
                 <ChevronDown size={14} className={showCSVMenu ? 'rotate-180 transition-transform' : 'transition-transform'} />
               </Button>
               {showCSVMenu && (
-                <div className="absolute right-0 mt-1 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-20 py-1">
+                <div className="absolute right-0 sm:right-0 mt-1 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-20 py-1">
                   <button
                     onClick={handleExportCSV}
                     disabled={!transactions || transactions.length === 0}
-                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 w-full px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Download size={14} />
                     Export
                   </button>
                   <button
                     onClick={handleImportCSV}
-                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    className="flex items-center gap-2 w-full px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
                   >
                     <Upload size={14} />
                     Import
@@ -105,9 +105,9 @@ export default function TransactionsPage() {
               )}
             </div>
 
-            <Button onClick={() => setShowForm(true)} className="w-full sm:w-auto">
+            <Button onClick={() => setShowForm(true)} className="flex-1 sm:flex-initial sm:w-auto">
               <Plus size={16} />
-              Add Transaction
+              <span className="sm:inline">Add</span>
             </Button>
           </div>
         }

@@ -312,8 +312,8 @@ export default function CSVImportModal({ open, onClose }: CSVImportModalProps) {
                   </span>
                 </div>
 
-                <div className="max-h-60 overflow-auto border border-gray-200 rounded-lg">
-                  <table className="w-full text-xs">
+                <div className="max-h-60 overflow-auto border border-gray-200 rounded-lg -mx-1 sm:mx-0">
+                  <table className="w-full text-xs min-w-[500px]">
                     <thead className="bg-gray-50 sticky top-0">
                       <tr>
                         <th className="px-2 py-1.5 text-left font-medium text-gray-600">#</th>

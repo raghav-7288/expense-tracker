@@ -133,7 +133,7 @@ export default function TransactionForm({
         {...register('notes')}
       />
 
-      <div className="flex gap-3 pt-3 border-t border-gray-100">
+      <div className="flex gap-3 pt-3 border-t border-gray-100 sticky bottom-0 bg-white -mx-4 px-4 pb-1 sm:static sm:mx-0 sm:px-0 sm:pb-0">
         <Button type="button" variant="secondary" onClick={onCancel} className="flex-1">
           Cancel
         </Button>

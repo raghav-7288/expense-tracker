@@ -87,7 +87,7 @@ export default function CategoryForm({
 
       <div className="space-y-2">
         <label id="color-label" className="block text-sm font-medium text-gray-700">Color</label>
-        <div className="grid grid-cols-8 gap-2" role="radiogroup" aria-labelledby="color-label">
+        <div className="grid grid-cols-6 sm:grid-cols-8 gap-2" role="radiogroup" aria-labelledby="color-label">
           {CATEGORY_COLORS.map((color, index) => (
             <button
               key={color}

@@ -9,7 +9,7 @@ import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import TransactionForm from '@/components/transactions/TransactionForm';
 import { useUpdateTransaction, useDeleteTransaction } from '@/hooks/useTransactions';
-import { Edit, Trash2, MoreHorizontal } from 'lucide-react';
+import { Edit, Trash2 } from 'lucide-react';
 import type { Transaction } from '@/types';
 
 interface TransactionListProps {
@@ -147,11 +147,11 @@ export default function TransactionList({ transactions }: TransactionListProps) 
         {transactions.map((t) => (
           <div
             key={t.id}
-            className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 flex items-center gap-3"
+            className="bg-white rounded-xl border border-gray-200 shadow-sm p-3 sm:p-4 flex items-center gap-3 overflow-hidden"
           >
             <Avatar name={t.description} color={t.categories?.color ?? '#6b7280'} />
 
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 overflow-hidden">
               <div className="flex items-center justify-between gap-2">
                 <p className="text-sm font-medium text-gray-900 truncate">{t.description}</p>
                 <span
@@ -163,25 +163,34 @@ export default function TransactionList({ transactions }: TransactionListProps) 
                   {t.type === 'income' ? '+' : '-'}{formatCurrency(Number(t.amount), currency)}
                 </span>
               </div>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-[11px] text-gray-400">{formatDateShort(t.date)}</span>
+              <div className="flex items-center gap-2 mt-1 overflow-hidden">
+                <span className="text-[11px] text-gray-400 flex-shrink-0">{formatDateShort(t.date)}</span>
                 {t.categories && (
                   <>
                     <span className="text-[11px] text-gray-200">·</span>
-                    <span className="text-[11px] text-gray-400">{t.categories.name}</span>
+                    <span className="text-[11px] text-gray-400 truncate">{t.categories.name}</span>
                   </>
                 )}
-                <Badge type={t.type} className="ml-auto" />
+                <Badge type={t.type} className="ml-auto flex-shrink-0" />
               </div>
             </div>
 
-            <button
-              onClick={() => setEditingTransaction(t)}
-              className="p-1.5 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 flex-shrink-0"
-              aria-label="Edit transaction"
-            >
-              <MoreHorizontal size={16} />
-            </button>
+            <div className="flex flex-col gap-1 flex-shrink-0">
+              <button
+                onClick={() => setEditingTransaction(t)}
+                className="p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                aria-label="Edit transaction"
+              >
+                <Edit size={14} />
+              </button>
+              <button
+                onClick={() => setDeletingId(t.id)}
+                className="p-2 rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50"
+                aria-label="Delete transaction"
+              >
+                <Trash2 size={14} />
+              </button>
+            </div>
           </div>
         ))}
       </div>

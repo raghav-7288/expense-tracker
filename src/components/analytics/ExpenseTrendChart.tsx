@@ -22,9 +22,9 @@ export default function ExpenseTrendChart({ data, loading, currency }: ExpenseTr
 
   return (
     <ChartCard title="Expense Trend" description="Spending over time" loading={loading} empty={empty}>
-      <div className="h-64">
+      <div className="h-52 sm:h-64">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+          <AreaChart data={data} margin={{ top: 5, right: 5, left: -5, bottom: 0 }}>
             <defs>
               <linearGradient id="expenseGrad" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#ef4444" stopOpacity={0.2} />
@@ -32,8 +32,8 @@ export default function ExpenseTrendChart({ data, loading, currency }: ExpenseTr
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
-            <XAxis dataKey="label" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} width={55} />
+            <XAxis dataKey="label" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
+            <YAxis tick={{ fontSize: 10 }} axisLine={false} tickLine={false} width={45} />
             <Tooltip
               contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '12px' }}
               formatter={(value) => [formatCompactCurrency(Number(value), currency), 'Expenses']}

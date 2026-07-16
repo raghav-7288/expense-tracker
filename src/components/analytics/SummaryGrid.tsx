@@ -32,7 +32,7 @@ function SummaryCard({ title, value, icon, change, subtitle, variant = 'default'
   const isPositive = (change ?? 0) > 0;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-3 sm:p-4 hover:shadow-md transition-shadow group overflow-hidden">
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-3 sm:p-4 hover:shadow-md transition-shadow group overflow-hidden min-w-0">
       <div className="flex items-center justify-between mb-2">
         <span className="text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wide truncate">{title}</span>
         <div
@@ -46,7 +46,7 @@ function SummaryCard({ title, value, icon, change, subtitle, variant = 'default'
           {icon}
         </div>
       </div>
-      <p className="text-lg font-bold text-gray-900 truncate">{value}</p>
+      <p className="text-base sm:text-lg font-bold text-gray-900 truncate">{value}</p>
       <div className="flex items-center gap-1.5 mt-1">
         {hasChange && (
           <span
@@ -77,7 +77,7 @@ interface SummaryGridProps {
 
 export default function SummaryGrid({ summary, currency }: SummaryGridProps) {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3 min-w-0">
       <SummaryCard
         title="Balance"
         value={formatCompactCurrency(summary.currentBalance, currency)}
