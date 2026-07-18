@@ -143,25 +143,43 @@ export default function ProfilePage() {
       {/* Appearance */}
       <Card>
         <h3 className="text-sm font-semibold text-gray-900 mb-4 section-heading">Appearance</h3>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {darkMode ? <Moon size={18} className="text-gray-400" aria-hidden="true" /> : <Sun size={18} className="text-gray-400" aria-hidden="true" />}
-            <div>
+        <button
+          type="button"
+          onClick={() => setDarkMode(!darkMode)}
+          className="w-full flex items-center justify-between gap-4 py-2 group"
+          aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+          role="switch"
+          aria-checked={darkMode}
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <div className={cn(
+              'w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0',
+              darkMode ? 'bg-slate-700' : 'bg-amber-50',
+            )}>
+              {darkMode
+                ? <Moon size={20} className="text-amber-400" />
+                : <Sun size={20} className="text-amber-500" />
+              }
+            </div>
+            <div className="text-left min-w-0">
               <p className="text-sm font-medium text-gray-900 section-heading">Dark Mode</p>
               <p className="text-xs text-gray-500 muted-text">
                 {darkMode ? 'Dark theme is active' : 'Light theme is active'}
               </p>
             </div>
           </div>
-          <button
-            type="button"
-            className={cn('toggle-switch', darkMode && 'active')}
-            onClick={() => setDarkMode(!darkMode)}
-            aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-            role="switch"
-            aria-checked={darkMode}
-          />
-        </div>
+          {/* Toggle track */}
+          <div className={cn(
+            'relative w-12 h-7 rounded-full flex-shrink-0 transition-colors duration-200',
+            darkMode ? 'bg-primary-500' : 'bg-gray-300',
+          )}>
+            {/* Toggle knob */}
+            <div className={cn(
+              'absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-md transition-transform duration-200',
+              darkMode && 'translate-x-5',
+            )} />
+          </div>
+        </button>
       </Card>
 
       {/* Change Password */}
