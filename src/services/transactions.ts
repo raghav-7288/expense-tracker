@@ -54,8 +54,13 @@ export async function getTransactions(userId: string, filters?: TransactionFilte
   }
 
   if (filters?.category_id) {
+    // Validate UUID format to prevent PostgREST filter injection
+    const catId = filters.category_id;
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(catId)) {
+      return { data: [], error: null };
+    }
     // Search across both category FK columns
-    query = query.or(`system_category_id.eq.${filters.category_id},user_category_id.eq.${filters.category_id}`);
+    query = query.or(`system_category_id.eq.${catId},user_category_id.eq.${catId}`);
   }
 
   if (filters?.date_from) {
@@ -67,15 +72,26 @@ export async function getTransactions(userId: string, filters?: TransactionFilte
   }
 
   if (filters?.search) {
-    query = query.ilike('description', `%${filters.search}%`);
+    // Escape PostgREST/SQL LIKE wildcards in user input
+    const sanitized = filters.search.replace(/[%_\\]/g, (ch) => `\\${ch}`);
+    query = query.ilike('description', `%${sanitized}%`);
   }
 
-  const sortBy = filters?.sort_by === 'amount' ? 'amount' : 'date';
+  const sortBy = filters?.sort_by === 'amount'
+    ? 'amount'
+    : filters?.sort_by === 'description'
+      ? 'description'
+      : 'date';
   const ascending = filters?.sort_order === 'asc';
   query = query.order(sortBy, { ascending });
 
-  if (sortBy !== 'date') {
+  // Secondary sort: when primary is date, break ties with created_at (full timestamp);
+  // for other primary sorts, fall back to newest-first by date then created_at.
+  if (sortBy === 'date') {
+    query = query.order('created_at', { ascending });
+  } else {
     query = query.order('date', { ascending: false });
+    query = query.order('created_at', { ascending: false });
   }
 
   const { data, error } = await query;

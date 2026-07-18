@@ -42,10 +42,12 @@ export default function TransactionFilterBar({ filters, onChange, resultCount }:
     { value: 'date-asc', label: 'Oldest First' },
     { value: 'amount-desc', label: 'Highest Amount' },
     { value: 'amount-asc', label: 'Lowest Amount' },
+    { value: 'description-asc', label: 'A–Z' },
+    { value: 'description-desc', label: 'Z–A' },
   ];
 
   function handleSortChange(value: string) {
-    const [sort_by, sort_order] = value.split('-') as ['date' | 'amount', 'asc' | 'desc'];
+    const [sort_by, sort_order] = value.split('-') as ['date' | 'amount' | 'description', 'asc' | 'desc'];
     onChange({ ...filters, sort_by, sort_order });
   }
 

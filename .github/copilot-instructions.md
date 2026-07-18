@@ -19,6 +19,10 @@ See `CLAUDE.md` at the project root for full architecture details, coding standa
 - Use Lucide React for icons.
 - Prefer reusing existing components/hooks/utils over creating new ones.
 
+## Do Not Modify
+
+- **`vercel.json`** — This file must never be changed. It must always remain exactly as-is with `yarn install --no-lockfile` and `yarn run build`. Do not replace with npm commands or alter any fields.
+
 ## File Locations
 
 | What              | Where                          |
@@ -34,4 +38,3 @@ See `CLAUDE.md` at the project root for full architecture details, coding standa
 | Business logic    | `src/engines/`                 |
 | Pure utilities    | `src/utils/`                   |
 | DB schema         | `supabase/migrations/`         |
-

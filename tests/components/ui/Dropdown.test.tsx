@@ -57,6 +57,95 @@ describe('Dropdown', () => {
     await userEvent.click(screen.getByText('Open'));
     expect(screen.getByRole('menu').className).toContain('left-0');
   });
+
+  it('closes on click outside', async () => {
+    render(
+      <div>
+        <Dropdown trigger={<button>Open</button>}>
+          <DropdownItem>Item 1</DropdownItem>
+        </Dropdown>
+        <button>Outside</button>
+      </div>
+    );
+    await userEvent.click(screen.getByText('Open'));
+    expect(screen.getByRole('menu')).toBeInTheDocument();
+    await userEvent.click(screen.getByText('Outside'));
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+  });
+
+  it('navigates with ArrowDown key', async () => {
+    render(
+      <Dropdown trigger={<button>Open</button>}>
+        <DropdownItem>Item A</DropdownItem>
+        <DropdownItem>Item B</DropdownItem>
+      </Dropdown>
+    );
+    await userEvent.click(screen.getByText('Open'));
+    // First item should be focused
+    const items = screen.getAllByRole('menuitem');
+    expect(document.activeElement).toBe(items[0]);
+    // Press ArrowDown to move to next item
+    await userEvent.keyboard('{ArrowDown}');
+    expect(document.activeElement).toBe(items[1]);
+  });
+
+  it('navigates with ArrowUp key', async () => {
+    render(
+      <Dropdown trigger={<button>Open</button>}>
+        <DropdownItem>Item A</DropdownItem>
+        <DropdownItem>Item B</DropdownItem>
+      </Dropdown>
+    );
+    await userEvent.click(screen.getByText('Open'));
+    const items = screen.getAllByRole('menuitem');
+    // Move down first, then up
+    await userEvent.keyboard('{ArrowDown}');
+    expect(document.activeElement).toBe(items[1]);
+    await userEvent.keyboard('{ArrowUp}');
+    expect(document.activeElement).toBe(items[0]);
+  });
+
+  it('navigates with Home and End keys', async () => {
+    render(
+      <Dropdown trigger={<button>Open</button>}>
+        <DropdownItem>Item A</DropdownItem>
+        <DropdownItem>Item B</DropdownItem>
+        <DropdownItem>Item C</DropdownItem>
+      </Dropdown>
+    );
+    await userEvent.click(screen.getByText('Open'));
+    const items = screen.getAllByRole('menuitem');
+    await userEvent.keyboard('{End}');
+    expect(document.activeElement).toBe(items[2]);
+    await userEvent.keyboard('{Home}');
+    expect(document.activeElement).toBe(items[0]);
+  });
+
+  it('wraps around with ArrowDown on last item', async () => {
+    render(
+      <Dropdown trigger={<button>Open</button>}>
+        <DropdownItem>Item A</DropdownItem>
+        <DropdownItem>Item B</DropdownItem>
+      </Dropdown>
+    );
+    await userEvent.click(screen.getByText('Open'));
+    const items = screen.getAllByRole('menuitem');
+    await userEvent.keyboard('{ArrowDown}'); // to Item B
+    await userEvent.keyboard('{ArrowDown}'); // wrap to Item A
+    expect(document.activeElement).toBe(items[0]);
+  });
+
+  it('passes label to aria attributes', async () => {
+    render(
+      <Dropdown trigger={<button>Open</button>} label="Actions menu">
+        <DropdownItem>Item 1</DropdownItem>
+      </Dropdown>
+    );
+    const trigger = screen.getByLabelText('Actions menu');
+    expect(trigger).toBeInTheDocument();
+    await userEvent.click(trigger);
+    expect(screen.getByRole('menu')).toHaveAttribute('aria-label', 'Actions menu');
+  });
 });
 
 describe('DropdownItem', () => {

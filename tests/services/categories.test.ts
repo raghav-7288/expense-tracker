@@ -11,10 +11,6 @@ import {
   restoreSystemCategory,
   copySystemCategory,
   getHiddenSystemCategories,
-  getCategories,
-  createCategory,
-  updateCategory,
-  deleteCategory,
 } from '@/services/categories';
 
 // ---------- Supabase mock ----------
@@ -348,37 +344,6 @@ describe('categories service', () => {
 
       const result = await deleteUserCategory('1', 'user-1');
       expect(result.error).toEqual(error);
-    });
-  });
-
-  // --------------- Backward Compatibility ---------------
-
-  describe('backward compatibility wrappers', () => {
-    it('getCategories is a function', () => {
-      expect(typeof getCategories).toBe('function');
-    });
-
-    it('createCategory creates via user_categories', async () => {
-      const cat = { id: '1', name: 'New' };
-      mockFrom.mockReturnValue(buildChain({ data: cat, error: null }));
-
-      const result = await createCategory({ user_id: 'u1', name: 'New', type: 'expense', color: '#000', icon: 'tag' });
-      expect(result.data).toEqual(cat);
-    });
-
-    it('updateCategory updates user_categories', async () => {
-      const cat = { id: '1', name: 'Updated' };
-      mockFrom.mockReturnValue(buildChain({ data: cat, error: null }));
-
-      const result = await updateCategory('1', { name: 'Updated' });
-      expect(result.data).toEqual(cat);
-    });
-
-    it('deleteCategory soft-deletes', async () => {
-      mockFrom.mockReturnValue(buildChain({ error: null }));
-
-      const result = await deleteCategory('1');
-      expect(result.error).toBeNull();
     });
   });
 });

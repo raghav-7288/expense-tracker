@@ -131,7 +131,7 @@ export interface TransactionFilters {
   date_from?: string;
   date_to?: string;
   search?: string;
-  sort_by?: 'date' | 'amount';
+  sort_by?: 'date' | 'amount' | 'description';
   sort_order?: 'asc' | 'desc';
 }
 

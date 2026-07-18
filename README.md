@@ -1,174 +1,285 @@
 # ExpenseTracker
 
-> **Live:** [expense-tracker-rg.vercel.app](https://expense-tracker-rg.vercel.app)
+> A modern, full-featured personal finance tracker built with React 19 and Supabase.
 
-A modern personal finance app for tracking income and expenses, managing categories, and visualizing spending with interactive charts and deep analytics.
+🌐 **Live Demo:** [expense-tracker-rg.vercel.app](https://expense-tracker-rg.vercel.app)
 
-## Tech Stack
-
-- **Frontend:** React 19 · TypeScript · Vite 8 · Tailwind CSS v4
-- **Data:** TanStack Query 5 · React Hook Form 7 · Zod 4
-- **Routing:** React Router 7
-- **Backend:** Supabase (Postgres + Auth + RLS + Google OAuth)
-- **Charts:** Recharts 3
-- **Animations:** Framer Motion
-- **Icons:** Lucide React
-- **Testing:** Vitest · React Testing Library
-- **Deploy:** Vercel (static SPA)
+---
 
 ## Features
 
-- 🔐 Authentication (email/password + Google OAuth)
-- 📊 Dashboard with gradient stat cards, charts, and recent activity
-- 📈 Full Analytics module (20+ charts, heatmap, insights, reports)
-- 💰 Transaction management with search, filters, date range, and sorting
-- 🏷️ Category management with color/icon customization
-- 🌙 Dark mode with comprehensive CSS coverage
-- 👤 Profile settings with currency preference (default: INR)
-- 📱 Fully responsive (320px–1440px, mobile-first)
-- ♿ WCAG AA accessible (ARIA, keyboard nav, skip link, focus management)
-- ✨ Smooth Framer Motion animations (page transitions, modals, stagger)
-- 💀 Skeleton loading states for every component
-- 📭 Contextual empty states with guidance and CTAs
-- 📤 CSV export for analytics data
-- 🎨 Complete design system with tokens and reusable components
+### 🔐 Authentication
+- Email/password sign up and sign in
+- Google OAuth integration
+- Forgot password / reset password flow
+- Protected routes with auth guards
 
-## Getting Started
+### 📊 Dashboard
+- Total balance, income, and expense stats
+- Monthly income vs. expenses chart
+- Category breakdown pie chart
+- Recent transactions feed
+
+### 📈 Analytics (20+ charts & insights)
+- Income vs. Expense trends
+- Cash flow analysis
+- Savings trend tracking
+- Daily, weekly, and monthly spending charts
+- Expense heatmap
+- Category pie charts & comparison
+- Financial health score
+- AI-powered smart insights
+- Spending pattern analysis
+- Largest/smallest transaction rankings
+- Top categories breakdown table
+- Monthly & yearly reports
+- Investment tracker
+
+### 💳 Transactions
+- Full CRUD — create, edit, delete
+- Filter by type, category, date range, and search
+- Sort: newest/oldest, highest/lowest amount, A–Z / Z–A
+- CSV import and export
+- Optimistic delete with rollback
+
+### 🏷️ Categories
+- System categories (global defaults, read-only)
+- Custom user categories (create, edit, delete)
+- Hide/restore system categories
+- Copy system category to make it editable
+- Filter by type, custom, or default
+- Color picker and icon selector
+
+### 👤 Profile
+- Update name and currency
+- Change password
+- Dark mode toggle
+- 15+ supported currencies
+
+### 🎨 Design
+- Fully responsive (mobile, tablet, desktop)
+- Dark mode with system preference detection
+- Smooth page transitions (Framer Motion)
+- Accessible — ARIA labels, keyboard navigation, skip links
+- Skeleton loaders, empty states, and error states
+
+---
+
+## Screenshots
+
+| Dashboard | Analytics | Transactions |
+|---|---|---|
+| ![Dashboard](docs/screenshots/dashboard.png) | ![Analytics](docs/screenshots/analytics.png) | ![Transactions](docs/screenshots/transactions.png) |
+
+| Categories | Profile | Mobile |
+|---|---|---|
+| ![Categories](docs/screenshots/categories.png) | ![Profile](docs/screenshots/profile.png) | ![Mobile](docs/screenshots/mobile.png) |
+
+> 📸 *Add screenshots to `docs/screenshots/` to populate these placeholders.*
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| **Framework** | React 19 |
+| **Language** | TypeScript 6 (strict mode) |
+| **Build Tool** | Vite 8 |
+| **Styling** | Tailwind CSS v4 |
+| **Backend** | Supabase (Postgres + Auth + RLS) |
+| **State** | TanStack React Query 5, Zustand |
+| **Forms** | React Hook Form 7 + Zod 4 |
+| **Charts** | Recharts 3 |
+| **Routing** | React Router 7 |
+| **Animations** | Framer Motion 12 |
+| **Icons** | Lucide React |
+| **Notifications** | react-hot-toast |
+| **Testing** | Vitest 4 + React Testing Library |
+
+---
+
+## Quick Start
 
 ### Prerequisites
 
-- Node.js 22.x
-- npm or yarn
-- A [Supabase](https://supabase.com) project (free tier works)
+- **Node.js 22.x** — [Download](https://nodejs.org/)
+- **Supabase project** — [Create one free](https://supabase.com/dashboard)
 
-### 1. Clone & Install
+### 1. Clone and install
 
 ```bash
-git clone https://github.com/raghav-7288/expense-tracker.git
+git clone https://github.com/your-username/expense-tracker.git
 cd expense-tracker
 npm install
 ```
 
-### 2. Configure Environment
+### 2. Configure environment
 
 ```bash
 cp .env.example .env.local
 ```
 
 Edit `.env.local` with your Supabase credentials:
-- Go to [Supabase Dashboard](https://supabase.com/dashboard) → your project → Settings → API
-- Copy the **Project URL** and **anon/public key**
 
-### 3. Set Up Database
-
-Open the Supabase SQL Editor and paste the contents of:
-```
-supabase/migrations/001_initial_schema.sql
+```dotenv
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key-here
 ```
 
-Click **Run**. This creates all tables, RLS policies, triggers, and default categories.
+> Get these from [Supabase Dashboard → Settings → API](https://supabase.com/dashboard/project/_/settings/api).
 
-### 4. Configure Google OAuth (Optional)
+### 3. Set up the database
 
-1. Enable Google provider in Supabase Dashboard → Authentication → Providers
-2. Add your Google OAuth Client ID and Secret from [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
-3. Add redirect URI: `https://<your-project>.supabase.co/auth/v1/callback`
+Run the migration files **in order** in your Supabase SQL Editor:
 
-### 5. Start Development
+1. `supabase/migrations/001_initial_schema.sql`
+2. `supabase/migrations/002_category_system.sql`
+3. `supabase/migrations/003_audit_fixes.sql`
+4. `supabase/migrations/004_fix_transaction_category_fk.sql`
+5. `supabase/migrations/005_add_investment_expense_category.sql`
+
+See [DATABASE_SETUP.md](DATABASE_SETUP.md) for detailed instructions.
+
+### 4. Start development server
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173)
+Open [http://localhost:5173](http://localhost:5173).
 
-### Scripts
+---
 
-| Command              | Description                          |
-| -------------------- | ------------------------------------ |
-| `npm run dev`        | Start Vite dev server (port 5173)    |
-| `npm run build`      | Type-check + production build        |
-| `npm run lint`       | Lint TypeScript files with ESLint    |
-| `npm run test`       | Run all tests                        |
-| `npm run test:watch` | Run tests in watch mode              |
-| `npm run test:coverage` | Run tests with coverage report    |
-| `npm run preview`    | Serve production build locally       |
+## Environment Variables
 
-## Deploying to Vercel
+| Variable | Description | Required |
+|---|---|---|
+| `VITE_SUPABASE_URL` | Your Supabase project URL | ✅ |
+| `VITE_SUPABASE_ANON_KEY` | Supabase anonymous/public API key | ✅ |
 
-1. Push to GitHub
-2. Import the repo in [Vercel](https://vercel.com)
-3. Set environment variables:
-   - `VITE_SUPABASE_URL` → your Supabase project URL
-   - `VITE_SUPABASE_ANON_KEY` → your Supabase anon key
-4. Deploy — uses `yarn install --no-lockfile` and `yarn run build`
+> ⚠️ **Never** use the `service_role` key in frontend code — it bypasses Row Level Security.
 
-The `vercel.json` handles SPA routing, `public/_headers` handles caching.
+---
+
+## Scripts
+
+| Command | Description |
+|---|---|
+| `npm run dev` | Start development server |
+| `npm run build` | Type-check and build for production |
+| `npm run preview` | Preview production build locally |
+| `npm run lint` | Run ESLint |
+| `npm test` | Run tests once |
+| `npm run test:watch` | Run tests in watch mode |
+| `npm run test:coverage` | Run tests with coverage report |
+| `npm run verify-supabase` | Verify Supabase connection |
+
+---
+
+## Testing
+
+The project uses **Vitest 4** with **React Testing Library** and **jsdom**.
+
+```bash
+# Run all tests
+npm test
+
+# Run with coverage
+npm run test:coverage
+
+# Watch mode
+npm run test:watch
+```
+
+**Current status:** 65 test files · 533 passing tests · 81% statement coverage
+
+---
+
+## Deployment
+
+### Vercel (Recommended)
+
+1. Push your repo to GitHub
+2. Import the project at [vercel.com/new](https://vercel.com/new)
+3. Add environment variables in Vercel dashboard:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+4. Deploy — Vercel auto-detects the config from `vercel.json`
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions.
+
+---
 
 ## Project Structure
 
 ```
-src/
-├── components/
-│   ├── analytics/       # 20+ chart & analysis components
-│   ├── auth/            # ProtectedRoute, GoogleSignInButton
-│   ├── categories/      # CategoryForm, CategoryList
-│   ├── dashboard/       # StatCard, Charts, RecentTransactions
-│   ├── transactions/    # TransactionForm, List, Filters
-│   └── ui/              # Button, Input, Modal, Card, Skeleton, Avatar,
-│                        #   FormAlert, Divider, SectionHeader, StatusDot, etc.
-├── context/             # AuthContext, ThemeContext
-├── engines/             # analytics.ts (pure computation functions)
-├── hooks/               # useAuth, useTransactions, useCategories,
-│                        #   useDashboard, useProfile, useAnalytics, useCurrency
-├── layouts/             # AuthLayout, DashboardLayout
-├── lib/                 # supabase.ts, queryClient.ts, queryKeys.ts
-├── pages/               # Dashboard, Transactions, Categories, Profile,
-│                        #   Analytics, Auth pages
-├── routes/              # Route definitions
-├── services/            # Supabase CRUD (profiles, categories, transactions)
-├── styles/              # Tailwind CSS + dark mode + design system tokens
-├── test/                # Test setup, utilities, factories, mocks
-├── types/               # TypeScript interfaces (app + analytics)
-└── utils/               # cn, formatCurrency, formatDate, constants, animations
-tests/                   # 54 test files, 321 tests
+expense-tracker/
+├── public/                  # Static assets, security headers
+├── src/
+│   ├── components/
+│   │   ├── analytics/       # 20 chart & insight components
+│   │   ├── auth/            # Auth forms, Google sign-in, protected route
+│   │   ├── categories/      # Category list, form, management
+│   │   ├── dashboard/       # Stat cards, charts, recent transactions
+│   │   ├── layout/          # Layout primitives
+│   │   ├── transactions/    # Transaction list, form, filters, CSV
+│   │   └── ui/              # Reusable UI primitives (Button, Modal, Input, etc.)
+│   ├── context/             # AuthContext, ThemeContext
+│   ├── engines/             # Analytics computation engine
+│   ├── hooks/               # Custom React hooks
+│   ├── layouts/             # AuthLayout, DashboardLayout
+│   ├── lib/                 # Supabase client, React Query config
+│   ├── pages/               # Page components (lazy-loaded)
+│   ├── routes/              # React Router configuration
+│   ├── services/            # Supabase data access layer
+│   ├── stores/              # Zustand stores
+│   ├── styles/              # Global CSS, design system tokens
+│   ├── types/               # TypeScript type definitions
+│   └── utils/               # Pure utility functions
+├── supabase/
+│   └── migrations/          # SQL migration files (001–005)
+├── tests/                   # Test files (mirrors src/ structure)
+└── docs/                    # Architecture docs, AI context
 ```
+
+---
 
 ## Database Schema
 
-Three tables with Row Level Security:
+### Tables
 
-| Table          | Purpose                                    |
-| -------------- | ------------------------------------------ |
-| `profiles`     | User metadata (name, currency, avatar)     |
-| `categories`   | Income/expense categories per user         |
-| `transactions` | All financial transactions with date/notes |
+| Table | Purpose |
+|---|---|
+| `profiles` | User profile (name, currency, avatar) |
+| `system_categories` | Global default categories (read-only) |
+| `user_categories` | Per-user custom categories (soft-delete) |
+| `user_hidden_categories` | Hidden system category preferences |
+| `transactions` | Income/expense records |
 
-- Auto-creates profile on signup (trigger)
-- Seeds 12 default categories on signup (trigger)
-- Auto-updates `updated_at` on every edit (trigger)
+All tables have **Row Level Security (RLS)** enabled — users can only access their own data.
 
-## Environment Variables
+---
 
-| Variable                 | Description              | Required |
-| ------------------------ | ------------------------ | -------- |
-| `VITE_SUPABASE_URL`      | Supabase project URL     | ✅       |
-| `VITE_SUPABASE_ANON_KEY` | Supabase public anon key | ✅       |
+## Roadmap
 
-> ⚠️ Never use the `service_role` key in frontend code. The anon key + RLS is secure.
+- [ ] Budget goals and spending limits
+- [ ] Recurring transactions
+- [ ] Multi-currency support with live exchange rates
+- [ ] Receipt photo upload (Supabase Storage)
+- [ ] Push notifications for budget alerts
+- [ ] Export to PDF reports
+- [ ] Shared household accounts
+- [ ] Mobile app (React Native)
 
-## Testing
+---
 
-- **Framework:** Vitest 4 + React Testing Library + jsdom
-- **Tests:** 321 passing across 54 test files
-- **Coverage:** Services 100%, Utils 100%, Hooks 85%+, UI 90%+
+## Contributing
 
-```bash
-npm run test            # Run once
-npm run test:watch      # Watch mode
-npm run test:coverage   # With coverage report
-```
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+---
 
 ## License
 
-Private
+This project is licensed under the MIT License — see [LICENSE](LICENSE) for details.

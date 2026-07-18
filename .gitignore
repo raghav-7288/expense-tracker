@@ -11,9 +11,11 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
+.env.*
+!.env.example
 package-lock.json
 coverage
-docs/*
 
 # Editor directories and files
 .vscode/*
