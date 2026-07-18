@@ -183,6 +183,13 @@ body.dark-mode .peer:checked ~ .txn-type-income {
   flex-shrink: 0;
 }
 
+@media (max-width: 640px) {
+  .toggle-switch {
+    width: 56px;
+    height: 30px;
+  }
+}
+
 .toggle-switch:focus-visible {
   outline: 2px solid #3b82f6;
   outline-offset: 2px;
@@ -202,10 +209,24 @@ body.dark-mode .peer:checked ~ .txn-type-income {
   background: white;
   border-radius: 50%;
   transition: transform 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 640px) {
+  .toggle-switch::after {
+    width: 24px;
+    height: 24px;
+  }
 }
 
 .toggle-switch.active::after {
   transform: translateX(22px);
+}
+
+@media (max-width: 640px) {
+  .toggle-switch.active::after {
+    transform: translateX(26px);
+  }
 }
 
 /* =========================================
@@ -362,11 +383,16 @@ body.dark-mode input:-webkit-autofill:focus {
 body.dark-mode label { color: #cbd5e1 !important; }
 
 /* ── Buttons ── */
-body.dark-mode [class*="bg-white"][class*="border"][class*="text-gray-700"],
-body.dark-mode [class*="bg-white"][class*="border"][class*="text-gray-600"] {
+body.dark-mode button[class*="bg-white"],
+body.dark-mode [class*="bg-white"][class*="border"] {
   background: #1e293b !important;
   border-color: #3d4a5c !important;
   color: #e2e8f0 !important;
+}
+body.dark-mode button[class*="bg-white"]:hover,
+body.dark-mode [class*="bg-white"][class*="border"]:hover {
+  background: #334155 !important;
+  border-color: #475569 !important;
 }
 
 /* Ghost button hover */
