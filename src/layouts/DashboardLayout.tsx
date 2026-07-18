@@ -18,6 +18,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
+import toast from 'react-hot-toast';
 
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -44,6 +45,7 @@ export default function DashboardLayout() {
 
   async function handleSignOut() {
     await signOut();
+    toast.success('Signed out');
     navigate('/login');
   }
 

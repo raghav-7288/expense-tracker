@@ -67,6 +67,7 @@ export default function ChangePasswordForm() {
     const { error } = await updatePassword(data.password);
     if (error) {
       setError('root', { message: error.message });
+      toast.error('Failed to change password');
     } else {
       reset();
       toast.success('Password updated successfully');

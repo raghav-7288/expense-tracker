@@ -14,6 +14,7 @@ import { SkeletonTable } from '@/components/ui/Skeleton';
 import { Plus, ChevronDown, Upload, Download, Receipt } from 'lucide-react';
 import { generateCSV, downloadFile } from '@/engines/analytics';
 import type { TransactionFilters } from '@/types';
+import toast from 'react-hot-toast';
 
 export default function TransactionsPage() {
   const [filters, setFilters] = useState<TransactionFilters>({
@@ -55,9 +56,14 @@ export default function TransactionsPage() {
 
   function handleExportCSV() {
     if (!transactions || transactions.length === 0) return;
-    const csv = generateCSV(transactions);
-    const date = new Date().toISOString().split('T')[0] ?? 'export';
-    downloadFile(csv, `transactions-${date}.csv`, 'text/csv');
+    try {
+      const csv = generateCSV(transactions);
+      const date = new Date().toISOString().split('T')[0] ?? 'export';
+      downloadFile(csv, `transactions-${date}.csv`, 'text/csv');
+      toast.success(`Exported ${String(transactions.length)} transactions`);
+    } catch {
+      toast.error('Failed to export transactions');
+    }
     setShowCSVMenu(false);
   }
 
@@ -77,7 +83,6 @@ export default function TransactionsPage() {
             <div className="relative" ref={csvMenuRef}>
               <Button
                 variant="secondary"
-                size="sm"
                 onClick={() => setShowCSVMenu((v) => !v)}
                 className="w-full sm:w-auto"
               >
@@ -89,14 +94,14 @@ export default function TransactionsPage() {
                   <button
                     onClick={handleExportCSV}
                     disabled={!transactions || transactions.length === 0}
-                    className="flex items-center gap-2 w-full px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Download size={14} />
                     Export
                   </button>
                   <button
                     onClick={handleImportCSV}
-                    className="flex items-center gap-2 w-full px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
                   >
                     <Upload size={14} />
                     Import

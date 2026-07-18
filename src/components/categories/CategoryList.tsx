@@ -94,7 +94,7 @@ export default function CategoryList({ categories }: CategoryListProps) {
                   <button
                     onClick={() => handleCopy(category)}
                     disabled={copyMutation.isPending}
-                    className="p-1.5 rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 disabled:opacity-50"
+                    className="p-1.5 rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-colors duration-150 disabled:opacity-50"
                     aria-label={`Copy ${category.name}`}
                     title="Copy as custom"
                   >
@@ -102,7 +102,7 @@ export default function CategoryList({ categories }: CategoryListProps) {
                   </button>
                   <button
                     onClick={() => setHidingCategory(category)}
-                    className="p-1.5 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50"
+                    className="p-1.5 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors duration-150"
                     aria-label={`Hide ${category.name}`}
                     title="Hide"
                   >
@@ -137,14 +137,14 @@ export default function CategoryList({ categories }: CategoryListProps) {
                 <div className="flex items-center gap-0.5 flex-shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => setEditingCategory(category)}
-                    className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                    className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors duration-150"
                     aria-label={`Edit ${category.name}`}
                   >
                     <Edit size={14} />
                   </button>
                   <button
                     onClick={() => setDeletingCategory(category)}
-                    className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50"
+                    className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors duration-150"
                     aria-label={`Delete ${category.name}`}
                   >
                     <Trash2 size={14} />

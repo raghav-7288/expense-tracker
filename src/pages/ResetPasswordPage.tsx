@@ -40,6 +40,7 @@ export default function ResetPasswordPage() {
     const { error } = await updatePassword(data.password);
     if (error) {
       setError('root', { message: error.message });
+      toast.error('Failed to update password');
     } else {
       toast.success('Password updated successfully!');
       navigate('/dashboard');

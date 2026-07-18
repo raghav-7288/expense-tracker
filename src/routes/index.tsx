@@ -18,7 +18,7 @@ const AnalyticsPage = lazy(() => import('@/pages/AnalyticsPage'));
 function PageFallback() {
   return (
     <div className="flex items-center justify-center min-h-[50vh]">
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary-500 border-t-transparent" />
+      <div className="h-8 w-8 animate-spin will-change-transform rounded-full border-4 border-primary-500 border-t-transparent" />
     </div>
   );
 }

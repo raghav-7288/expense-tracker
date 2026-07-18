@@ -43,6 +43,7 @@ export default function SignUpPage() {
     const { error } = await signUp(data.email, data.password, data.fullName);
     if (error) {
       setError('root', { message: error.message });
+      toast.error('Registration failed');
     } else {
       toast.success('Account created! Check your email to confirm.');
     }

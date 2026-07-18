@@ -121,7 +121,7 @@ export function DropdownItem({
       role="menuitem"
       tabIndex={-1}
       className={cn(
-        'flex items-center gap-2 w-full px-3 py-2 text-sm text-left transition-colors',
+        'flex items-center gap-2 w-full px-3 py-2 text-sm text-left transition-colors duration-150',
         'disabled:opacity-50 disabled:cursor-not-allowed',
         'focus:outline-none focus:bg-gray-50',
         {

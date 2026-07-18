@@ -66,5 +66,53 @@ describe('Button', () => {
     render(<Button className="w-full">Click</Button>);
     expect(screen.getByRole('button').className).toContain('w-full');
   });
+
+  // Loading spinner stability tests
+  describe('loading spinner stability', () => {
+    it('children stay in DOM during loading (invisible but present for sizing)', () => {
+      const { container } = render(<Button loading>Add Transaction</Button>);
+      // Children text is still in the DOM (holds width)
+      expect(screen.getByRole('button')).toHaveTextContent('Add Transaction');
+      // But the content wrapper is invisible
+      const contentSpan = container.querySelector('button > span:first-child');
+      expect(contentSpan?.className).toContain('invisible');
+    });
+
+    it('spinner is absolutely positioned (no layout shift)', () => {
+      const { container } = render(<Button loading>Submit</Button>);
+      const spinnerWrapper = container.querySelector('button > span:last-child');
+      expect(spinnerWrapper?.className).toContain('absolute');
+      expect(spinnerWrapper?.className).toContain('inset-0');
+    });
+
+    it('children are visible when not loading', () => {
+      const { container } = render(<Button>Submit</Button>);
+      const contentSpan = container.querySelector('button > span:first-child');
+      expect(contentSpan?.className).not.toContain('invisible');
+    });
+
+    it('button has relative positioning for spinner overlay', () => {
+      render(<Button>Click</Button>);
+      expect(screen.getByRole('button').className).toContain('relative');
+    });
+
+    it('re-render from loading to not-loading removes spinner', () => {
+      const { container, rerender } = render(<Button loading>Save</Button>);
+      expect(container.querySelector('.animate-spin')).toBeInTheDocument();
+      rerender(<Button>Save</Button>);
+      expect(container.querySelector('.animate-spin')).not.toBeInTheDocument();
+      expect(container.querySelector('.invisible')).not.toBeInTheDocument();
+    });
+
+    it('re-render from not-loading to loading keeps text for sizing', () => {
+      const { container, rerender } = render(<Button>Save Changes</Button>);
+      expect(container.querySelector('.invisible')).not.toBeInTheDocument();
+      rerender(<Button loading>Save Changes</Button>);
+      // Text stays in DOM but is invisible
+      expect(screen.getByRole('button')).toHaveTextContent('Save Changes');
+      expect(container.querySelector('.invisible')).toBeInTheDocument();
+      expect(container.querySelector('.animate-spin')).toBeInTheDocument();
+    });
+  });
 });
 

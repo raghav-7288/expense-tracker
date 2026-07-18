@@ -29,9 +29,18 @@ export default function TextArea({ label, error, className, id, ...props }: Text
         )}
         rows={3}
         aria-invalid={error ? 'true' : undefined}
+        aria-describedby={error ? `${textareaId}-error` : undefined}
         {...props}
       />
-      {error && <p className="text-xs text-red-600 mt-1">{error}</p>}
+      {error && (
+        <p id={`${textareaId}-error`} className="text-xs text-red-600 flex items-center gap-1" role="alert">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="flex-shrink-0">
+            <circle cx="6" cy="6" r="6" fill="currentColor" opacity="0.15" />
+            <path d="M6 3.5V6.5M6 8.5V8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+          </svg>
+          {error}
+        </p>
+      )}
     </div>
   );
 }
