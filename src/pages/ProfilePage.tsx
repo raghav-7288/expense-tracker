@@ -105,7 +105,7 @@ export default function ProfilePage() {
   const providers = identities.map((i) => i.provider);
 
   return (
-    <AnimatedPage className="space-y-6">
+      <AnimatedPage className="space-y-6 max-w-3xl mx-auto">
       <PageHeader title="Profile" description="Manage your account settings" />
 
       {/* Profile Info */}
