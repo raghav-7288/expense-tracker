@@ -7,21 +7,24 @@ import { createTestQueryClient, createMockAuth } from '@/test/test-utils';
 import { useProfile, useUpdateProfile } from '@/hooks/useProfile';
 import type { ReactNode } from 'react';
 
-vi.mock('react-hot-toast', () => ({
-  default: { success: vi.fn(), error: vi.fn() },
+const { mockToast, mockGetProfile, mockUpdateProfile } = vi.hoisted(() => ({
+  mockToast: { success: vi.fn(), error: vi.fn() },
+  mockGetProfile: vi.fn(),
+  mockUpdateProfile: vi.fn(),
 }));
 
-const mockGetProfile = vi.fn();
-const mockUpdateProfile = vi.fn();
+vi.mock('react-hot-toast', () => ({
+  default: mockToast,
+}));
 
 vi.mock('@/services/profiles', () => ({
   getProfile: (...args: unknown[]) => mockGetProfile(...args),
   updateProfile: (...args: unknown[]) => mockUpdateProfile(...args),
 }));
 
-function createWrapper() {
+function createWrapper(authOverrides: Record<string, unknown> = {}) {
   const queryClient = createTestQueryClient();
-  const authValue = createMockAuth();
+  const authValue = createMockAuth(authOverrides);
   return function Wrapper({ children }: { children: ReactNode }) {
     return (
       <QueryClientProvider client={queryClient}>
@@ -55,6 +58,23 @@ describe('useProfile', () => {
 
     const { result } = renderHook(() => useProfile(), { wrapper: createWrapper() });
     await waitFor(() => expect(result.current.isError).toBe(true));
+    expect(result.current.error?.message).toBe('Not found');
+  });
+
+  it('does not fetch when user is null', async () => {
+    const { result } = renderHook(() => useProfile(), {
+      wrapper: createWrapper({ user: null }),
+    });
+    // query should be disabled — not fetching
+    expect(result.current.fetchStatus).toBe('idle');
+    expect(mockGetProfile).not.toHaveBeenCalled();
+  });
+
+  it('returns null data when user is null', async () => {
+    const { result } = renderHook(() => useProfile(), {
+      wrapper: createWrapper({ user: null }),
+    });
+    expect(result.current.data).toBeUndefined();
   });
 });
 
@@ -63,17 +83,57 @@ describe('useUpdateProfile', () => {
     vi.clearAllMocks();
   });
 
-  it('updates profile', async () => {
+  it('updates profile successfully', async () => {
     mockUpdateProfile.mockResolvedValue({ data: { full_name: 'New Name' }, error: null });
     const { result } = renderHook(() => useUpdateProfile(), { wrapper: createWrapper() });
     await result.current.mutateAsync({ full_name: 'New Name' });
     expect(mockUpdateProfile).toHaveBeenCalledWith('user-123', { full_name: 'New Name' });
   });
 
-  it('handles update error', async () => {
+  it('shows success toast on successful update', async () => {
+    mockUpdateProfile.mockResolvedValue({ data: { full_name: 'New Name' }, error: null });
+    const { result } = renderHook(() => useUpdateProfile(), { wrapper: createWrapper() });
+    await result.current.mutateAsync({ full_name: 'New Name' });
+    expect(mockToast.success).toHaveBeenCalledWith('Profile updated');
+  });
+
+  it('handles update error and throws', async () => {
     mockUpdateProfile.mockResolvedValue({ data: null, error: { message: 'Failed' } });
     const { result } = renderHook(() => useUpdateProfile(), { wrapper: createWrapper() });
     await expect(result.current.mutateAsync({ full_name: 'X' })).rejects.toThrow('Failed');
   });
-});
 
+  it('shows error toast on update failure', async () => {
+    mockUpdateProfile.mockResolvedValue({ data: null, error: { message: 'Server error' } });
+    const { result } = renderHook(() => useUpdateProfile(), { wrapper: createWrapper() });
+    try {
+      await result.current.mutateAsync({ full_name: 'X' });
+    } catch {
+      // expected
+    }
+    await waitFor(() => {
+      expect(mockToast.error).toHaveBeenCalledWith('Server error');
+    });
+  });
+
+  it('throws if user is not authenticated', async () => {
+    const { result } = renderHook(() => useUpdateProfile(), {
+      wrapper: createWrapper({ user: null }),
+    });
+    await expect(result.current.mutateAsync({ full_name: 'X' })).rejects.toThrow('Not authenticated');
+  });
+
+  it('can update currency', async () => {
+    mockUpdateProfile.mockResolvedValue({ data: { currency: 'EUR' }, error: null });
+    const { result } = renderHook(() => useUpdateProfile(), { wrapper: createWrapper() });
+    await result.current.mutateAsync({ currency: 'EUR' });
+    expect(mockUpdateProfile).toHaveBeenCalledWith('user-123', { currency: 'EUR' });
+  });
+
+  it('can update multiple fields at once', async () => {
+    mockUpdateProfile.mockResolvedValue({ data: { full_name: 'Jane', currency: 'GBP' }, error: null });
+    const { result } = renderHook(() => useUpdateProfile(), { wrapper: createWrapper() });
+    await result.current.mutateAsync({ full_name: 'Jane', currency: 'GBP' });
+    expect(mockUpdateProfile).toHaveBeenCalledWith('user-123', { full_name: 'Jane', currency: 'GBP' });
+  });
+});
