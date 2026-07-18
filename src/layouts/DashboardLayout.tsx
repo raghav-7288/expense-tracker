@@ -52,7 +52,7 @@ export default function DashboardLayout() {
   const userName = user?.user_metadata?.full_name ?? user?.email ?? '';
 
   return (
-    <div className="min-h-screen flex bg-gray-50 dark-layout">
+    <div className="h-screen flex overflow-hidden bg-gray-50 dark-layout">
       {/* Skip to content link */}
       <a
         href="#main-content"
@@ -161,7 +161,7 @@ export default function DashboardLayout() {
       </aside>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Top bar (desktop: breadcrumb, mobile: hamburger + logo) */}
         <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200/60 nav-sidebar">
           <div className="flex items-center gap-3 px-4 md:px-6 lg:px-8 h-14">

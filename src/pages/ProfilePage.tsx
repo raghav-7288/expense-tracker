@@ -162,7 +162,7 @@ export default function ProfilePage() {
               }
             </div>
             <div className="text-left min-w-0">
-              <p className="text-sm font-medium text-gray-900 section-heading">Dark Mode</p>
+              <p className="text-sm font-medium text-gray-900 section-heading">{darkMode ? 'Light Mode' : 'Dark Mode'}</p>
               <p className="text-xs text-gray-500 muted-text">
                 {darkMode ? 'Dark theme is active' : 'Light theme is active'}
               </p>
