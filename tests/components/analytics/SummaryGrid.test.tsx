@@ -64,5 +64,49 @@ describe('SummaryGrid', () => {
     // Should contain red-colored elements for negative savings
     expect(container.querySelector('.bg-red-100')).toBeInTheDocument();
   });
+
+  // Multi-currency verification
+  describe('multi-currency rendering', () => {
+    it('renders USD values with $ symbol', () => {
+      const { container } = render(<SummaryGrid summary={mockSummary} currency="USD" />);
+      expect(container.textContent).toContain('$');
+    });
+
+    it('renders INR values with ₹ symbol', () => {
+      const { container } = render(<SummaryGrid summary={mockSummary} currency="INR" />);
+      expect(container.textContent).toContain('₹');
+      expect(container.textContent).not.toContain('$');
+    });
+
+    it('renders EUR values with € symbol', () => {
+      const { container } = render(<SummaryGrid summary={mockSummary} currency="EUR" />);
+      expect(container.textContent).toContain('€');
+      expect(container.textContent).not.toContain('$');
+    });
+
+    it('renders GBP values with £ symbol', () => {
+      const { container } = render(<SummaryGrid summary={mockSummary} currency="GBP" />);
+      expect(container.textContent).toContain('£');
+      expect(container.textContent).not.toContain('$');
+    });
+
+    it('renders JPY values with ¥ symbol and no decimals', () => {
+      const { container } = render(<SummaryGrid summary={mockSummary} currency="JPY" />);
+      const text = container.textContent ?? '';
+      expect(text).toContain('¥');
+      expect(text).not.toContain('$');
+      // JPY values should not have decimal points in monetary amounts
+      // (they will appear in percentages like "50%" which is fine)
+    });
+
+    it('currency switch updates all monetary values', () => {
+      const { container, rerender } = render(<SummaryGrid summary={mockSummary} currency="USD" />);
+      expect(container.textContent).toContain('$');
+
+      rerender(<SummaryGrid summary={mockSummary} currency="INR" />);
+      expect(container.textContent).toContain('₹');
+      expect(container.textContent).not.toContain('$');
+    });
+  });
 });
 

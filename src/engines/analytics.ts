@@ -14,6 +14,7 @@ import type {
   YearlyReportData,
   TransactionRankingItem,
 } from '@/types/analytics';
+import { formatCurrency } from '@/utils/formatCurrency';
 
 /* ============================================================
    DATE UTILITIES
@@ -125,7 +126,7 @@ export function filterTransactions(
    ============================================================ */
 
 function pctChange(current: number, previous: number): number {
-  if (previous === 0) return current > 0 ? 100 : 0;
+  if (previous === 0) return current > 0 ? 100 : current < 0 ? -100 : 0;
   return Math.round(((current - previous) / previous) * 100);
 }
 
@@ -483,6 +484,7 @@ export function generateInsights(
   transactions: Transaction[],
   summary: AnalyticsSummary,
   expenseCategories: CategoryBreakdownItem[],
+  currency: string,
 ): InsightItem[] {
   const insights: InsightItem[] = [];
 
@@ -603,7 +605,7 @@ export function generateInsights(
     insights.push({
       id: String(insights.length + 1),
       type: 'info',
-      message: `Your largest expense was $${summary.highestExpense.toFixed(2)}`,
+      message: `Your largest expense was ${formatCurrency(summary.highestExpense, currency)}`,
     });
   }
 
@@ -611,7 +613,7 @@ export function generateInsights(
     insights.push({
       id: String(insights.length + 1),
       type: 'info',
-      message: `Your average daily spending is $${summary.avgDailySpending.toFixed(2)}`,
+      message: `Your average daily spending is ${formatCurrency(summary.avgDailySpending, currency)}`,
     });
   }
 

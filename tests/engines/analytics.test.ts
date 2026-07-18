@@ -236,6 +236,16 @@ describe('computeSummary', () => {
     const summary = computeSummary(current, [], current, range);
     expect(summary.incomeChange).toBe(100); // from 0 to positive = 100%
   });
+
+  it('handles previous period with zero then current negative savings', () => {
+    // Only expenses, no income → negative savings
+    const current = [txn({ type: 'expense', amount: 500 })];
+    const range: DateRange = { startDate: '2024-06-01', endDate: '2024-06-30' };
+    const summary = computeSummary(current, [], current, range);
+    // savings = 0 - 500 = -500, prevSavings = 0
+    // pctChange(-500, 0) should return -100
+    expect(summary.savingsChange).toBe(-100);
+  });
 });
 
 // --------------- computeDailySeries ---------------
@@ -498,37 +508,37 @@ describe('generateInsights', () => {
   it('generates top category insight', () => {
     const cats = [{ name: 'Food', percentage: 30, amount: 300, color: '#f00', icon: 'utensils', count: 5, avgTransaction: 60, highestTransaction: 100, lowestTransaction: 20 }];
     const summary = makeSummary();
-    const insights = generateInsights([], summary, cats);
+    const insights = generateInsights([], summary, cats, 'USD');
     expect(insights.some((i) => i.message.includes('Food'))).toBe(true);
   });
 
   it('generates great savings insight', () => {
     const summary = makeSummary({ savingsRate: 25 });
-    const insights = generateInsights([], summary, []);
+    const insights = generateInsights([], summary, [], 'USD');
     expect(insights.some((i) => i.type === 'success' && i.message.includes('25%'))).toBe(true);
   });
 
   it('generates low savings warning', () => {
     const summary = makeSummary({ savingsRate: 5 });
-    const insights = generateInsights([], summary, []);
+    const insights = generateInsights([], summary, [], 'USD');
     expect(insights.some((i) => i.type === 'warning' && i.message.includes('5%'))).toBe(true);
   });
 
   it('generates spending increase warning', () => {
     const summary = makeSummary({ expenseChange: 30 });
-    const insights = generateInsights([], summary, []);
+    const insights = generateInsights([], summary, [], 'USD');
     expect(insights.some((i) => i.type === 'warning' && i.message.includes('30%'))).toBe(true);
   });
 
   it('generates spending decrease success', () => {
     const summary = makeSummary({ expenseChange: -15 });
-    const insights = generateInsights([], summary, []);
+    const insights = generateInsights([], summary, [], 'USD');
     expect(insights.some((i) => i.type === 'success' && i.message.includes('15%'))).toBe(true);
   });
 
   it('generates savings improvement insight', () => {
     const summary = makeSummary({ savingsChange: 20, savings: 500 });
-    const insights = generateInsights([], summary, []);
+    const insights = generateInsights([], summary, [], 'USD');
     expect(insights.some((i) => i.message.includes('20% more'))).toBe(true);
   });
 
@@ -539,7 +549,7 @@ describe('generateInsights', () => {
       txn({ date: '2024-06-10', type: 'expense', amount: 50 }),  // Monday
     ];
     const summary = makeSummary();
-    const insights = generateInsights(txns, summary, []);
+    const insights = generateInsights(txns, summary, [], 'USD');
     expect(insights.some((i) => i.message.includes('Weekend'))).toBe(true);
   });
 
@@ -548,27 +558,71 @@ describe('generateInsights', () => {
       txn({ date: '2024-06-14', type: 'expense', amount: 500 }), // Friday
     ];
     const summary = makeSummary();
-    const insights = generateInsights(txns, summary, []);
+    const insights = generateInsights(txns, summary, [], 'USD');
     expect(insights.some((i) => i.message.includes('Fridays'))).toBe(true);
   });
 
   it('generates high-percentage category tip', () => {
     const cats = [{ name: 'Rent', percentage: 40, amount: 2000, color: '#f00', icon: 'home', count: 1, avgTransaction: 2000, highestTransaction: 2000, lowestTransaction: 2000 }];
     const summary = makeSummary();
-    const insights = generateInsights([], summary, cats);
+    const insights = generateInsights([], summary, cats, 'USD');
     expect(insights.some((i) => i.type === 'tip' && i.message.includes('Rent'))).toBe(true);
   });
 
   it('generates highest expense insight', () => {
     const summary = makeSummary({ highestExpense: 999.99 });
-    const insights = generateInsights([], summary, []);
+    const insights = generateInsights([], summary, [], 'USD');
     expect(insights.some((i) => i.message.includes('$999.99'))).toBe(true);
   });
 
   it('generates avg daily spending insight', () => {
     const summary = makeSummary({ avgDailySpending: 42.50 });
-    const insights = generateInsights([], summary, []);
+    const insights = generateInsights([], summary, [], 'USD');
     expect(insights.some((i) => i.message.includes('$42.50'))).toBe(true);
+  });
+
+  // Multi-currency verification
+  describe('multi-currency insights', () => {
+    it('formats highest expense with INR symbol', () => {
+      const summary = makeSummary({ highestExpense: 999.99 });
+      const insights = generateInsights([], summary, [], 'INR');
+      expect(insights.some((i) => i.message.includes('₹'))).toBe(true);
+      expect(insights.some((i) => i.message.includes('999.99'))).toBe(true);
+    });
+
+    it('formats avg daily spending with EUR symbol', () => {
+      const summary = makeSummary({ avgDailySpending: 42.50 });
+      const insights = generateInsights([], summary, [], 'EUR');
+      expect(insights.some((i) => i.message.includes('€'))).toBe(true);
+      expect(insights.some((i) => i.message.includes('42.50'))).toBe(true);
+    });
+
+    it('formats highest expense with GBP symbol', () => {
+      const summary = makeSummary({ highestExpense: 1500 });
+      const insights = generateInsights([], summary, [], 'GBP');
+      expect(insights.some((i) => i.message.includes('£'))).toBe(true);
+      expect(insights.some((i) => i.message.includes('1,500'))).toBe(true);
+    });
+
+    it('formats JPY without decimal places', () => {
+      const summary = makeSummary({ highestExpense: 10000 });
+      const insights = generateInsights([], summary, [], 'JPY');
+      const msg = insights.find((i) => i.message.includes('largest expense'));
+      expect(msg).toBeDefined();
+      expect(msg!.message).toContain('¥');
+      expect(msg!.message).not.toContain('.');
+    });
+
+    it('uses different symbols for different currencies', () => {
+      const summary = makeSummary({ highestExpense: 500, avgDailySpending: 100 });
+      const usd = generateInsights([], summary, [], 'USD');
+      const inr = generateInsights([], summary, [], 'INR');
+      const usdMsg = usd.find((i) => i.message.includes('largest expense'))!.message;
+      const inrMsg = inr.find((i) => i.message.includes('largest expense'))!.message;
+      expect(usdMsg).toContain('$');
+      expect(inrMsg).toContain('₹');
+      expect(usdMsg).not.toEqual(inrMsg);
+    });
   });
 });
 
@@ -797,6 +851,4 @@ describe('downloadFile', () => {
     removeChild.mockRestore();
   });
 });
-
-
 

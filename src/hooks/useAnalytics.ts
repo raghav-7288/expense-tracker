@@ -27,6 +27,7 @@ import {
 
 export function useAnalytics(filters: AnalyticsFilters): AnalyticsData {
   const { user } = useAuth();
+  const currency = useCurrency();
 
   const {
     data: allTransactions,
@@ -133,8 +134,8 @@ export function useAnalytics(filters: AnalyticsFilters): AnalyticsData {
   );
 
   const insights = useMemo(
-    () => (summary ? generateInsights(currentTransactions, summary, expenseCategories) : []),
-    [currentTransactions, summary, expenseCategories],
+    () => (summary ? generateInsights(currentTransactions, summary, expenseCategories, currency) : []),
+    [currentTransactions, summary, expenseCategories, currency],
   );
 
   const spendingPatterns = useMemo(

@@ -55,7 +55,7 @@ export default function YearlyReport({ data, loading, currency }: YearlyReportPr
                 <XAxis dataKey="shortMonth" tick={{ fontSize: 9 }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 9 }} axisLine={false} tickLine={false} width={45} />
                 <Tooltip
-                  contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '11px' }}
+                  contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '12px' }}
                   formatter={(value) => [formatCompactCurrency(Number(value), currency)]}
                 />
                 <Legend wrapperStyle={{ fontSize: '10px' }} />
