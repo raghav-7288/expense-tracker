@@ -229,6 +229,18 @@ describe('TopCategories', () => {
     render(<TopCategories data={[]} currency="USD" />);
     expect(screen.getByText(/Categorize/i)).toBeInTheDocument();
   });
+
+  it('renders INR amounts with ₹ symbol', () => {
+    const { container } = render(<TopCategories data={categoryBreakdown} currency="INR" />);
+    expect(container.textContent).toContain('₹');
+    expect(container.textContent).not.toContain('$');
+  });
+
+  it('renders JPY amounts without decimals', () => {
+    const { container } = render(<TopCategories data={categoryBreakdown} currency="JPY" />);
+    expect(container.textContent).toContain('¥');
+    expect(container.textContent).not.toContain('$');
+  });
 });
 
 // ============ LARGEST TRANSACTIONS ============
@@ -244,6 +256,20 @@ describe('LargestTransactions', () => {
     render(<LargestTransactions largest={[]} smallest={[]} currency="USD" />);
     expect(screen.getByText(/No data/i)).toBeInTheDocument();
   });
+
+  it('renders EUR amounts with € symbol', () => {
+    const { container } = render(<LargestTransactions largest={transactions} smallest={transactions} currency="EUR" />);
+    expect(container.textContent).toContain('€');
+    expect(container.textContent).not.toContain('$');
+  });
+
+  it('currency switch updates all amounts', () => {
+    const { container, rerender } = render(<LargestTransactions largest={transactions} smallest={transactions} currency="USD" />);
+    expect(container.textContent).toContain('$');
+    rerender(<LargestTransactions largest={transactions} smallest={transactions} currency="GBP" />);
+    expect(container.textContent).toContain('£');
+    expect(container.textContent).not.toContain('$');
+  });
 });
 
 // ============ SPENDING PATTERNS ============
@@ -253,6 +279,12 @@ describe('SpendingPatterns', () => {
     render(<SpendingPatterns data={patterns} currency="USD" />);
     expect(screen.getByText('Spending Patterns')).toBeInTheDocument();
     expect(screen.getByText(/Weekday vs Weekend/i)).toBeInTheDocument();
+  });
+
+  it('renders INR amounts in weekday/weekend labels', () => {
+    const { container } = render(<SpendingPatterns data={patterns} currency="INR" />);
+    expect(container.textContent).toContain('₹');
+    expect(container.textContent).not.toContain('$');
   });
 });
 
@@ -264,6 +296,20 @@ describe('MonthlyReport', () => {
     expect(screen.getByText('June 2024')).toBeInTheDocument();
     expect(screen.getByText(/5% less/)).toBeInTheDocument();
   });
+
+  it('renders with INR currency symbol', () => {
+    const { container } = render(<MonthlyReport data={monthlyReport} currency="INR" />);
+    expect(container.textContent).toContain('₹');
+    expect(container.textContent).not.toContain('$');
+  });
+
+  it('currency switch updates all monetary values', () => {
+    const { container, rerender } = render(<MonthlyReport data={monthlyReport} currency="USD" />);
+    expect(container.textContent).toContain('$');
+    rerender(<MonthlyReport data={monthlyReport} currency="EUR" />);
+    expect(container.textContent).toContain('€');
+    expect(container.textContent).not.toContain('$');
+  });
 });
 
 // ============ YEARLY REPORT ============
@@ -272,6 +318,12 @@ describe('YearlyReport', () => {
   it('renders yearly summary', () => {
     render(<YearlyReport data={yearlyReport} currency="USD" />);
     expect(screen.getByText('2024 Annual Report')).toBeInTheDocument();
+  });
+
+  it('renders with GBP currency symbol', () => {
+    const { container } = render(<YearlyReport data={yearlyReport} currency="GBP" />);
+    expect(container.textContent).toContain('£');
+    expect(container.textContent).not.toContain('$');
   });
 });
 
@@ -287,6 +339,20 @@ describe('CategoryBreakdownTable', () => {
   it('renders empty state', () => {
     render(<CategoryBreakdownTable data={[]} currency="USD" />);
     expect(screen.getByText(/No data/i)).toBeInTheDocument();
+  });
+
+  it('renders INR amounts with ₹ symbol', () => {
+    const { container } = render(<CategoryBreakdownTable data={categoryBreakdown} currency="INR" />);
+    expect(container.textContent).toContain('₹');
+    expect(container.textContent).not.toContain('$');
+  });
+
+  it('currency switch updates all table values', () => {
+    const { container, rerender } = render(<CategoryBreakdownTable data={categoryBreakdown} currency="USD" />);
+    expect(container.textContent).toContain('$');
+    rerender(<CategoryBreakdownTable data={categoryBreakdown} currency="JPY" />);
+    expect(container.textContent).toContain('¥');
+    expect(container.textContent).not.toContain('$');
   });
 });
 

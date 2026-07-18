@@ -66,7 +66,7 @@ export default function SpendingPatterns({ data, loading, currency }: SpendingPa
                 <XAxis dataKey="shortDay" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 10 }} axisLine={false} tickLine={false} width={45} />
                 <Tooltip
-                  contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '11px' }}
+                  contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '12px' }}
                   formatter={(value) => [formatCurrency(Number(value), currency), 'Total']}
                 />
                 <Bar dataKey="amount" fill="#6366f1" radius={[3, 3, 0, 0]} />
