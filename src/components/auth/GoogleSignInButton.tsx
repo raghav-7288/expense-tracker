@@ -48,7 +48,7 @@ export default function GoogleSignInButton({ onClick, className }: GoogleSignInB
         )}
       >
         {loading ? (
-          <Loader2 size={18} className="animate-spin text-gray-400" />
+          <Loader2 size={18} className="animate-spin will-change-transform text-gray-400" />
         ) : (
           <GoogleIcon />
         )}

@@ -9,7 +9,7 @@ interface SpinnerProps {
 export default function Spinner({ size = 20, className }: SpinnerProps) {
   return (
     <div className="flex items-center justify-center p-8">
-      <Loader2 size={size} className={cn('animate-spin text-gray-400', className)} />
+      <Loader2 size={size} className={cn('animate-spin will-change-transform text-gray-400', className)} />
     </div>
   );
 }

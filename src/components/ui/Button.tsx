@@ -20,7 +20,7 @@ export default function Button({
   return (
     <button
       className={cn(
-        'inline-flex items-center justify-center rounded-lg font-medium transition-all duration-150',
+        'relative inline-flex items-center justify-center rounded-lg font-medium transition-all duration-150',
         'focus-visible:outline-2 focus-visible:outline-offset-2',
         'disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none',
         {
@@ -39,8 +39,21 @@ export default function Button({
       disabled={disabled || loading}
       {...props}
     >
-      {loading && <Loader2 size={14} className="animate-spin" />}
-      {children}
+      <span className={cn(
+        'inline-flex items-center justify-center',
+        {
+          'gap-1.5': size === 'sm',
+          'gap-2': size === 'md' || size === 'lg',
+        },
+        loading && 'invisible',
+      )}>
+        {children}
+      </span>
+      {loading && (
+        <span className="absolute inset-0 flex items-center justify-center">
+          <Loader2 size={14} className="animate-spin will-change-transform" />
+        </span>
+      )}
     </button>
   );
 }

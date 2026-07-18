@@ -232,6 +232,17 @@ body.dark-mode .peer:checked ~ .txn-type-income {
 /* =========================================
    DARK MODE OVERRIDES — body.dark-mode
    Organized by category for maintainability.
+
+   Elevation scale:
+     Level 0 (page bg)      #0f172a
+     Level 1 (cards/modal)   #1e293b
+     Level 2 (floating)      #243347
+     Hover (on L1)           #2a3a4e
+     Hover (on L2)           #30475f
+     Active/Pressed          #334155
+     Borders (subtle)        #2d3a4d
+     Borders (medium)        #3d4a5c
+     Borders (strong)        #475569
    ========================================= */
 
 /* ── Base ── */
@@ -249,14 +260,17 @@ body.dark-mode .dark-layout {
 body.dark-mode .nav-sidebar {
   background: #1e293b !important;
   border-color: #1e293b !important;
-  box-shadow: 1px 0 0 #334155 !important;
+  box-shadow: 1px 0 0 #2d3a4d !important;
 }
 
 body.dark-mode .nav-brand { color: #f1f5f9 !important; }
 
-body.dark-mode .nav-link { color: #94a3b8 !important; }
+body.dark-mode .nav-link {
+  color: #94a3b8 !important;
+  transition: background 0.15s ease, color 0.15s ease;
+}
 body.dark-mode .nav-link:hover {
-  background: #1e293b !important;
+  background: #2a3a4e !important;
   color: #e2e8f0 !important;
 }
 body.dark-mode .nav-link-active {
@@ -265,9 +279,9 @@ body.dark-mode .nav-link-active {
 }
 
 body.dark-mode .nav-theme-toggle { color: #fbbf24; }
-body.dark-mode .nav-theme-toggle:hover { background: #334155; }
+body.dark-mode .nav-theme-toggle:hover { background: #2a3a4e; }
 
-/* ── Cards & Surfaces ── */
+/* ── Cards & Surfaces (Level 1) ── */
 body.dark-mode [class*="rounded-xl"][class*="border"][class*="bg-white"],
 body.dark-mode [class*="rounded-xl"][class*="shadow-sm"] {
   background: #1e293b !important;
@@ -291,7 +305,7 @@ body.dark-mode [class*="text-gray-400"] { color: #64748b !important; }
 body.dark-mode [class*="text-gray-300"] { color: #475569 !important; }
 
 /* ── Backgrounds ── */
-body.dark-mode [class*="bg-gray-100"] { background: #334155 !important; }
+body.dark-mode [class*="bg-gray-100"] { background: #283848 !important; }
 body.dark-mode [class*="bg-gray-50"] { background: #1a2332 !important; }
 
 /* Colored light backgrounds → dark equivalents */
@@ -343,9 +357,9 @@ body.dark-mode [class*="border-amber-200"] { border-color: rgba(245, 158, 11, 0.
 body.dark-mode [class*="border-purple-200"] { border-color: rgba(139, 92, 246, 0.2) !important; }
 
 /* Dividers */
-body.dark-mode [class*="divide-gray-100"] > * + *,
-body.dark-mode [class*="divide-gray-200"] > * + *,
-body.dark-mode [class*="divide-gray-50"] > * + * { border-color: #2d3a4d !important; }
+body.dark-mode [class*="divide-gray-100"] > *,
+body.dark-mode [class*="divide-gray-200"] > *,
+body.dark-mode [class*="divide-gray-50"] > * { border-color: #2d3a4d !important; }
 
 /* ── Forms ── */
 body.dark-mode input,
@@ -362,6 +376,11 @@ body.dark-mode input::placeholder,
 body.dark-mode textarea::placeholder {
   color: #64748b !important;
   -webkit-text-fill-color: #64748b !important;
+}
+body.dark-mode input:hover,
+body.dark-mode select:hover,
+body.dark-mode textarea:hover {
+  border-color: #475569 !important;
 }
 body.dark-mode input:focus,
 body.dark-mode select:focus,
@@ -382,7 +401,70 @@ body.dark-mode input:-webkit-autofill:focus {
 }
 body.dark-mode label { color: #cbd5e1 !important; }
 
-/* ── Buttons ── */
+/* ============================================================
+   INTERACTIVE STATES — unified hover/active/focus
+   Order: general hovers → specific component hovers → buttons
+   Later rules take precedence for same-specificity selectors.
+   ============================================================ */
+
+/* ── Subtle hover (menu items, nav links, table rows, list items) ── */
+body.dark-mode [class*="hover:bg-gray-50"]:hover,
+body.dark-mode [class*="hover\\:bg-gray-50"]:hover {
+  background: #2a3a4e !important;
+  color: #f1f5f9 !important;
+}
+
+/* ── Medium hover (icon buttons, ghost buttons, filter chips, tabs) ── */
+body.dark-mode [class*="hover:bg-gray-100"]:hover,
+body.dark-mode [class*="hover\\:bg-gray-100"]:hover {
+  background: #334155 !important;
+  color: #f1f5f9 !important;
+}
+
+/* ── Strong hover (active filter chip bg-gray-200) ── */
+body.dark-mode [class*="hover:bg-gray-200"]:hover,
+body.dark-mode [class*="hover\\:bg-gray-200"]:hover {
+  background: #3d4a5c !important;
+  color: #f1f5f9 !important;
+}
+
+/* ── Table row hover (very subtle — content, not action) ── */
+body.dark-mode tr:hover {
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+
+/* ── Colored hovers ── */
+body.dark-mode [class*="hover:bg-red-50"]:hover {
+  background: rgba(244, 63, 94, 0.12) !important;
+  color: #fca5a5 !important;
+}
+body.dark-mode [class*="hover:bg-primary-50"]:hover,
+body.dark-mode [class*="hover:bg-blue-50"]:hover {
+  background: rgba(59, 130, 246, 0.12) !important;
+}
+body.dark-mode [class*="hover:bg-amber-50"]:hover {
+  background: rgba(245, 158, 11, 0.12) !important;
+}
+body.dark-mode [class*="hover:bg-emerald-50"]:hover,
+body.dark-mode [class*="hover:bg-green-50"]:hover {
+  background: rgba(16, 185, 129, 0.12) !important;
+}
+
+/* ── Hover text color overrides ── */
+body.dark-mode [class*="hover:text-gray-600"]:hover { color: #e2e8f0 !important; }
+body.dark-mode [class*="hover:text-gray-700"]:hover { color: #f1f5f9 !important; }
+body.dark-mode [class*="hover:text-gray-800"]:hover { color: #f1f5f9 !important; }
+body.dark-mode [class*="hover:text-gray-900"]:hover { color: #f8fafc !important; }
+body.dark-mode [class*="hover:text-red-600"]:hover { color: #fca5a5 !important; }
+body.dark-mode [class*="hover:text-primary-700"]:hover { color: #93c5fd !important; }
+body.dark-mode [class*="hover:text-emerald-600"]:hover,
+body.dark-mode [class*="hover:text-green-600"]:hover { color: #6ee7b7 !important; }
+body.dark-mode [class*="hover:text-amber-600"]:hover { color: #fcd34d !important; }
+
+/* ── Hover border overrides ── */
+body.dark-mode [class*="hover:border-gray-300"]:hover { border-color: #475569 !important; }
+
+/* ── Secondary buttons (bg-white + border) — must come AFTER general hovers ── */
 body.dark-mode button[class*="bg-white"],
 body.dark-mode [class*="bg-white"][class*="border"] {
   background: #1e293b !important;
@@ -391,44 +473,74 @@ body.dark-mode [class*="bg-white"][class*="border"] {
 }
 body.dark-mode button[class*="bg-white"]:hover,
 body.dark-mode [class*="bg-white"][class*="border"]:hover {
-  background: #334155 !important;
+  background: #2a3a4e !important;
   border-color: #475569 !important;
+  color: #f8fafc !important;
+}
+body.dark-mode button[class*="bg-white"]:active,
+body.dark-mode [class*="bg-white"][class*="border"]:active {
+  background: #334155 !important;
 }
 
-/* Ghost button hover */
-body.dark-mode [class*="hover:bg-gray-100"]:hover,
-body.dark-mode [class*="hover\\:bg-gray-100"]:hover { background: #334155 !important; }
+/* ── Primary buttons — keep vibrant, just adjust slightly ── */
+body.dark-mode button[class*="bg-primary-600"]:hover {
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3) !important;
+}
 
-/* ── Hover states ── */
-body.dark-mode [class*="hover:bg-gray-50"]:hover,
-body.dark-mode [class*="hover\\:bg-gray-50"]:hover,
-body.dark-mode tr:hover { background: rgba(255, 255, 255, 0.03) !important; }
-body.dark-mode [class*="hover:bg-red-50"]:hover { background: rgba(244, 63, 94, 0.1) !important; }
+/* ── Danger buttons ── */
+body.dark-mode button[class*="bg-red-600"]:hover {
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3) !important;
+}
+
+/* ── Dropdown / floating panels (elevated surface — Level 2) ── */
+body.dark-mode [class*="shadow-lg"][class*="bg-white"] {
+  background: #243347 !important;
+  border-color: #344d65 !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45) !important;
+}
+/* Dropdown item hovers sit on Level 2 surface — need a brighter hover */
+body.dark-mode [class*="shadow-lg"] [class*="hover:bg-gray-50"]:hover,
+body.dark-mode [class*="shadow-lg"] [class*="hover\\:bg-gray-50"]:hover {
+  background: #30475f !important;
+  color: #f8fafc !important;
+}
 
 /* ── Auth layout ── */
 body.dark-mode .min-h-screen[class*="bg-gray-50"] { background: #0f172a !important; }
 
-/* ── Modal ── */
+/* ── Modal (Level 1 — same as cards) ── */
 body.dark-mode [class*="bg-black/40"] { background: rgba(0, 0, 0, 0.65) !important; }
 
 body.dark-mode .modal-content {
   background: #1e293b !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+  border: 1px solid #2d3a4d !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5) !important;
 }
 
 body.dark-mode .modal-header {
   background: #1e293b !important;
-  border-color: #334155 !important;
+  border-color: #2d3a4d !important;
+}
+
+/* Modal close button */
+body.dark-mode .modal-header button:hover {
+  background: #2a3a4e !important;
+  color: #f1f5f9 !important;
+}
+
+/* Modal footer sticky bar with bg-white */
+body.dark-mode .modal-content [class*="bg-white"] {
+  background: #1e293b !important;
 }
 
 /* ── Skeleton loading ── */
 body.dark-mode [class*="bg-gray-200\\/70"],
-body.dark-mode [class*="bg-gray-200"] { background: #334155 !important; }
+body.dark-mode [class*="bg-gray-200"] { background: #2d3a4d !important; }
 
 /* ── Recharts ── */
 body.dark-mode .recharts-default-tooltip {
-  background: #1e293b !important;
-  border: 1px solid #334155 !important;
+  background: #243347 !important;
+  border: 1px solid #344d65 !important;
   color: #e2e8f0 !important;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
 }

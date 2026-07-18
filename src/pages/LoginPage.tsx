@@ -10,6 +10,7 @@ import FormAlert from '@/components/ui/FormAlert';
 import AnimatedPage from '@/components/ui/AnimatedPage';
 import Divider from '@/components/ui/Divider';
 import GoogleSignInButton from '@/components/auth/GoogleSignInButton';
+import toast from 'react-hot-toast';
 import { Mail, Lock } from 'lucide-react';
 
 const loginSchema = z.object({
@@ -37,6 +38,7 @@ export default function LoginPage() {
     const { error } = await signIn(data.email, data.password);
     if (error) {
       setError('root', { message: error.message });
+      toast.error('Sign in failed');
     }
     setLoading(false);
   }
