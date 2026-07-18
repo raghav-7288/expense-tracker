@@ -14,7 +14,7 @@ export default function StatCard({ title, value, icon, trend, variant = 'default
   return (
     <div
       className={cn(
-        'relative overflow-hidden rounded-xl p-5 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5',
+        'relative overflow-hidden rounded-xl p-4 sm:p-5 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5',
         {
           'bg-white border border-gray-200 shadow-sm': variant === 'default',
           'bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-emerald-500/20 shadow-md': variant === 'success',
@@ -48,7 +48,7 @@ export default function StatCard({ title, value, icon, trend, variant = 'default
           </div>
         </div>
         <p
-          className={cn('text-2xl font-bold tracking-tight', {
+          className={cn('text-xl sm:text-2xl font-bold tracking-tight truncate', {
             'text-gray-900': variant === 'default',
             'text-white': variant !== 'default',
           })}

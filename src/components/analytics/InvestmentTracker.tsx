@@ -125,12 +125,12 @@ export default function InvestmentTracker({ transactions, currency }: Investment
           emptyMessage="No investment transactions yet. Categorize transactions under 'Investments' to track them here."
           emptyIcon={<TrendingUp size={18} />}
         >
-          <div className="h-56">
+          <div className="h-48 sm:h-56">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={monthlyData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+              <BarChart data={monthlyData} margin={{ top: 5, right: 5, left: -5, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="label" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} width={55} />
+                <XAxis dataKey="label" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 10 }} axisLine={false} tickLine={false} width={45} />
                 <Tooltip
                   contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '12px' }}
                   formatter={(value) => [formatCompactCurrency(Number(value), currency), 'Invested']}
@@ -148,7 +148,7 @@ export default function InvestmentTracker({ transactions, currency }: Investment
           emptyMessage="Start investing to see your growth trend."
           emptyIcon={<TrendingUp size={18} />}
         >
-          <div className="h-56">
+          <div className="h-48 sm:h-56">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
                 data={monthlyData.reduce<{ label: string; cumulative: number }[]>((acc, m) => {
@@ -156,11 +156,11 @@ export default function InvestmentTracker({ transactions, currency }: Investment
                   acc.push({ label: m.label, cumulative: prev + m.amount });
                   return acc;
                 }, [])}
-                margin={{ top: 5, right: 10, left: 0, bottom: 0 }}
+                margin={{ top: 5, right: 5, left: -5, bottom: 0 }}
               >
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="label" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} width={55} />
+                <XAxis dataKey="label" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 10 }} axisLine={false} tickLine={false} width={45} />
                 <Tooltip
                   contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '12px' }}
                   formatter={(value) => [formatCompactCurrency(Number(value), currency), 'Total']}
@@ -187,16 +187,16 @@ export default function InvestmentTracker({ transactions, currency }: Investment
               .sort((a, b) => b.date.localeCompare(a.date))
               .slice(0, 5)
               .map((t) => (
-                <div key={t.id} className="flex items-center justify-between py-1.5 border-b border-gray-50 last:border-0">
-                  <div className="flex items-center gap-2">
+                <div key={t.id} className="flex items-center justify-between py-1.5 border-b border-gray-50 last:border-0 gap-3">
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
                     <div className={cn(
-                      'w-6 h-6 rounded-full flex items-center justify-center',
+                      'w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0',
                       t.type === 'income' ? 'bg-green-50' : 'bg-amber-50',
                     )}>
                       <TrendingUp size={12} className={t.type === 'income' ? 'text-green-600' : 'text-amber-600'} />
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-800">{t.description}</p>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-gray-800 truncate">{t.description}</p>
                       <p className="text-[11px] text-gray-400">
                         {new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(
                           new Date(t.date + 'T00:00:00'),

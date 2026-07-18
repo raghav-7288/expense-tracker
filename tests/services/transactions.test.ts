@@ -75,12 +75,22 @@ describe('transactions service', () => {
       expect(chain.eq).not.toHaveBeenCalledWith('type', 'all');
     });
 
-    it('applies category_id filter using or', async () => {
+    it('applies category_id filter using or with valid UUID', async () => {
       const chain = buildChain({ data: [], error: null });
       mockFrom.mockReturnValue(chain);
 
-      await getTransactions('user-1', { category_id: 'cat-1' });
-      expect(chain.or).toHaveBeenCalledWith('system_category_id.eq.cat-1,user_category_id.eq.cat-1');
+      const uuid = '550e8400-e29b-41d4-a716-446655440000';
+      await getTransactions('user-1', { category_id: uuid });
+      expect(chain.or).toHaveBeenCalledWith(`system_category_id.eq.${uuid},user_category_id.eq.${uuid}`);
+    });
+
+    it('rejects invalid category_id without querying', async () => {
+      const chain = buildChain({ data: [], error: null });
+      mockFrom.mockReturnValue(chain);
+
+      const result = await getTransactions('user-1', { category_id: 'malicious-input' });
+      expect(result.data).toEqual([]);
+      expect(chain.or).not.toHaveBeenCalled();
     });
 
     it('applies date filters', async () => {
@@ -107,6 +117,61 @@ describe('transactions service', () => {
       const result = await getTransactions('user-1');
       expect(result.data).toBeNull();
       expect(result.error).toEqual(error);
+    });
+
+    it('sorts by date descending with created_at tiebreaker by default', async () => {
+      const chain = buildChain({ data: [], error: null });
+      mockFrom.mockReturnValue(chain);
+
+      await getTransactions('user-1');
+      expect(chain.order).toHaveBeenCalledWith('date', { ascending: false });
+      expect(chain.order).toHaveBeenCalledWith('created_at', { ascending: false });
+    });
+
+    it('sorts by date ascending with created_at tiebreaker', async () => {
+      const chain = buildChain({ data: [], error: null });
+      mockFrom.mockReturnValue(chain);
+
+      await getTransactions('user-1', { sort_by: 'date', sort_order: 'asc' });
+      expect(chain.order).toHaveBeenCalledWith('date', { ascending: true });
+      expect(chain.order).toHaveBeenCalledWith('created_at', { ascending: true });
+    });
+
+    it('sorts by amount with date and created_at fallback', async () => {
+      const chain = buildChain({ data: [], error: null });
+      mockFrom.mockReturnValue(chain);
+
+      await getTransactions('user-1', { sort_by: 'amount', sort_order: 'desc' });
+      expect(chain.order).toHaveBeenCalledWith('amount', { ascending: false });
+      expect(chain.order).toHaveBeenCalledWith('date', { ascending: false });
+      expect(chain.order).toHaveBeenCalledWith('created_at', { ascending: false });
+    });
+
+    it('sorts by description ascending with date and created_at fallback', async () => {
+      const chain = buildChain({ data: [], error: null });
+      mockFrom.mockReturnValue(chain);
+
+      await getTransactions('user-1', { sort_by: 'description', sort_order: 'asc' });
+      expect(chain.order).toHaveBeenCalledWith('description', { ascending: true });
+      expect(chain.order).toHaveBeenCalledWith('date', { ascending: false });
+      expect(chain.order).toHaveBeenCalledWith('created_at', { ascending: false });
+    });
+
+    it('uses created_at to differentiate same-day transactions', async () => {
+      const rows = [
+        rawRow({ id: 'txn-morning', description: 'Groceries', date: '2026-07-10', created_at: '2026-07-10T11:15:00Z' }),
+        rawRow({ id: 'txn-afternoon', description: 'Fuel', date: '2026-07-10', created_at: '2026-07-10T16:30:00Z' }),
+        rawRow({ id: 'txn-evening', description: 'Coffee', date: '2026-07-10', created_at: '2026-07-10T21:45:00Z' }),
+      ];
+      const chain = buildChain({ data: rows, error: null });
+      mockFrom.mockReturnValue(chain);
+
+      const result = await getTransactions('user-1', { sort_by: 'date', sort_order: 'desc' });
+      // Verify the query used created_at as tiebreaker
+      expect(chain.order).toHaveBeenCalledWith('date', { ascending: false });
+      expect(chain.order).toHaveBeenCalledWith('created_at', { ascending: false });
+      // All three rows returned
+      expect(result.data).toHaveLength(3);
     });
   });
 

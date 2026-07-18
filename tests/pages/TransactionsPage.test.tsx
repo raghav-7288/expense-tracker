@@ -86,9 +86,100 @@ describe('TransactionsPage', () => {
     } as never);
 
     renderWithProviders(<TransactionsPage />);
-    // There may be multiple "Add Transaction" buttons (header + empty state)
-    const buttons = screen.getAllByRole('button', { name: /Add Transaction/i });
-    await userEvent.click(buttons[0]!);
+    // Empty state shows "Add Your First Transaction" button
+    const button = screen.getByRole('button', { name: /Add Your First Transaction/i });
+    await userEvent.click(button);
+    await waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+  });
+
+  it('renders CSV dropdown button', () => {
+    mockUseTransactions.mockReturnValue({
+      data: [
+        {
+          id: '1', type: 'expense', amount: 50, description: 'Test',
+          date: '2024-06-15', user_id: 'u1', category_id: null, notes: null,
+          created_at: '', updated_at: '', categories: null,
+        },
+      ],
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+    } as never);
+
+    renderWithProviders(<TransactionsPage />);
+    expect(screen.getByRole('button', { name: /CSV/i })).toBeInTheDocument();
+  });
+
+  it('shows CSV menu when CSV button clicked', async () => {
+    mockUseTransactions.mockReturnValue({
+      data: [
+        {
+          id: '1', type: 'expense', amount: 50, description: 'Test',
+          date: '2024-06-15', user_id: 'u1', category_id: null, notes: null,
+          created_at: '', updated_at: '', categories: null,
+        },
+      ],
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+    } as never);
+
+    renderWithProviders(<TransactionsPage />);
+    await userEvent.click(screen.getByRole('button', { name: /CSV/i }));
+    expect(screen.getByText('Export')).toBeInTheDocument();
+    expect(screen.getByText('Import')).toBeInTheDocument();
+  });
+
+  it('renders filter bar with result count', () => {
+    mockUseTransactions.mockReturnValue({
+      data: [
+        {
+          id: '1', type: 'expense', amount: 50, description: 'Test',
+          date: '2024-06-15', user_id: 'u1', category_id: null, notes: null,
+          created_at: '', updated_at: '', categories: null,
+        },
+      ],
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+    } as never);
+
+    renderWithProviders(<TransactionsPage />);
+    expect(screen.getByText('1 transaction')).toBeInTheDocument();
+  });
+
+  it('shows page header with title', () => {
+    mockUseTransactions.mockReturnValue({
+      data: [],
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+    } as never);
+
+    renderWithProviders(<TransactionsPage />);
+    expect(screen.getByText('Transactions')).toBeInTheDocument();
+    expect(screen.getByText('Manage your income and expenses')).toBeInTheDocument();
+  });
+
+  it('opens Add modal from header button when transactions exist', async () => {
+    mockUseTransactions.mockReturnValue({
+      data: [
+        {
+          id: '1', type: 'expense', amount: 50, description: 'Test',
+          date: '2024-06-15', user_id: 'u1', category_id: null, notes: null,
+          created_at: '', updated_at: '', categories: null,
+        },
+      ],
+      isLoading: false,
+      isError: false,
+      refetch: vi.fn(),
+    } as never);
+
+    renderWithProviders(<TransactionsPage />);
+    const addBtn = screen.getByRole('button', { name: /Add/i });
+    await userEvent.click(addBtn);
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
     });

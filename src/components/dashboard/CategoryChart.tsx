@@ -14,7 +14,7 @@ export default function CategoryChart() {
   if (isLoading) return <SkeletonPieChart />;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 h-full">
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-5 h-full overflow-hidden">
       <div className="mb-4">
         <h3 className="text-sm font-semibold text-gray-900">Expenses by Category</h3>
         <p className="text-xs text-gray-400 mt-0.5">This month's breakdown</p>

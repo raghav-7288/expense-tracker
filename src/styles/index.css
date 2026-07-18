@@ -49,6 +49,28 @@ body {
   min-width: 320px;
 }
 
+/* Global max-width containment */
+#root {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* Hide scrollbar utility */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Improve touch targets on mobile */
+@media (max-width: 640px) {
+  select, button, input[type="date"] {
+    min-height: 44px;
+  }
+}
+
 
 /* Modal animations */
 @keyframes fadeIn {

@@ -10,12 +10,20 @@ export const ThemeContext = createContext<ThemeContextType | undefined>(undefine
 
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [darkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem('expense-tracker-dark-mode') === 'true';
+    try {
+      return localStorage.getItem('expense-tracker-dark-mode') === 'true';
+    } catch {
+      return false;
+    }
   });
 
   useEffect(() => {
     document.body.classList.toggle('dark-mode', darkMode);
-    localStorage.setItem('expense-tracker-dark-mode', String(darkMode));
+    try {
+      localStorage.setItem('expense-tracker-dark-mode', String(darkMode));
+    } catch {
+      // localStorage unavailable (private browsing, storage quota, etc.)
+    }
   }, [darkMode]);
 
   return (

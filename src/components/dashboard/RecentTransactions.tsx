@@ -17,7 +17,7 @@ export default function RecentTransactions() {
 
   return (
     <Card padding={false}>
-      <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+      <div className="flex items-center justify-between px-4 sm:px-5 py-4 border-b border-gray-100">
         <h3 className="text-sm font-semibold text-gray-900">Recent Transactions</h3>
         <Link
           to="/transactions"
@@ -46,7 +46,7 @@ export default function RecentTransactions() {
       ) : (
         <div className="divide-y divide-gray-50">
           {transactions.map((t) => (
-            <div key={t.id} className="flex items-center justify-between px-5 py-3 hover:bg-gray-50/50 transition-colors">
+            <div key={t.id} className="flex items-center justify-between px-4 sm:px-5 py-3 hover:bg-gray-50/50 transition-colors gap-3">
               <div className="flex items-center gap-3 min-w-0">
                 <Avatar name={t.description} color={t.categories?.color ?? '#6b7280'} size="sm" />
                 <div className="min-w-0">

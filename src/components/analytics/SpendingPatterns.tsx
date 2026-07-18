@@ -44,7 +44,7 @@ export default function SpendingPatterns({ data, loading, currency }: SpendingPa
               />
             </div>
           </div>
-          <div className="flex justify-between text-xs">
+          <div className="flex flex-col sm:flex-row sm:justify-between gap-1 text-xs">
             <span className="text-gray-500">
               <span className="inline-block w-2 h-2 rounded-full bg-blue-500 mr-1" />
               Weekday {weekdayPct}% · {formatCurrency(data.weekdayTotal, currency)}

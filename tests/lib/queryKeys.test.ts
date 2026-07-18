@@ -27,6 +27,21 @@ describe('queryKeys', () => {
       const key = queryKeys.categories.list('user-1', 'expense');
       expect(key).toEqual(['categories', 'user-1', 'expense']);
     });
+
+    it('hidden includes userId', () => {
+      const key = queryKeys.categories.hidden('user-1');
+      expect(key).toEqual(['categories', 'hidden', 'user-1']);
+    });
+  });
+
+  describe('analytics', () => {
+    it('all includes userId', () => {
+      expect(queryKeys.analytics.all('user-1')).toEqual(['analytics', 'user-1']);
+    });
+
+    it('all with undefined userId', () => {
+      expect(queryKeys.analytics.all(undefined)).toEqual(['analytics', undefined]);
+    });
   });
 
   describe('profile', () => {

@@ -47,7 +47,7 @@ describe('TransactionList', () => {
     const transactions = [buildTransaction({ id: '1', description: 'Test' })];
     renderWithProviders(<TransactionList transactions={transactions} />);
     expect(screen.getAllByLabelText('Edit transaction').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByLabelText('Delete transaction')).toBeInTheDocument();
+    expect(screen.getAllByLabelText('Delete transaction').length).toBeGreaterThanOrEqual(1);
   });
 
   it('opens edit modal on edit click', async () => {
@@ -61,7 +61,8 @@ describe('TransactionList', () => {
   it('opens delete confirmation on delete click', async () => {
     const transactions = [buildTransaction({ id: '1', description: 'Test' })];
     renderWithProviders(<TransactionList transactions={transactions} />);
-    await userEvent.click(screen.getByLabelText('Delete transaction'));
+    const deleteButtons = screen.getAllByLabelText('Delete transaction');
+    await userEvent.click(deleteButtons[0]!);
     expect(screen.getByText('Delete Transaction')).toBeInTheDocument();
     expect(screen.getByText(/Are you sure/)).toBeInTheDocument();
   });
@@ -69,7 +70,8 @@ describe('TransactionList', () => {
   it('calls delete mutation and closes modal on confirm', async () => {
     const transactions = [buildTransaction({ id: '1', description: 'Test' })];
     renderWithProviders(<TransactionList transactions={transactions} />);
-    await userEvent.click(screen.getByLabelText('Delete transaction'));
+    const deleteButtons = screen.getAllByLabelText('Delete transaction');
+    await userEvent.click(deleteButtons[0]!);
     await userEvent.click(screen.getByRole('button', { name: 'Delete' }));
     await waitFor(() => {
       expect(mockMutateDelete).toHaveBeenCalledWith('1');
@@ -79,7 +81,8 @@ describe('TransactionList', () => {
   it('closes delete modal on cancel', async () => {
     const transactions = [buildTransaction({ id: '1', description: 'Test' })];
     renderWithProviders(<TransactionList transactions={transactions} />);
-    await userEvent.click(screen.getByLabelText('Delete transaction'));
+    const deleteButtons = screen.getAllByLabelText('Delete transaction');
+    await userEvent.click(deleteButtons[0]!);
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
     await waitFor(() => {
       expect(screen.queryByText('Delete Transaction')).not.toBeInTheDocument();

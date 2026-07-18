@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>10/20</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">9.09% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>1/11</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">90.9% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>1/1</span>
+                <span class='fraction'>10/11</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line high'></div>
+    <div class='status-line medium'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -111,14 +111,37 @@
 <a name='L46'></a><a href='#L46'>46</a>
 <a name='L47'></a><a href='#L47'>47</a>
 <a name='L48'></a><a href='#L48'>48</a>
-<a name='L49'></a><a href='#L49'>49</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -159,54 +182,67 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import AuthLayout from '@/layouts/AuthLayout';
 import DashboardLayout from '@/layouts/DashboardLayout';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
-import LoginPage from '@/pages/LoginPage';
-import SignUpPage from '@/pages/SignUpPage';
-import ForgotPasswordPage from '@/pages/ForgotPasswordPage';
-import ResetPasswordPage from '@/pages/ResetPasswordPage';
-import DashboardPage from '@/pages/DashboardPage';
-import TransactionsPage from '@/pages/TransactionsPage';
-import CategoriesPage from '@/pages/CategoriesPage';
-import ProfilePage from '@/pages/ProfilePage';
-import AnalyticsPage from '@/pages/AnalyticsPage';
+&nbsp;
+// Lazy-loaded pages for code splitting
+const LoginPage = <span class="fstat-no" title="function not covered" >lazy(() =&gt; <span class="cstat-no" title="statement not covered" >i</span>mport('@/pages/LoginPage'));</span>
+const SignUpPage = <span class="fstat-no" title="function not covered" >lazy(() =&gt; <span class="cstat-no" title="statement not covered" >i</span>mport('@/pages/SignUpPage'));</span>
+const ForgotPasswordPage = <span class="fstat-no" title="function not covered" >lazy(() =&gt; <span class="cstat-no" title="statement not covered" >i</span>mport('@/pages/ForgotPasswordPage'));</span>
+const ResetPasswordPage = <span class="fstat-no" title="function not covered" >lazy(() =&gt; <span class="cstat-no" title="statement not covered" >i</span>mport('@/pages/ResetPasswordPage'));</span>
+const DashboardPage = <span class="fstat-no" title="function not covered" >lazy(() =&gt; <span class="cstat-no" title="statement not covered" >i</span>mport('@/pages/DashboardPage'));</span>
+const TransactionsPage = <span class="fstat-no" title="function not covered" >lazy(() =&gt; <span class="cstat-no" title="statement not covered" >i</span>mport('@/pages/TransactionsPage'));</span>
+const CategoriesPage = <span class="fstat-no" title="function not covered" >lazy(() =&gt; <span class="cstat-no" title="statement not covered" >i</span>mport('@/pages/CategoriesPage'));</span>
+const ProfilePage = <span class="fstat-no" title="function not covered" >lazy(() =&gt; <span class="cstat-no" title="statement not covered" >i</span>mport('@/pages/ProfilePage'));</span>
+const AnalyticsPage = <span class="fstat-no" title="function not covered" >lazy(() =&gt; <span class="cstat-no" title="statement not covered" >i</span>mport('@/pages/AnalyticsPage'));</span>
+&nbsp;
+function <span class="fstat-no" title="function not covered" >PageFallback() {</span>
+<span class="cstat-no" title="statement not covered" >  return (</span>
+    &lt;div className="flex items-center justify-center min-h-[50vh]"&gt;
+      &lt;div className="h-8 w-8 animate-spin rounded-full border-4 border-primary-500 border-t-transparent" /&gt;
+    &lt;/div&gt;
+  );
+}
 &nbsp;
 export default function AppRouter() {
   return (
     &lt;BrowserRouter&gt;
-      &lt;Routes&gt;
-        {/* Public auth routes */}
-        &lt;Route element={&lt;AuthLayout /&gt;}&gt;
-          &lt;Route path="/login" element={&lt;LoginPage /&gt;} /&gt;
-          &lt;Route path="/signup" element={&lt;SignUpPage /&gt;} /&gt;
-          &lt;Route path="/forgot-password" element={&lt;ForgotPasswordPage /&gt;} /&gt;
-          &lt;Route path="/reset-password" element={&lt;ResetPasswordPage /&gt;} /&gt;
-        &lt;/Route&gt;
+      &lt;Suspense fallback={&lt;PageFallback /&gt;}&gt;
+        &lt;Routes&gt;
+          {/* Public auth routes */}
+          &lt;Route element={&lt;AuthLayout /&gt;}&gt;
+            &lt;Route path="/login" element={&lt;LoginPage /&gt;} /&gt;
+            &lt;Route path="/signup" element={&lt;SignUpPage /&gt;} /&gt;
+            &lt;Route path="/forgot-password" element={&lt;ForgotPasswordPage /&gt;} /&gt;
+            &lt;Route path="/reset-password" element={&lt;ResetPasswordPage /&gt;} /&gt;
+          &lt;/Route&gt;
 &nbsp;
-        {/* Protected app routes */}
-        &lt;Route
-          element={
-            &lt;ProtectedRoute&gt;
-              &lt;DashboardLayout /&gt;
-            &lt;/ProtectedRoute&gt;
-          }
-        &gt;
-          &lt;Route path="/dashboard" element={&lt;DashboardPage /&gt;} /&gt;
-          &lt;Route path="/analytics" element={&lt;AnalyticsPage /&gt;} /&gt;
-          &lt;Route path="/transactions" element={&lt;TransactionsPage /&gt;} /&gt;
-          &lt;Route path="/categories" element={&lt;CategoriesPage /&gt;} /&gt;
-          &lt;Route path="/profile" element={&lt;ProfilePage /&gt;} /&gt;
-        &lt;/Route&gt;
+          {/* Protected app routes */}
+          &lt;Route
+            element={
+              &lt;ProtectedRoute&gt;
+                &lt;DashboardLayout /&gt;
+              &lt;/ProtectedRoute&gt;
+            }
+          &gt;
+            &lt;Route path="/dashboard" element={&lt;DashboardPage /&gt;} /&gt;
+            &lt;Route path="/analytics" element={&lt;AnalyticsPage /&gt;} /&gt;
+            &lt;Route path="/transactions" element={&lt;TransactionsPage /&gt;} /&gt;
+            &lt;Route path="/categories" element={&lt;CategoriesPage /&gt;} /&gt;
+            &lt;Route path="/profile" element={&lt;ProfilePage /&gt;} /&gt;
+          &lt;/Route&gt;
 &nbsp;
-        {/* Default redirect */}
-        &lt;Route path="*" element={&lt;Navigate to="/dashboard" replace /&gt;} /&gt;
-      &lt;/Routes&gt;
+          {/* Default redirect */}
+          &lt;Route path="*" element={&lt;Navigate to="/dashboard" replace /&gt;} /&gt;
+        &lt;/Routes&gt;
+      &lt;/Suspense&gt;
     &lt;/BrowserRouter&gt;
   );
 }
-&nbsp;
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -214,7 +250,7 @@ export default function AppRouter() {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-07-15T12:27:22.411Z
+                at 2026-07-18T10:32:32.232Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

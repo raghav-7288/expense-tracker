@@ -22,17 +22,17 @@ export default function CategoryComparisonChart({ data, loading, currency }: Cat
 
   return (
     <ChartCard title="Category Comparison" description="Top categories by amount" loading={loading} empty={top.length === 0}>
-      <div className="h-72">
+      <div className="h-56 sm:h-72">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={top} layout="vertical" margin={{ top: 0, right: 10, left: 0, bottom: 0 }}>
-            <XAxis type="number" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
+          <BarChart data={top} layout="vertical" margin={{ top: 0, right: 5, left: 0, bottom: 0 }}>
+            <XAxis type="number" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
             <YAxis
               type="category"
               dataKey="name"
-              tick={{ fontSize: 11 }}
+              tick={{ fontSize: 10 }}
               axisLine={false}
               tickLine={false}
-              width={90}
+              width={70}
             />
             <Tooltip
               contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb', fontSize: '12px' }}
