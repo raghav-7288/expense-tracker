@@ -13,12 +13,25 @@ export const CATEGORY_ICONS = [
 ] as const;
 
 export const CURRENCIES = [
-  { value: 'USD', label: 'USD ($)' },
-  { value: 'EUR', label: 'EUR (€)' },
-  { value: 'GBP', label: 'GBP (£)' },
-  { value: 'INR', label: 'INR (₹)' },
-  { value: 'JPY', label: 'JPY (¥)' },
-  { value: 'CAD', label: 'CAD ($)' },
-  { value: 'AUD', label: 'AUD ($)' },
+  { value: 'USD', label: 'USD ($)', symbol: '$' },
+  { value: 'EUR', label: 'EUR (€)', symbol: '€' },
+  { value: 'GBP', label: 'GBP (£)', symbol: '£' },
+  { value: 'INR', label: 'INR (₹)', symbol: '₹' },
+  { value: 'JPY', label: 'JPY (¥)', symbol: '¥' },
+  { value: 'CAD', label: 'CAD (C$)', symbol: 'C$' },
+  { value: 'AUD', label: 'AUD (A$)', symbol: 'A$' },
+  { value: 'CHF', label: 'CHF (Fr)', symbol: 'Fr' },
+  { value: 'CNY', label: 'CNY (¥)', symbol: '¥' },
+  { value: 'KRW', label: 'KRW (₩)', symbol: '₩' },
+  { value: 'BRL', label: 'BRL (R$)', symbol: 'R$' },
+  { value: 'MXN', label: 'MXN ($)', symbol: '$' },
+  { value: 'SGD', label: 'SGD (S$)', symbol: 'S$' },
+  { value: 'HKD', label: 'HKD (HK$)', symbol: 'HK$' },
+  { value: 'SEK', label: 'SEK (kr)', symbol: 'kr' },
+  { value: 'NOK', label: 'NOK (kr)', symbol: 'kr' },
+  { value: 'NZD', label: 'NZD (NZ$)', symbol: 'NZ$' },
+  { value: 'ZAR', label: 'ZAR (R)', symbol: 'R' },
+  { value: 'THB', label: 'THB (฿)', symbol: '฿' },
+  { value: 'AED', label: 'AED (د.إ)', symbol: 'د.إ' },
 ] as const;
 

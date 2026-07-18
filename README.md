@@ -65,20 +65,6 @@
 
 ---
 
-## Screenshots
-
-| Dashboard | Analytics | Transactions |
-|---|---|---|
-| ![Dashboard](docs/screenshots/dashboard.png) | ![Analytics](docs/screenshots/analytics.png) | ![Transactions](docs/screenshots/transactions.png) |
-
-| Categories | Profile | Mobile |
-|---|---|---|
-| ![Categories](docs/screenshots/categories.png) | ![Profile](docs/screenshots/profile.png) | ![Mobile](docs/screenshots/mobile.png) |
-
-> 📸 *Add screenshots to `docs/screenshots/` to populate these placeholders.*
-
----
-
 ## Tech Stack
 
 | Layer | Technology |

@@ -27,8 +27,8 @@ describe('constants', () => {
   });
 
   describe('CURRENCIES', () => {
-    it('has 7 currency options', () => {
-      expect(CURRENCIES).toHaveLength(7);
+    it('has at least 15 currency options', () => {
+      expect(CURRENCIES.length).toBeGreaterThanOrEqual(15);
     });
 
     it('each has value and label', () => {
