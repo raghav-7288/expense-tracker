@@ -183,6 +183,63 @@ describe('filterTransactions', () => {
     const result = filterTransactions(txns, range, { type: 'all' });
     expect(result).toHaveLength(2);
   });
+
+  // ── Multi-category (categoryIds) tests ──
+
+  it('filters by multiple categoryIds', () => {
+    const allInRange = [
+      txn({ id: '1', date: '2024-06-01', type: 'expense', category_id: 'cat-1' }),
+      txn({ id: '2', date: '2024-06-15', type: 'income', category_id: 'cat-2' }),
+      txn({ id: '4', date: '2024-06-10', type: 'expense', category_id: 'cat-3' }),
+    ];
+    const result = filterTransactions(allInRange, range, { categoryIds: ['cat-1', 'cat-3'] });
+    expect(result).toHaveLength(2);
+    expect(result.map((t) => t.id).sort()).toEqual(['1', '4']);
+  });
+
+  it('categoryIds with single category', () => {
+    const result = filterTransactions(txns, range, { categoryIds: ['cat-2'] });
+    expect(result).toHaveLength(1);
+    expect(result[0]?.id).toBe('2');
+  });
+
+  it('categoryIds empty array returns nothing', () => {
+    const result = filterTransactions(txns, range, { categoryIds: [] });
+    expect(result).toHaveLength(0);
+  });
+
+  it('categoryIds excludes null category_id transactions', () => {
+    const withNull = [
+      txn({ id: '1', date: '2024-06-01', category_id: 'cat-1' }),
+      txn({ id: '2', date: '2024-06-10', category_id: null, categories: undefined }),
+    ];
+    const result = filterTransactions(withNull, range, { categoryIds: ['cat-1'] });
+    expect(result).toHaveLength(1);
+    expect(result[0]?.id).toBe('1');
+  });
+
+  it('categoryIds + type filter work together', () => {
+    const mixed = [
+      txn({ id: '1', date: '2024-06-01', type: 'expense', category_id: 'cat-1' }),
+      txn({ id: '2', date: '2024-06-10', type: 'income', category_id: 'cat-1' }),
+      txn({ id: '3', date: '2024-06-15', type: 'expense', category_id: 'cat-2' }),
+    ];
+    const result = filterTransactions(mixed, range, { categoryIds: ['cat-1'], type: 'expense' });
+    expect(result).toHaveLength(1);
+    expect(result[0]?.id).toBe('1');
+  });
+
+  it('categoryIds + date range work together', () => {
+    const result = filterTransactions(txns, range, { categoryIds: ['cat-1'] });
+    // Only id=1 is in range AND has cat-1 (id=3 is out of range)
+    expect(result).toHaveLength(1);
+    expect(result[0]?.id).toBe('1');
+  });
+
+  it('undefined categoryIds does not filter (backward compat)', () => {
+    const result = filterTransactions(txns, range, { categoryIds: undefined });
+    expect(result).toHaveLength(2); // all in range
+  });
 });
 
 // --------------- computeSummary ---------------

@@ -51,22 +51,39 @@ export function useAnalytics(filters: AnalyticsFilters): AnalyticsData {
     [filters.preset, filters.customRange],
   );
 
+  /**
+   * Pre-filter by selected categories so every downstream computation
+   * automatically respects the category filter.
+   * `null` / `undefined` → all transactions (no category filter).
+   * `[]` → empty set (explicit "no categories selected").
+   */
+  const baseTransactions = useMemo(() => {
+    if (!allTransactions) return [];
+    const ids = filters.categoryIds;
+    if (ids === undefined || ids === null) return allTransactions;
+    if (ids.length === 0) return [];
+    const idSet = new Set(ids);
+    return allTransactions.filter(
+      (t) => t.category_id !== null && idSet.has(t.category_id),
+    );
+  }, [allTransactions, filters.categoryIds]);
+
   const prevDateRange = useMemo(() => getPreviousPeriod(dateRange), [dateRange]);
 
   const currentTransactions = useMemo(
-    () => filterTransactions(allTransactions ?? [], dateRange, filters),
-    [allTransactions, dateRange, filters],
+    () => filterTransactions(baseTransactions, dateRange, filters),
+    [baseTransactions, dateRange, filters],
   );
 
   const prevTransactions = useMemo(
-    () => filterTransactions(allTransactions ?? [], prevDateRange),
-    [allTransactions, prevDateRange],
+    () => filterTransactions(baseTransactions, prevDateRange),
+    [baseTransactions, prevDateRange],
   );
 
   const summary = useMemo(() => {
     if (!allTransactions) return null;
-    return computeSummary(currentTransactions, prevTransactions, allTransactions, dateRange);
-  }, [currentTransactions, prevTransactions, allTransactions, dateRange]);
+    return computeSummary(currentTransactions, prevTransactions, baseTransactions, dateRange);
+  }, [currentTransactions, prevTransactions, baseTransactions, allTransactions, dateRange]);
 
   // For monthly trend charts (Income vs Expenses, Cash Flow, Savings Trend),
   // always show at least 6 months so the trend is meaningful even when
@@ -89,8 +106,8 @@ export function useAnalytics(filters: AnalyticsFilters): AnalyticsData {
   }, [dateRange]);
 
   const trendTransactions = useMemo(
-    () => filterTransactions(allTransactions ?? [], trendRange),
-    [allTransactions, trendRange],
+    () => filterTransactions(baseTransactions, trendRange),
+    [baseTransactions, trendRange],
   );
 
   const dailySeries = useMemo(
@@ -109,8 +126,8 @@ export function useAnalytics(filters: AnalyticsFilters): AnalyticsData {
   );
 
   const savingsTrend = useMemo(
-    () => computeSavingsTrend(allTransactions ?? [], trendRange),
-    [allTransactions, trendRange],
+    () => computeSavingsTrend(baseTransactions, trendRange),
+    [baseTransactions, trendRange],
   );
 
   const expenseCategories = useMemo(
@@ -124,8 +141,8 @@ export function useAnalytics(filters: AnalyticsFilters): AnalyticsData {
   );
 
   const heatmapData = useMemo(
-    () => computeHeatmap(allTransactions ?? []),
-    [allTransactions],
+    () => computeHeatmap(baseTransactions),
+    [baseTransactions],
   );
 
   const financialHealth = useMemo(
@@ -153,8 +170,8 @@ export function useAnalytics(filters: AnalyticsFilters): AnalyticsData {
 
   const yearlyReport = useMemo(() => {
     const year = new Date().getFullYear();
-    return computeYearlyReport(allTransactions ?? [], year);
-  }, [allTransactions]);
+    return computeYearlyReport(baseTransactions, year);
+  }, [baseTransactions]);
 
   const largestTransactions = useMemo(
     () => getTransactionRankings(currentTransactions, 'largest'),

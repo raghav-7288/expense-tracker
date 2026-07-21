@@ -21,6 +21,8 @@ export interface AnalyticsFilters {
   preset: TimeRangePreset;
   customRange?: DateRange;
   categoryId?: string;
+  /** Multi-select category filter. `null`/`undefined` = all, `[]` = none. */
+  categoryIds?: string[] | null;
   type?: TransactionType | 'all';
 }
 
