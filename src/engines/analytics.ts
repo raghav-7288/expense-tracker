@@ -111,12 +111,15 @@ export function getPreviousPeriod(range: DateRange): DateRange {
 export function filterTransactions(
   transactions: Transaction[],
   range: DateRange,
-  filters?: Pick<AnalyticsFilters, 'categoryId' | 'type'>,
+  filters?: Pick<AnalyticsFilters, 'categoryId' | 'categoryIds' | 'type'>,
 ): Transaction[] {
+  const categoryIdSet = filters?.categoryIds ? new Set(filters.categoryIds) : null;
+
   return transactions.filter((t) => {
     if (t.date < range.startDate || t.date > range.endDate) return false;
     if (filters?.type && filters.type !== 'all' && t.type !== filters.type) return false;
     if (filters?.categoryId && t.category_id !== filters.categoryId) return false;
+    if (categoryIdSet && (t.category_id === null || !categoryIdSet.has(t.category_id))) return false;
     return true;
   });
 }

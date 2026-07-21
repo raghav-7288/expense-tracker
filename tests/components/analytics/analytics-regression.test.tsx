@@ -5,6 +5,9 @@
  * formatting across all analytics components when the user's
  * preferred currency is changed.
  *
+ * Also verifies that ALL analytics computations respect the
+ * multi-category filter (categoryIds).
+ *
  * Covers: SummaryGrid, TopCategories, LargestTransactions,
  * CategoryBreakdownTable, SpendingPatterns, MonthlyReport,
  * YearlyReport, SmartInsights (via generateInsights engine),
@@ -15,8 +18,23 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { ThemeContext } from '@/context/ThemeContext';
-import { generateInsights } from '@/engines/analytics';
+import {
+  generateInsights,
+  filterTransactions,
+  computeSummary,
+  computeDailySeries,
+  computeWeeklySeries,
+  computeMonthlySeries,
+  computeSavingsTrend,
+  computeCategoryBreakdown,
+  computeHeatmap,
+  computeSpendingPatterns,
+  computeMonthlyReport,
+  computeYearlyReport,
+  getTransactionRankings,
+} from '@/engines/analytics';
 import { formatCurrency, formatCompactCurrency } from '@/utils/formatCurrency';
+import type { Transaction } from '@/types';
 import type {
   AnalyticsSummary,
   CategoryBreakdownItem,
@@ -26,6 +44,7 @@ import type {
   YearlyReportData,
   FinancialHealthScore,
   InsightItem,
+  DateRange,
 } from '@/types/analytics';
 
 // Mock Recharts to avoid SVG rendering issues in jsdom
@@ -609,6 +628,184 @@ describe('REGRESSION: full currency rotation on MonthlyReport', () => {
         assertNoDollarSign(text, currency);
       }
     }
+  });
+});
+
+/* ================================================================
+   15. CATEGORY FILTER REGRESSION — all analytics respect categoryIds
+   ================================================================ */
+
+function txn(overrides: Partial<Transaction> = {}): Transaction {
+  return {
+    id: 'txn-1',
+    user_id: 'u1',
+    category_id: 'cat-1',
+    type: 'expense',
+    amount: 100,
+    description: 'Test',
+    notes: null,
+    date: '2024-06-15',
+    created_at: '2024-06-15T10:00:00Z',
+    updated_at: '2024-06-15T10:00:00Z',
+    categories: { id: 'cat-1', user_id: 'u1', name: 'Food', type: 'expense', color: '#ef4444', icon: 'utensils', created_at: '', updated_at: '' },
+    ...overrides,
+  };
+}
+
+describe('REGRESSION: category filter propagates to all analytics', () => {
+  const range: DateRange = { startDate: '2024-06-01', endDate: '2024-06-30' };
+
+  // Diverse set of transactions spanning categories
+  const allTxns: Transaction[] = [
+    txn({ id: '1', date: '2024-06-01', type: 'expense', amount: 100, category_id: 'cat-food',
+      categories: { id: 'cat-food', user_id: 'u1', name: 'Food', type: 'expense', color: '#f00', icon: 'utensils', created_at: '', updated_at: '' } }),
+    txn({ id: '2', date: '2024-06-10', type: 'expense', amount: 200, category_id: 'cat-transport',
+      categories: { id: 'cat-transport', user_id: 'u1', name: 'Transport', type: 'expense', color: '#00f', icon: 'car', created_at: '', updated_at: '' } }),
+    txn({ id: '3', date: '2024-06-15', type: 'income', amount: 5000, category_id: 'cat-salary',
+      categories: { id: 'cat-salary', user_id: 'u1', name: 'Salary', type: 'income', color: '#0f0', icon: 'wallet', created_at: '', updated_at: '' } }),
+    txn({ id: '4', date: '2024-06-20', type: 'expense', amount: 50, category_id: 'cat-food',
+      categories: { id: 'cat-food', user_id: 'u1', name: 'Food', type: 'expense', color: '#f00', icon: 'utensils', created_at: '', updated_at: '' } }),
+    txn({ id: '5', date: '2024-06-25', type: 'expense', amount: 300, category_id: 'cat-entertainment',
+      categories: { id: 'cat-entertainment', user_id: 'u1', name: 'Entertainment', type: 'expense', color: '#800', icon: 'music', created_at: '', updated_at: '' } }),
+  ];
+
+  it('filterTransactions with categoryIds reduces transaction set', () => {
+    const filtered = filterTransactions(allTxns, range, { categoryIds: ['cat-food'] });
+    expect(filtered).toHaveLength(2);
+    expect(filtered.every((t) => t.category_id === 'cat-food')).toBe(true);
+  });
+
+  it('computeSummary uses only category-filtered transactions', () => {
+    const base = allTxns.filter((t) => t.category_id === 'cat-food');
+    const summary = computeSummary(base, [], base, range);
+    expect(summary.totalExpenses).toBe(150); // 100 + 50
+    expect(summary.totalIncome).toBe(0);     // no income in Food
+    expect(summary.transactionCount).toBe(2);
+  });
+
+  it('computeDailySeries only includes filtered categories', () => {
+    const filtered = allTxns.filter((t) => t.category_id === 'cat-food');
+    const series = computeDailySeries(filtered, range);
+    const totalExpenses = series.reduce((s, p) => s + p.expenses, 0);
+    expect(totalExpenses).toBe(150);
+    const totalIncome = series.reduce((s, p) => s + p.income, 0);
+    expect(totalIncome).toBe(0);
+  });
+
+  it('computeWeeklySeries only includes filtered categories', () => {
+    const filtered = allTxns.filter((t) => t.category_id === 'cat-food');
+    const series = computeWeeklySeries(filtered, range);
+    const totalExpenses = series.reduce((s, p) => s + p.expenses, 0);
+    expect(totalExpenses).toBe(150);
+  });
+
+  it('computeMonthlySeries only includes filtered categories', () => {
+    const filtered = allTxns.filter((t) => t.category_id === 'cat-food');
+    const series = computeMonthlySeries(filtered, range);
+    const totalExpenses = series.reduce((s, p) => s + p.expenses, 0);
+    expect(totalExpenses).toBe(150);
+  });
+
+  it('computeSavingsTrend reflects filtered categories', () => {
+    const filtered = allTxns.filter((t) => t.category_id === 'cat-food');
+    const trend = computeSavingsTrend(filtered, range);
+    // Food is all expenses, so cumulative should be negative
+    const lastNet = trend[trend.length - 1]?.net ?? 0;
+    expect(lastNet).toBe(-150);
+  });
+
+  it('computeCategoryBreakdown only shows filtered categories', () => {
+    const filtered = allTxns.filter((t) => ['cat-food', 'cat-transport'].includes(t.category_id ?? ''));
+    const breakdown = computeCategoryBreakdown(filtered, 'expense');
+    expect(breakdown).toHaveLength(2);
+    const names = breakdown.map((b) => b.name);
+    expect(names).toContain('Food');
+    expect(names).toContain('Transport');
+    expect(names).not.toContain('Entertainment');
+  });
+
+  it('computeSpendingPatterns only uses filtered categories', () => {
+    const filtered = allTxns.filter((t) => t.category_id === 'cat-food');
+    const patterns = computeSpendingPatterns(filtered);
+    const totalSpending = patterns.weekdayTotal + patterns.weekendTotal;
+    expect(totalSpending).toBe(150);
+  });
+
+  it('getTransactionRankings only ranks filtered transactions', () => {
+    const filtered = allTxns.filter((t) => t.category_id === 'cat-food');
+    const rankings = getTransactionRankings(filtered, 'largest');
+    expect(rankings).toHaveLength(2);
+    expect(rankings[0]?.amount).toBe(100);
+    expect(rankings[1]?.amount).toBe(50);
+  });
+
+  it('computeMonthlyReport uses only filtered transactions for comparison', () => {
+    const current = allTxns.filter((t) => t.category_id === 'cat-food');
+    const report = computeMonthlyReport(current, [], 'June 2024');
+    expect(report.totalExpenses).toBe(150);
+    expect(report.totalIncome).toBe(0);
+    expect(report.biggestCategory).toBe('Food');
+  });
+
+  it('computeYearlyReport only includes filtered categories', () => {
+    const filtered = allTxns.filter((t) => t.category_id === 'cat-food');
+    const report = computeYearlyReport(filtered, 2024);
+    expect(report.totalExpenses).toBe(150);
+    expect(report.totalIncome).toBe(0);
+  });
+
+  it('generateInsights uses filtered category breakdown', () => {
+    const filtered = allTxns.filter((t) => t.category_id === 'cat-food');
+    const breakdown = computeCategoryBreakdown(filtered, 'expense');
+    const summary = computeSummary(filtered, [], filtered, range);
+    const insights = generateInsights(filtered, summary, breakdown, 'USD');
+    // All insights should relate to Food (only category)
+    const topCatInsight = insights.find((i) => i.message.includes('Food'));
+    expect(topCatInsight).toBeDefined();
+    // Should not mention Transport or Entertainment
+    expect(insights.every((i) => !i.message.includes('Transport'))).toBe(true);
+  });
+
+  it('date + category filters work together', () => {
+    // Narrow date range + specific category
+    const narrowRange: DateRange = { startDate: '2024-06-01', endDate: '2024-06-15' };
+    const filtered = filterTransactions(allTxns, narrowRange, { categoryIds: ['cat-food'] });
+    // Only txn id=1 (June 1, Food) matches both
+    expect(filtered).toHaveLength(1);
+    expect(filtered[0]?.id).toBe('1');
+  });
+
+  it('empty categoryIds results in empty analytics', () => {
+    const filtered = filterTransactions(allTxns, range, { categoryIds: [] });
+    expect(filtered).toHaveLength(0);
+
+    const summary = computeSummary(filtered, [], filtered, range);
+    expect(summary.totalExpenses).toBe(0);
+    expect(summary.totalIncome).toBe(0);
+    expect(summary.transactionCount).toBe(0);
+
+    const breakdown = computeCategoryBreakdown(filtered, 'expense');
+    expect(breakdown).toHaveLength(0);
+
+    const rankings = getTransactionRankings(filtered, 'largest');
+    expect(rankings).toHaveLength(0);
+  });
+
+  it('multiple category selection aggregates correctly', () => {
+    const filtered = allTxns.filter((t) =>
+      ['cat-food', 'cat-transport', 'cat-entertainment'].includes(t.category_id ?? ''),
+    );
+    const summary = computeSummary(filtered, [], filtered, range);
+    expect(summary.totalExpenses).toBe(650); // 100 + 200 + 50 + 300
+    expect(summary.totalIncome).toBe(0);
+    expect(summary.transactionCount).toBe(4);
+  });
+
+  it('category filter with income categories includes income', () => {
+    const filtered = allTxns.filter((t) => t.category_id === 'cat-salary');
+    const summary = computeSummary(filtered, [], filtered, range);
+    expect(summary.totalIncome).toBe(5000);
+    expect(summary.totalExpenses).toBe(0);
   });
 });
 
