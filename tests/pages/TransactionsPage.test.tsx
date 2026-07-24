@@ -63,8 +63,8 @@ describe('TransactionsPage', () => {
     mockUseTransactions.mockReturnValue({
       data: [
         {
-          id: '1', type: 'expense', amount: 50, description: 'Groceries',
-          date: '2024-06-15', user_id: 'u1', category_id: null, notes: null,
+          id: '1', type: 'expense', amount: 50, notes: 'Groceries',
+          date: '2024-06-15', user_id: 'u1', category_id: null,
           created_at: '', updated_at: '', categories: null,
         },
       ],
@@ -98,8 +98,8 @@ describe('TransactionsPage', () => {
     mockUseTransactions.mockReturnValue({
       data: [
         {
-          id: '1', type: 'expense', amount: 50, description: 'Test',
-          date: '2024-06-15', user_id: 'u1', category_id: null, notes: null,
+          id: '1', type: 'expense', amount: 50, notes: 'Test',
+          date: '2024-06-15', user_id: 'u1', category_id: null,
           created_at: '', updated_at: '', categories: null,
         },
       ],
@@ -116,8 +116,8 @@ describe('TransactionsPage', () => {
     mockUseTransactions.mockReturnValue({
       data: [
         {
-          id: '1', type: 'expense', amount: 50, description: 'Test',
-          date: '2024-06-15', user_id: 'u1', category_id: null, notes: null,
+          id: '1', type: 'expense', amount: 50, notes: 'Test',
+          date: '2024-06-15', user_id: 'u1', category_id: null,
           created_at: '', updated_at: '', categories: null,
         },
       ],
@@ -136,8 +136,8 @@ describe('TransactionsPage', () => {
     mockUseTransactions.mockReturnValue({
       data: [
         {
-          id: '1', type: 'expense', amount: 50, description: 'Test',
-          date: '2024-06-15', user_id: 'u1', category_id: null, notes: null,
+          id: '1', type: 'expense', amount: 50, notes: 'Test',
+          date: '2024-06-15', user_id: 'u1', category_id: null,
           created_at: '', updated_at: '', categories: null,
         },
       ],
@@ -167,8 +167,8 @@ describe('TransactionsPage', () => {
     mockUseTransactions.mockReturnValue({
       data: [
         {
-          id: '1', type: 'expense', amount: 50, description: 'Test',
-          date: '2024-06-15', user_id: 'u1', category_id: null, notes: null,
+          id: '1', type: 'expense', amount: 50, notes: 'Test',
+          date: '2024-06-15', user_id: 'u1', category_id: null,
           created_at: '', updated_at: '', categories: null,
         },
       ],
@@ -185,6 +185,3 @@ describe('TransactionsPage', () => {
     });
   });
 });
-
-
-

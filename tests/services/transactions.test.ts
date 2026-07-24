@@ -31,8 +31,7 @@ function rawRow(overrides: Record<string, unknown> = {}) {
     user_category_id: null,
     type: 'expense',
     amount: 100,
-    description: 'Test',
-    notes: null,
+    notes: 'Test',
     date: '2024-06-15',
     created_at: '2024-06-15T10:00:00Z',
     updated_at: '2024-06-15T10:00:00Z',
@@ -107,7 +106,7 @@ describe('transactions service', () => {
       mockFrom.mockReturnValue(chain);
 
       await getTransactions('user-1', { search: 'grocery' });
-      expect(chain.ilike).toHaveBeenCalledWith('description', '%grocery%');
+      expect(chain.ilike).toHaveBeenCalledWith('notes', '%grocery%');
     });
 
     it('returns error on failure', async () => {
@@ -147,21 +146,21 @@ describe('transactions service', () => {
       expect(chain.order).toHaveBeenCalledWith('created_at', { ascending: false });
     });
 
-    it('sorts by description ascending with date and created_at fallback', async () => {
+    it('sorts by notes ascending with date and created_at fallback', async () => {
       const chain = buildChain({ data: [], error: null });
       mockFrom.mockReturnValue(chain);
 
-      await getTransactions('user-1', { sort_by: 'description', sort_order: 'asc' });
-      expect(chain.order).toHaveBeenCalledWith('description', { ascending: true });
+      await getTransactions('user-1', { sort_by: 'notes', sort_order: 'asc' });
+      expect(chain.order).toHaveBeenCalledWith('notes', { ascending: true });
       expect(chain.order).toHaveBeenCalledWith('date', { ascending: false });
       expect(chain.order).toHaveBeenCalledWith('created_at', { ascending: false });
     });
 
     it('uses created_at to differentiate same-day transactions', async () => {
       const rows = [
-        rawRow({ id: 'txn-morning', description: 'Groceries', date: '2026-07-10', created_at: '2026-07-10T11:15:00Z' }),
-        rawRow({ id: 'txn-afternoon', description: 'Fuel', date: '2026-07-10', created_at: '2026-07-10T16:30:00Z' }),
-        rawRow({ id: 'txn-evening', description: 'Coffee', date: '2026-07-10', created_at: '2026-07-10T21:45:00Z' }),
+        rawRow({ id: 'txn-morning', notes: 'Groceries', date: '2026-07-10', created_at: '2026-07-10T11:15:00Z' }),
+        rawRow({ id: 'txn-afternoon', notes: 'Fuel', date: '2026-07-10', created_at: '2026-07-10T16:30:00Z' }),
+        rawRow({ id: 'txn-evening', notes: 'Coffee', date: '2026-07-10', created_at: '2026-07-10T21:45:00Z' }),
       ];
       const chain = buildChain({ data: rows, error: null });
       mockFrom.mockReturnValue(chain);
@@ -209,7 +208,7 @@ describe('transactions service', () => {
 
       const result = await createTransaction({
         user_id: 'user-1', type: 'expense', amount: 100,
-        description: 'Test', date: '2024-01-01', category_id: 'sc-1',
+        notes: 'Test', date: '2024-01-01', category_id: 'sc-1',
       });
       expect(result.data?.id).toBe('txn-1');
     });
@@ -229,7 +228,7 @@ describe('transactions service', () => {
 
       const result = await createTransaction({
         user_id: 'user-1', type: 'expense', amount: 50,
-        description: 'Custom cat', date: '2024-01-01', category_id: 'uc-1',
+        notes: 'Custom cat', date: '2024-01-01', category_id: 'uc-1',
       });
       expect(result.data?.id).toBe('txn-1');
     });
@@ -240,7 +239,7 @@ describe('transactions service', () => {
 
       const result = await createTransaction({
         user_id: 'user-1', type: 'expense', amount: 100,
-        description: 'No cat', date: '2024-01-01', category_id: null,
+        notes: 'No cat', date: '2024-01-01', category_id: null,
       });
       expect(result.data?.category_id).toBeNull();
     });

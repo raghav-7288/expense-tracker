@@ -119,8 +119,8 @@ const mockCategories: CategoryBreakdownItem[] = [
 ];
 
 const mockTransactions: TransactionRankingItem[] = [
-  { id: '1', description: 'Rent', amount: 2000, date: '2024-06-01', categoryName: 'Housing', categoryColor: '#f00', type: 'expense' },
-  { id: '2', description: 'Salary', amount: 5000, date: '2024-06-01', categoryName: 'Income', categoryColor: '#0f0', type: 'income' },
+  { id: '1', notes: 'Rent', amount: 2000, date: '2024-06-01', categoryName: 'Housing', categoryColor: '#f00', type: 'expense' },
+  { id: '2', notes: 'Salary', amount: 5000, date: '2024-06-01', categoryName: 'Income', categoryColor: '#0f0', type: 'income' },
 ];
 
 const mockPatterns: SpendingPatternData = {
@@ -642,8 +642,7 @@ function txn(overrides: Partial<Transaction> = {}): Transaction {
     category_id: 'cat-1',
     type: 'expense',
     amount: 100,
-    description: 'Test',
-    notes: null,
+    notes: 'Test',
     date: '2024-06-15',
     created_at: '2024-06-15T10:00:00Z',
     updated_at: '2024-06-15T10:00:00Z',

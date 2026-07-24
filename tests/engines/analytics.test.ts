@@ -31,8 +31,7 @@ function txn(overrides: Partial<Transaction> = {}): Transaction {
     category_id: 'cat-1',
     type: 'expense',
     amount: 100,
-    description: 'Test',
-    notes: null,
+    notes: 'Test',
     date: '2024-06-15',
     created_at: '2024-06-15T10:00:00Z',
     updated_at: '2024-06-15T10:00:00Z',
@@ -812,15 +811,15 @@ describe('computeYearlyReport', () => {
 describe('getTransactionRankings', () => {
   it('returns largest transactions sorted desc', () => {
     const txns = [
-      txn({ id: '1', amount: 50, description: 'Small' }),
-      txn({ id: '2', amount: 500, description: 'Large' }),
-      txn({ id: '3', amount: 200, description: 'Medium' }),
+      txn({ id: '1', amount: 50, notes: 'Small' }),
+      txn({ id: '2', amount: 500, notes: 'Large' }),
+      txn({ id: '3', amount: 200, notes: 'Medium' }),
     ];
 
     const rankings = getTransactionRankings(txns, 'largest', 2);
     expect(rankings).toHaveLength(2);
-    expect(rankings[0]?.description).toBe('Large');
-    expect(rankings[1]?.description).toBe('Medium');
+    expect(rankings[0]?.notes).toBe('Large');
+    expect(rankings[1]?.notes).toBe('Medium');
   });
 
   it('returns smallest transactions sorted asc', () => {
@@ -849,29 +848,23 @@ describe('getTransactionRankings', () => {
 describe('generateCSV', () => {
   it('generates valid CSV string', () => {
     const txns = [
-      txn({ date: '2024-06-15', type: 'expense', amount: 42.50, description: 'Coffee', notes: 'Starbucks' }),
+      txn({ date: '2024-06-15', type: 'expense', amount: 42.50, notes: 'Coffee' }),
     ];
     const csv = generateCSV(txns);
     const lines = csv.split('\n');
-    expect(lines[0]).toBe('Date,Type,Category,Description,Amount,Notes');
+    expect(lines[0]).toBe('Date,Type,Category,Description,Amount');
     expect(lines[1]).toContain('2024-06-15');
     expect(lines[1]).toContain('expense');
     expect(lines[1]).toContain('"Coffee"');
     expect(lines[1]).toContain('42.5');
-    expect(lines[1]).toContain('"Starbucks"');
   });
 
-  it('escapes quotes in description', () => {
-    const txns = [txn({ description: 'He said "hello"', notes: null })];
+  it('escapes quotes in notes', () => {
+    const txns = [txn({ notes: 'He said "hello"' })];
     const csv = generateCSV(txns);
     expect(csv).toContain('"He said ""hello"""');
   });
 
-  it('handles null notes', () => {
-    const txns = [txn({ notes: null })];
-    const csv = generateCSV(txns);
-    expect(csv).toContain('""');
-  });
 
   it('handles null category', () => {
     const txns = [txn({ categories: undefined })];

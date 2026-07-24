@@ -93,8 +93,8 @@ const yearlyReport: YearlyReportData = {
 };
 
 const transactions: TransactionRankingItem[] = [
-  { id: '1', description: 'Rent', amount: 2000, date: '2024-06-01', categoryName: 'Housing', categoryColor: '#f00', type: 'expense' },
-  { id: '2', description: 'Salary', amount: 5000, date: '2024-06-01', categoryName: 'Income', categoryColor: '#0f0', type: 'income' },
+  { id: '1', notes: 'Rent', amount: 2000, date: '2024-06-01', categoryName: 'Housing', categoryColor: '#f00', type: 'expense' },
+  { id: '2', notes: 'Salary', amount: 5000, date: '2024-06-01', categoryName: 'Income', categoryColor: '#0f0', type: 'income' },
 ];
 
 // ============ LINE/AREA/BAR CHARTS ============

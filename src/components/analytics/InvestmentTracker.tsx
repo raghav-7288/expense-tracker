@@ -196,7 +196,7 @@ export default function InvestmentTracker({ transactions, currency }: Investment
                       <TrendingUp size={12} className={t.type === 'income' ? 'text-green-600' : 'text-amber-600'} />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-gray-800 truncate">{t.description}</p>
+                      <p className="text-sm font-medium text-gray-800 truncate">{t.notes}</p>
                       <p className="text-[11px] text-gray-400">
                         {new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(
                           new Date(t.date + 'T00:00:00'),

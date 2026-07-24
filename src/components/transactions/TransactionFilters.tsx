@@ -42,12 +42,14 @@ export default function TransactionFilterBar({ filters, onChange, resultCount }:
     { value: 'date-asc', label: 'Oldest First' },
     { value: 'amount-desc', label: 'Highest Amount' },
     { value: 'amount-asc', label: 'Lowest Amount' },
-    { value: 'description-asc', label: 'A–Z' },
-    { value: 'description-desc', label: 'Z–A' },
+    { value: 'notes-asc', label: 'A–Z' },
+    { value: 'notes-desc', label: 'Z–A' },
   ];
 
   function handleSortChange(value: string) {
-    const [sort_by, sort_order] = value.split('-') as ['date' | 'amount' | 'description', 'asc' | 'desc'];
+    const parts = value.split('-');
+    const sort_by = parts[0] as 'date' | 'amount' | 'notes';
+    const sort_order = parts[1] as 'asc' | 'desc';
     onChange({ ...filters, sort_by, sort_order });
   }
 
@@ -101,7 +103,7 @@ export default function TransactionFilterBar({ filters, onChange, resultCount }:
           <select
             value={filters.type ?? 'all'}
             onChange={(e) => onChange({ ...filters, type: e.target.value as TransactionFilters['type'] })}
-            className="w-full sm:w-auto px-2.5 py-2 sm:py-1.5 text-xs font-medium border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+            className="w-full sm:w-auto px-2.5 py-2 sm:py-1.5 text-xs font-medium border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all touch-manipulation"
           >
             {typeOptions.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
@@ -111,7 +113,7 @@ export default function TransactionFilterBar({ filters, onChange, resultCount }:
           <select
             value={filters.category_id ?? ''}
             onChange={(e) => onChange({ ...filters, category_id: e.target.value || undefined })}
-            className="w-full sm:w-auto px-2.5 py-2 sm:py-1.5 text-xs font-medium border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all sm:max-w-[140px] truncate"
+            className="w-full sm:w-auto px-2.5 py-2 sm:py-1.5 text-xs font-medium border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all sm:max-w-[140px] truncate touch-manipulation"
           >
             {categoryOptions.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
@@ -122,7 +124,7 @@ export default function TransactionFilterBar({ filters, onChange, resultCount }:
           <select
             value={dateMode}
             onChange={(e) => handleDateModeChange(e.target.value as DateMode)}
-            className="w-full sm:w-auto px-2.5 py-2 sm:py-1.5 text-xs font-medium border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+            className="w-full sm:w-auto px-2.5 py-2 sm:py-1.5 text-xs font-medium border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all touch-manipulation"
           >
             <option value="none">All Dates</option>
             <option value="single">Specific Date</option>
@@ -132,7 +134,7 @@ export default function TransactionFilterBar({ filters, onChange, resultCount }:
           <select
             value={`${filters.sort_by ?? 'date'}-${filters.sort_order ?? 'desc'}`}
             onChange={(e) => handleSortChange(e.target.value)}
-            className="w-full sm:w-auto px-2.5 py-2 sm:py-1.5 text-xs font-medium border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+            className="w-full sm:w-auto px-2.5 py-2 sm:py-1.5 text-xs font-medium border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all touch-manipulation"
           >
             {sortOptions.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>

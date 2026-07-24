@@ -830,7 +830,7 @@ export function getTransactionRankings(
 
   return sorted.slice(0, limit).map((t) => ({
     id: t.id,
-    description: t.description,
+    notes: t.notes,
     amount: Number(t.amount),
     date: t.date,
     categoryName: t.categories?.name ?? 'Uncategorized',
@@ -844,14 +844,13 @@ export function getTransactionRankings(
    ============================================================ */
 
 export function generateCSV(transactions: Transaction[]): string {
-  const headers = ['Date', 'Type', 'Category', 'Description', 'Amount', 'Notes'];
+  const headers = ['Date', 'Type', 'Category', 'Description', 'Amount'];
   const rows = transactions.map((t) => [
     t.date,
     t.type,
     t.categories?.name ?? '',
-    `"${t.description.replace(/"/g, '""')}"`,
+    `"${t.notes.replace(/"/g, '""')}"`,
     String(t.amount),
-    `"${(t.notes ?? '').replace(/"/g, '""')}"`,
   ]);
   return [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
 }

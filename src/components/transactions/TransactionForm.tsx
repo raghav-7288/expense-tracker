@@ -6,7 +6,6 @@ import { useCurrency } from '@/hooks/useCurrency';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
-import TextArea from '@/components/ui/TextArea';
 import { getToday } from '@/utils/formatDate';
 import { FileText, Calendar, IndianRupee, DollarSign, Euro, PoundSterling, JapaneseYen } from 'lucide-react';
 import type { Transaction, TransactionType } from '@/types';
@@ -14,10 +13,9 @@ import type { Transaction, TransactionType } from '@/types';
 const transactionSchema = z.object({
   type: z.enum(['income', 'expense']),
   amount: z.coerce.number().positive('Amount must be greater than 0'),
-  description: z.string().min(1, 'Description is required').max(200),
   category_id: z.string().optional(),
   date: z.string().min(1, 'Date is required'),
-  notes: z.string().max(500).optional(),
+  notes: z.string().min(1, 'Description is required').max(500),
 });
 
 type TransactionFormData = z.infer<typeof transactionSchema>;
@@ -56,7 +54,6 @@ export default function TransactionForm({
     defaultValues: {
       type: initialData?.type ?? 'expense',
       amount: initialData ? Number(initialData.amount) : undefined,
-      description: initialData?.description ?? '',
       category_id: initialData?.category_id ?? '',
       date: initialData?.date ?? getToday(),
       notes: initialData?.notes ?? '',
@@ -72,20 +69,20 @@ export default function TransactionForm({
   }));
 
   return (
-    <form onSubmit={handleSubmit((data) => onSubmit(data))} className="space-y-5">
+    <form onSubmit={handleSubmit((data) => onSubmit(data))} className="space-y-4 sm:space-y-5">
       {/* Type toggle */}
       <fieldset>
         <legend className="text-sm font-medium text-gray-700 mb-2">Transaction type</legend>
         <div className="txn-type-group grid grid-cols-2 gap-1.5 p-1.5 rounded-xl bg-gray-100">
-          <label className="relative cursor-pointer">
+          <label className="relative cursor-pointer touch-manipulation">
             <input type="radio" value="expense" {...register('type')} className="peer sr-only" />
-            <div className="txn-type-option txn-type-expense rounded-lg py-2.5 text-center text-sm font-bold transition-all peer-checked:bg-rose-500 peer-checked:text-white peer-checked:shadow-md peer-focus-visible:ring-2 peer-focus-visible:ring-rose-500/40">
+            <div className="txn-type-option txn-type-expense rounded-lg py-3 sm:py-2.5 text-center text-sm font-bold transition-all peer-checked:bg-rose-500 peer-checked:text-white peer-checked:shadow-md peer-focus-visible:ring-2 peer-focus-visible:ring-rose-500/40">
               Expense
             </div>
           </label>
-          <label className="relative cursor-pointer">
+          <label className="relative cursor-pointer touch-manipulation">
             <input type="radio" value="income" {...register('type')} className="peer sr-only" />
-            <div className="txn-type-option txn-type-income rounded-lg py-2.5 text-center text-sm font-bold transition-all peer-checked:bg-emerald-500 peer-checked:text-white peer-checked:shadow-md peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500/40">
+            <div className="txn-type-option txn-type-income rounded-lg py-3 sm:py-2.5 text-center text-sm font-bold transition-all peer-checked:bg-emerald-500 peer-checked:text-white peer-checked:shadow-md peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500/40">
               Income
             </div>
           </label>
@@ -103,11 +100,11 @@ export default function TransactionForm({
       />
 
       <Input
-        label="Description"
+        label="Notes"
         placeholder="e.g. Grocery shopping at Trader Joe's"
         leftIcon={<FileText size={15} />}
-        error={errors.description?.message}
-        {...register('description')}
+        error={errors.notes?.message}
+        {...register('notes')}
       />
 
       <Select
@@ -126,18 +123,12 @@ export default function TransactionForm({
         {...register('date')}
       />
 
-      <TextArea
-        label="Notes"
-        placeholder="Add any additional details..."
-        error={errors.notes?.message}
-        {...register('notes')}
-      />
 
-      <div className="flex gap-3 pt-3 border-t border-gray-100">
-        <Button type="button" variant="secondary" onClick={onCancel} className="flex-1">
+      <div className="flex gap-3 pt-4 sm:pt-3 border-t border-gray-100">
+        <Button type="button" variant="secondary" onClick={onCancel} className="flex-1 touch-manipulation">
           Cancel
         </Button>
-        <Button type="submit" loading={loading} className="flex-1">
+        <Button type="submit" loading={loading} className="flex-1 touch-manipulation">
           {initialData ? 'Save Changes' : 'Add Transaction'}
         </Button>
       </div>

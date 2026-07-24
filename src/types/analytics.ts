@@ -148,7 +148,7 @@ export interface YearlyReportData {
 
 export interface TransactionRankingItem {
   id: string;
-  description: string;
+  notes: string;
   amount: number;
   date: string;
   categoryName: string;

@@ -48,9 +48,9 @@ export default function RecentTransactions() {
           {transactions.map((t) => (
             <div key={t.id} className="flex items-center justify-between px-4 sm:px-5 py-3 hover:bg-gray-50/50 transition-colors gap-3">
               <div className="flex items-center gap-3 min-w-0">
-                <Avatar name={t.description} color={t.categories?.color ?? '#6b7280'} size="sm" />
+                <Avatar name={t.notes} color={t.categories?.color ?? '#6b7280'} size="sm" />
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">{t.description}</p>
+                  <p className="text-sm font-medium text-gray-900 truncate">{t.notes}</p>
                   <p className="text-[11px] text-gray-400">{formatDateShort(t.date)}</p>
                 </div>
               </div>
