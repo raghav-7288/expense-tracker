@@ -33,7 +33,7 @@ export default function TransactionList({ transactions }: TransactionListProps) 
         amount: data.amount as number,
         category_id: (data.category_id as string) || null,
         date: data.date as string,
-        notes: (data.notes as string) || null,
+        notes: (data.notes as string) || undefined,
       },
     });
     setEditingTransaction(null);

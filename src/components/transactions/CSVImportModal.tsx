@@ -192,10 +192,9 @@ export default function CSVImportModal({ open, onClose }: CSVImportModalProps) {
         user_id: user.id,
         type: row.type,
         amount: row.amount,
-        description: row.description,
         category_id: category?.id ?? null,
         date: row.date,
-        notes: row.notes || null,
+        notes: row.notes ? `${row.description} — ${row.notes}` : row.description,
       });
 
       if (error) {

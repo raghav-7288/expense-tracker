@@ -24,7 +24,7 @@ describe('TransactionForm', () => {
     expect(screen.getByText('Expense')).toBeInTheDocument();
     expect(screen.getByText('Income')).toBeInTheDocument();
     expect(screen.getByLabelText('Amount')).toBeInTheDocument();
-    expect(screen.getByLabelText('Description')).toBeInTheDocument();
+    expect(screen.getByLabelText('Notes')).toBeInTheDocument();
     expect(screen.getByLabelText('Date')).toBeInTheDocument();
   });
 
