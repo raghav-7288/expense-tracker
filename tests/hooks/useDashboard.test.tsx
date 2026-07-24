@@ -67,8 +67,8 @@ describe('useRecentTransactions', () => {
 
   it('returns limited recent transactions', async () => {
     const txns = Array.from({ length: 10 }, (_, i) => ({
-      id: String(i), type: 'expense', amount: 10, description: `T${i}`,
-      date: '2024-06-01', user_id: 'u1', category_id: null, notes: null,
+      id: String(i), type: 'expense', amount: 10, notes: `T${i}`,
+      date: '2024-06-01', user_id: 'u1', category_id: null,
     }));
     mockGetTransactions.mockResolvedValue({ data: txns, error: null });
 

@@ -30,13 +30,13 @@ vi.mock('@/hooks/useProfile', () => ({
 
 const mockTransactions = [
   {
-    id: '1', type: 'expense', amount: 50, description: 'Groceries', date: '2024-06-15',
-    user_id: 'u1', category_id: 'cat-1', notes: null, created_at: '', updated_at: '',
+    id: '1', type: 'expense', amount: 50, notes: 'Groceries', date: '2024-06-15',
+    user_id: 'u1', category_id: 'cat-1', created_at: '', updated_at: '',
     categories: { id: 'cat-1', user_id: 'u1', name: 'Food', type: 'expense', color: '#ef4444', icon: 'utensils', created_at: '', updated_at: '' },
   },
   {
-    id: '2', type: 'income', amount: 2000, description: 'Salary', date: '2024-06-01',
-    user_id: 'u1', category_id: 'cat-2', notes: 'Monthly', created_at: '', updated_at: '',
+    id: '2', type: 'income', amount: 2000, notes: 'Salary', date: '2024-06-01',
+    user_id: 'u1', category_id: 'cat-2', created_at: '', updated_at: '',
     categories: { id: 'cat-2', user_id: 'u1', name: 'Salary', type: 'income', color: '#10b981', icon: 'dollar-sign', created_at: '', updated_at: '' },
   },
 ];

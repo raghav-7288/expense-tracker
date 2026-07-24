@@ -25,8 +25,7 @@ function normalizeTransaction(row: Record<string, unknown>): Transaction {
     category_id: (row.system_category_id ?? row.user_category_id ?? row.category_id ?? null) as string | null,
     type: row.type as Transaction['type'],
     amount: row.amount as number,
-    description: row.description as string,
-    notes: (row.notes ?? null) as string | null,
+    notes: row.notes as string,
     date: row.date as string,
     created_at: row.created_at as string,
     updated_at: row.updated_at as string,
@@ -74,13 +73,13 @@ export async function getTransactions(userId: string, filters?: TransactionFilte
   if (filters?.search) {
     // Escape PostgREST/SQL LIKE wildcards in user input
     const sanitized = filters.search.replace(/[%_\\]/g, (ch) => `\\${ch}`);
-    query = query.ilike('description', `%${sanitized}%`);
+    query = query.ilike('notes', `%${sanitized}%`);
   }
 
   const sortBy = filters?.sort_by === 'amount'
     ? 'amount'
-    : filters?.sort_by === 'description'
-      ? 'description'
+    : filters?.sort_by === 'notes'
+      ? 'notes'
       : 'date';
   const ascending = filters?.sort_order === 'asc';
   query = query.order(sortBy, { ascending });
@@ -143,8 +142,7 @@ export async function createTransaction(input: CreateTransactionInput) {
       user_id: input.user_id,
       type: input.type,
       amount: input.amount,
-      description: input.description,
-      notes: input.notes ?? null,
+      notes: input.notes,
       date: input.date,
       ...categoryColumns,
     })
@@ -159,7 +157,6 @@ export async function updateTransaction(id: string, input: UpdateTransactionInpu
   const updateData: Record<string, unknown> = {};
   if (input.type !== undefined) updateData.type = input.type;
   if (input.amount !== undefined) updateData.amount = input.amount;
-  if (input.description !== undefined) updateData.description = input.description;
   if (input.notes !== undefined) updateData.notes = input.notes;
   if (input.date !== undefined) updateData.date = input.date;
 

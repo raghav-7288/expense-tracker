@@ -69,8 +69,7 @@ export interface Transaction {
   category_id: string | null;
   type: TransactionType;
   amount: number;
-  description: string;
-  notes: string | null;
+  notes: string;
   date: string;
   created_at: string;
   updated_at: string;
@@ -82,8 +81,7 @@ export interface CreateTransactionInput {
   category_id: string | null;
   type: TransactionType;
   amount: number;
-  description: string;
-  notes?: string | null;
+  notes: string;
   date: string;
 }
 
@@ -91,8 +89,7 @@ export interface UpdateTransactionInput {
   category_id?: string | null;
   type?: TransactionType;
   amount?: number;
-  description?: string;
-  notes?: string | null;
+  notes?: string;
   date?: string;
 }
 
@@ -131,7 +128,7 @@ export interface TransactionFilters {
   date_from?: string;
   date_to?: string;
   search?: string;
-  sort_by?: 'date' | 'amount' | 'description';
+  sort_by?: 'date' | 'amount' | 'notes';
   sort_order?: 'asc' | 'desc';
 }
 

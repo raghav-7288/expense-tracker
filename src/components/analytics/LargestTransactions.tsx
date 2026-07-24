@@ -44,7 +44,7 @@ export default function LargestTransactions({ largest, smallest, loading, curren
           <div key={t.id} className="flex items-center gap-3 py-2.5 first:pt-0 last:pb-0">
             <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: t.categoryColor }} />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">{t.description}</p>
+              <p className="text-sm font-medium text-gray-900 truncate">{t.notes}</p>
               <p className="text-xs text-gray-500">
                 {t.categoryName} · {formatDate(t.date)}
               </p>

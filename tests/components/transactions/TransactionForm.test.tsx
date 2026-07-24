@@ -44,8 +44,8 @@ describe('TransactionForm', () => {
 
   it('shows Update text when editing', () => {
     const initialData = {
-      id: '1', type: 'expense' as const, amount: 50, description: 'Test',
-      date: '2024-06-01', user_id: 'u1', category_id: 'c1', notes: null,
+      id: '1', type: 'expense' as const, amount: 50, notes: 'Test',
+      date: '2024-06-01', user_id: 'u1', category_id: 'c1',
       created_at: '', updated_at: '', categories: null,
     };
     renderWithProviders(<TransactionForm initialData={initialData} onSubmit={onSubmit} onCancel={onCancel} />);

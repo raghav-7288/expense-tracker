@@ -46,10 +46,9 @@ export default function TransactionsPage() {
     await createMutation.mutateAsync({
       type: data.type as 'income' | 'expense',
       amount: data.amount as number,
-      description: data.description as string,
       category_id: (data.category_id as string) || null,
       date: data.date as string,
-      notes: (data.notes as string) || null,
+      notes: data.notes as string,
     });
     setShowForm(false);
   }

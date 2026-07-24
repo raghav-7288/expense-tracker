@@ -49,14 +49,14 @@ describe('useAnalytics', () => {
     const transactions = [
       {
         id: '1', user_id: 'user-123', category_id: 'c1', type: 'expense',
-        amount: 50, description: 'Groceries', notes: null,
+        amount: 50, notes: 'Groceries',
         date: new Date().toISOString().split('T')[0],
         created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
         categories: { id: 'c1', user_id: 'user-123', name: 'Food', type: 'expense', color: '#ef4444', icon: 'utensils', created_at: '', updated_at: '' },
       },
       {
         id: '2', user_id: 'user-123', category_id: 'c2', type: 'income',
-        amount: 3000, description: 'Salary', notes: null,
+        amount: 3000, notes: 'Salary',
         date: new Date().toISOString().split('T')[0],
         created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
         categories: { id: 'c2', user_id: 'user-123', name: 'Salary', type: 'income', color: '#10b981', icon: 'briefcase', created_at: '', updated_at: '' },
@@ -134,14 +134,14 @@ describe('useAnalytics', () => {
     const transactions = [
       {
         id: '1', user_id: 'user-123', category_id: null, type: 'expense',
-        amount: 50, description: 'Coffee', notes: null,
+        amount: 50, notes: 'Coffee',
         date: new Date().toISOString().split('T')[0],
         created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
         categories: null,
       },
       {
         id: '2', user_id: 'user-123', category_id: null, type: 'income',
-        amount: 100, description: 'Gift', notes: null,
+        amount: 100, notes: 'Gift',
         date: new Date().toISOString().split('T')[0],
         created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
         categories: null,

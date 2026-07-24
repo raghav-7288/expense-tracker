@@ -46,7 +46,7 @@ describe('useTransactions', () => {
   });
 
   it('fetches transactions', async () => {
-    const data = [{ id: '1', description: 'Test' }];
+    const data = [{ id: '1', notes: 'Test' }];
     mockGetTransactions.mockResolvedValue({ data, error: null });
 
     const { result } = renderHook(() => useTransactions(), { wrapper: createWrapper() });
@@ -78,7 +78,7 @@ describe('useCreateTransaction', () => {
     mockCreateTransaction.mockResolvedValue({ data: { id: '1' }, error: null });
     const { result } = renderHook(() => useCreateTransaction(), { wrapper: createWrapper() });
     await result.current.mutateAsync({
-      type: 'expense', amount: 50, description: 'Test',
+      type: 'expense', amount: 50, notes: 'Test',
       date: '2024-01-01', category_id: null,
     });
     expect(mockCreateTransaction).toHaveBeenCalledWith(expect.objectContaining({
@@ -90,7 +90,7 @@ describe('useCreateTransaction', () => {
     mockCreateTransaction.mockResolvedValue({ data: null, error: { message: 'Invalid' } });
     const { result } = renderHook(() => useCreateTransaction(), { wrapper: createWrapper() });
     await expect(result.current.mutateAsync({
-      type: 'expense', amount: 0, description: 'X',
+      type: 'expense', amount: 0, notes: 'X',
       date: '2024-01-01', category_id: null,
     })).rejects.toThrow('Invalid');
   });

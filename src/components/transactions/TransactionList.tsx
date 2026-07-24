@@ -31,7 +31,6 @@ export default function TransactionList({ transactions }: TransactionListProps) 
       input: {
         type: data.type as 'income' | 'expense',
         amount: data.amount as number,
-        description: data.description as string,
         category_id: (data.category_id as string) || null,
         date: data.date as string,
         notes: (data.notes as string) || null,
@@ -78,14 +77,11 @@ export default function TransactionList({ transactions }: TransactionListProps) 
                 <tr key={t.id} className="group hover:bg-gray-50/60 transition-colors">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <Avatar name={t.description} color={t.categories?.color ?? '#6b7280'} size="sm" />
+                      <Avatar name={t.notes} color={t.categories?.color ?? '#6b7280'} size="sm" />
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-gray-900 truncate max-w-[200px]">
-                          {t.description}
+                          {t.notes}
                         </p>
-                        {t.notes && (
-                          <p className="text-[11px] text-gray-400 truncate max-w-[200px]">{t.notes}</p>
-                        )}
                       </div>
                     </div>
                   </td>
@@ -149,11 +145,11 @@ export default function TransactionList({ transactions }: TransactionListProps) 
             key={t.id}
             className="bg-white rounded-xl border border-gray-200 shadow-sm p-3 sm:p-4 flex items-center gap-3 overflow-hidden"
           >
-            <Avatar name={t.description} color={t.categories?.color ?? '#6b7280'} />
+            <Avatar name={t.notes} color={t.categories?.color ?? '#6b7280'} />
 
             <div className="flex-1 min-w-0 overflow-hidden">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-sm font-medium text-gray-900 truncate">{t.description}</p>
+                <p className="text-sm font-medium text-gray-900 truncate">{t.notes}</p>
                 <span
                   className={cn(
                     'text-sm font-semibold tabular-nums flex-shrink-0',
