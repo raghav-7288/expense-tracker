@@ -1,6 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useAnalytics, useCurrency } from '@/hooks/useAnalytics';
 import { useCategories } from '@/hooks/useCategories';
+import { useAccounts } from '@/hooks/useAccounts';
 import type { AnalyticsFilters, TimeRangePreset, DateRange } from '@/types/analytics';
 import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
@@ -45,28 +46,36 @@ export default function AnalyticsPage() {
 
   const { user } = useAuth();
   const { data: categoriesData, isLoading: categoriesLoading } = useCategories();
+  const { data: accounts } = useAccounts();
 
   const { data: allTransactions } = useQuery({
     queryKey: queryKeys.analytics.all(user?.id),
     queryFn: async () => {
       if (!user) throw new Error('Not authenticated');
       const { data, error } = await getTransactions(user.id);
-      if (error) throw error;
+      if (error) throw new Error(typeof error === 'object' && 'message' in error ? (error as { message: string }).message : 'Failed to load transactions');
       return data ?? [];
     },
     enabled: !!user,
     staleTime: 5 * 60 * 1000,
   });
 
-  /** Apply category filter to allTransactions for InvestmentTracker */
+  /** Apply category & account filters to allTransactions for InvestmentTracker */
   const filteredAllTransactions = useMemo(() => {
-    const txns = allTransactions ?? [];
+    let txns = allTransactions ?? [];
+
+    // Filter by account
+    if (filters.accountId) {
+      txns = txns.filter((t) => t.account_id === filters.accountId);
+    }
+
+    // Filter by categories
     const ids = filters.categoryIds;
     if (ids === undefined || ids === null) return txns;
     if (ids.length === 0) return [];
     const idSet = new Set(ids);
     return txns.filter((t) => t.category_id !== null && idSet.has(t.category_id));
-  }, [allTransactions, filters.categoryIds]);
+  }, [allTransactions, filters.categoryIds, filters.accountId]);
 
   const handlePresetChange = useCallback(
     (preset: TimeRangePreset, customRange?: DateRange) => {
@@ -78,6 +87,13 @@ export default function AnalyticsPage() {
   const handleCategoryChange = useCallback(
     (categoryIds: string[] | null) => {
       setFilters((prev) => ({ ...prev, categoryIds }));
+    },
+    [],
+  );
+
+  const handleAccountChange = useCallback(
+    (accountId: string | undefined) => {
+      setFilters((prev) => ({ ...prev, accountId }));
     },
     [],
   );
@@ -119,18 +135,34 @@ export default function AnalyticsPage() {
           customRange={filters.customRange}
           onChange={handlePresetChange}
         />
-        <div className="flex flex-wrap items-start gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <CategoryFilter
             categories={categoriesData ?? []}
             selectedIds={filters.categoryIds ?? null}
             onChange={handleCategoryChange}
             loading={categoriesLoading}
           />
+          {(accounts ?? []).length > 0 ? (
+            <select
+              value={filters.accountId ?? ''}
+              onChange={(e) => handleAccountChange(e.target.value || undefined)}
+              className="filter-select h-8 px-3 pr-7 text-xs font-medium rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all cursor-pointer appearance-none touch-manipulation"
+            >
+              <option value="">All Accounts</option>
+              {(accounts ?? []).map((a) => (
+                <option key={a.id} value={a.id}>{a.name}</option>
+              ))}
+            </select>
+          ) : (
+            <select disabled className="filter-select h-8 px-3 pr-7 text-xs font-medium rounded-lg bg-gray-100 text-gray-600 opacity-50 cursor-not-allowed appearance-none touch-manipulation">
+              <option>No Accounts</option>
+            </select>
+          )}
           {hasActiveCategoryFilter && (
             <button
               type="button"
               onClick={() => handleCategoryChange(null)}
-              className="px-2.5 py-1.5 rounded-lg text-xs font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+              className="h-8 px-3 inline-flex items-center rounded-lg text-xs font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors"
             >
               Reset category filter
             </button>

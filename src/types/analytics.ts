@@ -24,6 +24,7 @@ export interface AnalyticsFilters {
   /** Multi-select category filter. `null`/`undefined` = all, `[]` = none. */
   categoryIds?: string[] | null;
   type?: TransactionType | 'all';
+  accountId?: string;
 }
 
 export interface AnalyticsSummary {
@@ -154,6 +155,8 @@ export interface TransactionRankingItem {
   categoryName: string;
   categoryColor: string;
   type: TransactionType;
+  accountName?: string;
+  accountColor?: string;
 }
 
 export interface AnalyticsData {

@@ -6,23 +6,26 @@ import type {
   TransactionFilters,
 } from '@/types';
 
-// Select with joined category info from both system and user tables
+// Select with joined category info from both system and user tables, plus account
 const TRANSACTION_SELECT = `
   *,
   system_cat:system_categories(id, name, color, icon),
-  user_cat:user_categories(id, name, color, icon)
+  user_cat:user_categories(id, name, color, icon),
+  account:accounts(id, name, color)
 `;
 
-/** Normalize the joined category into the flat `categories` shape the UI expects. */
+/** Normalize the joined category and account into the flat shape the UI expects. */
 function normalizeTransaction(row: Record<string, unknown>): Transaction {
   const systemCat = row.system_cat as { id: string; name: string; color: string; icon: string } | null;
   const userCat = row.user_cat as { id: string; name: string; color: string; icon: string } | null;
   const cat = systemCat ?? userCat ?? null;
+  const account = row.account as { id: string; name: string; color: string } | null;
 
   return {
     id: row.id as string,
     user_id: row.user_id as string,
     category_id: (row.system_category_id ?? row.user_category_id ?? row.category_id ?? null) as string | null,
+    account_id: (row.account_id ?? null) as string | null,
     type: row.type as Transaction['type'],
     amount: row.amount as number,
     notes: row.notes as string,
@@ -39,6 +42,7 @@ function normalizeTransaction(row: Record<string, unknown>): Transaction {
       created_at: '',
       updated_at: '',
     } : null,
+    account: account ?? null,
   };
 }
 
@@ -70,6 +74,14 @@ export async function getTransactions(userId: string, filters?: TransactionFilte
     query = query.lte('date', filters.date_to);
   }
 
+  if (filters?.account_id) {
+    const accId = filters.account_id;
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(accId)) {
+      return { data: [], error: null };
+    }
+    query = query.eq('account_id', accId);
+  }
+
   if (filters?.search) {
     // Escape PostgREST/SQL LIKE wildcards in user input
     const sanitized = filters.search.replace(/[%_\\]/g, (ch) => `\\${ch}`);
@@ -91,6 +103,11 @@ export async function getTransactions(userId: string, filters?: TransactionFilte
   } else {
     query = query.order('date', { ascending: false });
     query = query.order('created_at', { ascending: false });
+  }
+
+  // Apply server-side limit if specified (pagination/recent queries)
+  if (filters?.limit && filters.limit > 0) {
+    query = query.limit(filters.limit);
   }
 
   const { data, error } = await query;
@@ -144,6 +161,7 @@ export async function createTransaction(input: CreateTransactionInput) {
       amount: input.amount,
       notes: input.notes,
       date: input.date,
+      account_id: input.account_id ?? null,
       ...categoryColumns,
     })
     .select(TRANSACTION_SELECT)
@@ -159,6 +177,7 @@ export async function updateTransaction(id: string, input: UpdateTransactionInpu
   if (input.amount !== undefined) updateData.amount = input.amount;
   if (input.notes !== undefined) updateData.notes = input.notes;
   if (input.date !== undefined) updateData.date = input.date;
+  if (input.account_id !== undefined) updateData.account_id = input.account_id;
 
   if (input.category_id !== undefined) {
     const categoryColumns = await resolveCategoryColumns(input.category_id);
@@ -198,3 +217,21 @@ export async function getMonthlyStats(userId: string, year: number) {
 
   return { data, error };
 }
+
+/**
+ * Lightweight query for dashboard totals — fetches only type + amount
+ * without joins, significantly reducing payload for users with many transactions.
+ */
+export async function getTransactionTotals(userId: string, dateFrom?: string, dateTo?: string) {
+  let query = supabase
+    .from('transactions')
+    .select('type, amount')
+    .eq('user_id', userId);
+
+  if (dateFrom) query = query.gte('date', dateFrom);
+  if (dateTo) query = query.lte('date', dateTo);
+
+  const { data, error } = await query;
+  return { data, error };
+}
+

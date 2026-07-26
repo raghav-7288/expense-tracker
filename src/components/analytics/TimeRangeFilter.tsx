@@ -33,7 +33,7 @@ export default function TimeRangeFilter({ value, customRange, onChange }: TimeRa
               onClick={() => onChange(preset.value)}
               aria-pressed={value === preset.value}
               className={cn(
-                'px-3 py-2 sm:py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap',
+                'px-3 h-9 sm:h-8 inline-flex items-center rounded-lg text-xs font-medium transition-all whitespace-nowrap',
                 value === preset.value
                   ? 'bg-primary-600 text-white shadow-sm'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200',

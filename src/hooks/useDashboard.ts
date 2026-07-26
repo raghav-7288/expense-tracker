@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { queryKeys } from '@/lib/queryKeys';
-import { getTransactions, getMonthlyStats } from '@/services/transactions';
+import { getTransactions, getMonthlyStats, getTransactionTotals } from '@/services/transactions';
 import type { DashboardStats, MonthlyData, CategoryBreakdown, Transaction } from '@/types';
 import { getMonthStart, getMonthEnd, getMonthName } from '@/utils/formatDate';
 
@@ -16,9 +16,10 @@ export function useDashboardStats() {
       const monthStart = getMonthStart();
       const monthEnd = getMonthEnd();
 
+      // Use lightweight query (type + amount only, no joins) for totals
       const [allResult, monthResult] = await Promise.all([
-        getTransactions(user.id),
-        getTransactions(user.id, { date_from: monthStart, date_to: monthEnd }),
+        getTransactionTotals(user.id),
+        getTransactionTotals(user.id, monthStart, monthEnd),
       ]);
 
       if (allResult.error) throw allResult.error;
@@ -62,9 +63,10 @@ export function useRecentTransactions(limit = 5) {
       const { data, error } = await getTransactions(user.id, {
         sort_by: 'date',
         sort_order: 'desc',
+        limit,
       });
       if (error) throw error;
-      return (data ?? []).slice(0, limit);
+      return data ?? [];
     },
     enabled: !!user,
   });

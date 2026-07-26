@@ -47,6 +47,9 @@ export default function LargestTransactions({ largest, smallest, loading, curren
               <p className="text-sm font-medium text-gray-900 truncate">{t.notes}</p>
               <p className="text-xs text-gray-500">
                 {t.categoryName} · {formatDate(t.date)}
+                {t.accountName && (
+                  <span className="text-gray-400"> · {t.accountName}</span>
+                )}
               </p>
             </div>
             <span

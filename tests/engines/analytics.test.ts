@@ -29,6 +29,7 @@ function txn(overrides: Partial<Transaction> = {}): Transaction {
     id: 'txn-1',
     user_id: 'u1',
     category_id: 'cat-1',
+    account_id: null,
     type: 'expense',
     amount: 100,
     notes: 'Test',
@@ -852,10 +853,10 @@ describe('generateCSV', () => {
     ];
     const csv = generateCSV(txns);
     const lines = csv.split('\n');
-    expect(lines[0]).toBe('Date,Type,Category,Description,Amount');
+    expect(lines[0]).toBe('Date,Type,Category,Account,Description,Amount');
     expect(lines[1]).toContain('2024-06-15');
     expect(lines[1]).toContain('expense');
-    expect(lines[1]).toContain('"Coffee"');
+    expect(lines[1]).toContain('Coffee');
     expect(lines[1]).toContain('42.5');
   });
 
@@ -863,6 +864,12 @@ describe('generateCSV', () => {
     const txns = [txn({ notes: 'He said "hello"' })];
     const csv = generateCSV(txns);
     expect(csv).toContain('"He said ""hello"""');
+  });
+
+  it('escapes commas in fields', () => {
+    const txns = [txn({ notes: 'Rent, utilities' })];
+    const csv = generateCSV(txns);
+    expect(csv).toContain('"Rent, utilities"');
   });
 
 

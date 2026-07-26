@@ -27,7 +27,6 @@ import {
   computeMonthlySeries,
   computeSavingsTrend,
   computeCategoryBreakdown,
-  computeHeatmap,
   computeSpendingPatterns,
   computeMonthlyReport,
   computeYearlyReport,
@@ -640,6 +639,7 @@ function txn(overrides: Partial<Transaction> = {}): Transaction {
     id: 'txn-1',
     user_id: 'u1',
     category_id: 'cat-1',
+    account_id: null,
     type: 'expense',
     amount: 100,
     notes: 'Test',
@@ -647,6 +647,7 @@ function txn(overrides: Partial<Transaction> = {}): Transaction {
     created_at: '2024-06-15T10:00:00Z',
     updated_at: '2024-06-15T10:00:00Z',
     categories: { id: 'cat-1', user_id: 'u1', name: 'Food', type: 'expense', color: '#ef4444', icon: 'utensils', created_at: '', updated_at: '' },
+    account: null,
     ...overrides,
   };
 }

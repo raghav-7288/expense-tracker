@@ -37,6 +37,13 @@ body {
   outline-offset: 2px;
 }
 
+/* Smooth transitions on interactive elements */
+a, button, input, select, textarea {
+  transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 /* Smooth scroll behavior */
 html {
   scroll-behavior: smooth;
@@ -126,6 +133,26 @@ body {
 ::selection {
   background: #bfdbfe;
   color: #1e3a8a;
+}
+
+/* Premium skeleton shimmer effect */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Subtle card lift on hover for premium feel */
+[class*="hover:shadow-lg"] {
+  will-change: transform, box-shadow;
 }
 
 input[type="number"]::-webkit-inner-spin-button,
@@ -292,6 +319,12 @@ body.dark-mode .nav-sidebar {
   box-shadow: 1px 0 0 #2d3a4d !important;
 }
 
+/* Header backdrop */
+body.dark-mode header.nav-sidebar {
+  background: rgba(30, 41, 59, 0.85) !important;
+  border-color: #2d3a4d !important;
+}
+
 body.dark-mode .nav-brand { color: #f1f5f9 !important; }
 
 body.dark-mode .nav-link {
@@ -334,8 +367,8 @@ body.dark-mode [class*="text-gray-400"] { color: #64748b !important; }
 body.dark-mode [class*="text-gray-300"] { color: #475569 !important; }
 
 /* ── Backgrounds ── */
-body.dark-mode [class*="bg-gray-100"] { background: #283848 !important; }
-body.dark-mode [class*="bg-gray-50"] { background: #1a2332 !important; }
+body.dark-mode [class*="bg-gray-100"] { background-color: #283848 !important; }
+body.dark-mode [class*="bg-gray-50"] { background-color: #1a2332 !important; }
 
 /* Colored light backgrounds → dark equivalents */
 body.dark-mode [class*="bg-green-50"] { background: rgba(16, 185, 129, 0.1) !important; }
@@ -392,7 +425,7 @@ body.dark-mode [class*="divide-gray-50"] > * { border-color: #2d3a4d !important;
 
 /* ── Forms ── */
 body.dark-mode input,
-body.dark-mode select,
+body.dark-mode select:not(.filter-select),
 body.dark-mode textarea {
   background: #0f172a !important;
   border-color: #3d4a5c !important;
@@ -407,12 +440,12 @@ body.dark-mode textarea::placeholder {
   -webkit-text-fill-color: #64748b !important;
 }
 body.dark-mode input:hover,
-body.dark-mode select:hover,
+body.dark-mode select:not(.filter-select):hover,
 body.dark-mode textarea:hover {
   border-color: #475569 !important;
 }
 body.dark-mode input:focus,
-body.dark-mode select:focus,
+body.dark-mode select:not(.filter-select):focus,
 body.dark-mode textarea:focus {
   border-color: #60a5fa !important;
   box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.12) !important;
@@ -430,6 +463,32 @@ body.dark-mode input:-webkit-autofill:focus {
 }
 body.dark-mode label { color: #cbd5e1 !important; }
 
+/* ── Filter Select Dropdowns ── */
+.filter-select {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-size: 12px;
+  background-position: right 8px center;
+  background-repeat: no-repeat;
+  border: none !important;
+}
+body.dark-mode .filter-select {
+  background-color: #283848 !important;
+  color: #e2e8f0 !important;
+  -webkit-text-fill-color: #e2e8f0 !important;
+  border: none !important;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+  background-size: 12px !important;
+  background-position: right 8px center !important;
+  background-repeat: no-repeat !important;
+}
+body.dark-mode .filter-select:hover {
+  background-color: #334155 !important;
+}
+body.dark-mode .filter-select option {
+  background: #1e293b !important;
+  color: #ffffff !important;
+}
+
 /* ============================================================
    INTERACTIVE STATES — unified hover/active/focus
    Order: general hovers → specific component hovers → buttons
@@ -439,21 +498,21 @@ body.dark-mode label { color: #cbd5e1 !important; }
 /* ── Subtle hover (menu items, nav links, table rows, list items) ── */
 body.dark-mode [class*="hover:bg-gray-50"]:hover,
 body.dark-mode [class*="hover\\:bg-gray-50"]:hover {
-  background: #2a3a4e !important;
+  background-color: #2a3a4e !important;
   color: #f1f5f9 !important;
 }
 
 /* ── Medium hover (icon buttons, ghost buttons, filter chips, tabs) ── */
 body.dark-mode [class*="hover:bg-gray-100"]:hover,
 body.dark-mode [class*="hover\\:bg-gray-100"]:hover {
-  background: #334155 !important;
+  background-color: #334155 !important;
   color: #f1f5f9 !important;
 }
 
 /* ── Strong hover (active filter chip bg-gray-200) ── */
 body.dark-mode [class*="hover:bg-gray-200"]:hover,
 body.dark-mode [class*="hover\\:bg-gray-200"]:hover {
-  background: #3d4a5c !important;
+  background-color: #3d4a5c !important;
   color: #f1f5f9 !important;
 }
 
@@ -564,7 +623,7 @@ body.dark-mode .modal-content [class*="bg-white"] {
 
 /* ── Skeleton loading ── */
 body.dark-mode [class*="bg-gray-200\\/70"],
-body.dark-mode [class*="bg-gray-200"] { background: #2d3a4d !important; }
+body.dark-mode [class*="bg-gray-200"] { background-color: #2d3a4d !important; }
 
 /* ── Recharts ── */
 body.dark-mode .recharts-default-tooltip {

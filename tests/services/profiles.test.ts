@@ -59,6 +59,23 @@ describe('profiles service', () => {
       expect(result.data).toBeNull();
       expect(result.error).toEqual(error);
     });
+
+    it('only passes whitelisted fields to update', async () => {
+      mockSingle.mockResolvedValue({ data: { id: 'user-1' }, error: null });
+
+      await updateProfile('user-1', { full_name: 'Test', currency: 'EUR' });
+      // The update mock is called with the safe input object
+      expect(mockUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({ full_name: 'Test', currency: 'EUR' }),
+      );
+    });
+
+    it('omits undefined fields from update payload', async () => {
+      mockSingle.mockResolvedValue({ data: { id: 'user-1' }, error: null });
+
+      await updateProfile('user-1', { currency: 'GBP' });
+      expect(mockUpdate).toHaveBeenCalledWith({ currency: 'GBP' });
+    });
   });
 });
 

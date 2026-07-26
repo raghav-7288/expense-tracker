@@ -9,6 +9,7 @@ import StatCard from '@/components/dashboard/StatCard';
 import RecentTransactions from '@/components/dashboard/RecentTransactions';
 import MonthlyChart from '@/components/dashboard/MonthlyChart';
 import CategoryChart from '@/components/dashboard/CategoryChart';
+import AccountBalances from '@/components/dashboard/AccountBalances';
 import ErrorState from '@/components/ui/ErrorState';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { SkeletonCard } from '@/components/ui/Skeleton';
@@ -145,11 +146,16 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent Transactions */}
-      <div>
-        <div className="mb-4">
-          <SectionHeader title="Activity" />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2">
+          <div className="mb-4">
+            <SectionHeader title="Activity" />
+          </div>
+          <RecentTransactions />
         </div>
-        <RecentTransactions />
+        <div>
+          <AccountBalances />
+        </div>
       </div>
     </div>
   );

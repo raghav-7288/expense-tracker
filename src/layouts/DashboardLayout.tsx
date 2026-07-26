@@ -16,6 +16,7 @@ import {
   Sun,
   Moon,
   ChevronRight,
+  Landmark,
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import toast from 'react-hot-toast';
@@ -24,14 +25,15 @@ const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/analytics', icon: BarChart3, label: 'Analytics' },
   { to: '/transactions', icon: ArrowLeftRight, label: 'Transactions' },
+  { to: '/accounts', icon: Landmark, label: 'Accounts' },
   { to: '/categories', icon: Tag, label: 'Categories' },
-  { to: '/profile', icon: User, label: 'Profile' },
 ];
 
 const PAGE_TITLES: Record<string, string> = {
   '/dashboard': 'Dashboard',
   '/analytics': 'Analytics',
   '/transactions': 'Transactions',
+  '/accounts': 'Accounts',
   '/categories': 'Categories',
   '/profile': 'Profile',
 };
@@ -132,16 +134,23 @@ export default function DashboardLayout() {
 
         {/* Footer */}
         <div className="p-3 border-t border-gray-100 flex-shrink-0 space-y-1">
-          {/* Theme toggle */}
-          <button
-            type="button"
-            onClick={() => setDarkMode(!darkMode)}
-            className="nav-link flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-[13px] font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-800 transition-all"
-            aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+          {/* Profile */}
+          <NavLink
+            to="/profile"
+            onClick={() => setSidebarOpen(false)}
+            className={({ isActive }) =>
+              cn(
+                'nav-link flex items-center gap-2.5 w-full px-3 py-2.5 sm:py-2 rounded-lg text-[13px] font-medium transition-all touch-manipulation',
+                isActive
+                  ? 'nav-link-active bg-primary-50 text-primary-700'
+                  : 'text-gray-500 hover:bg-gray-50 hover:text-gray-800',
+              )
+            }
           >
-            {darkMode ? <Sun size={17} className="text-amber-500" /> : <Moon size={17} className="text-gray-400" />}
-            <span>{darkMode ? 'Light Mode' : 'Dark Mode'}</span>
-          </button>
+            <User size={17} className="text-gray-400 flex-shrink-0" />
+            <span>Profile</span>
+          </NavLink>
+
 
           {/* Sign out */}
           <button
@@ -188,6 +197,16 @@ export default function DashboardLayout() {
             <div className="hidden lg:flex items-center gap-2 flex-1">
               <span className="text-sm font-medium text-gray-900">{currentTitle}</span>
             </div>
+
+            {/* Theme toggle — always visible */}
+            <button
+              type="button"
+              onClick={() => setDarkMode(!darkMode)}
+              className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-all touch-manipulation"
+              aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {darkMode ? <Sun size={18} className="text-amber-500" /> : <Moon size={18} />}
+            </button>
           </div>
         </header>
 

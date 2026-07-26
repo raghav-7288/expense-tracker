@@ -39,7 +39,7 @@ export function useAnalytics(filters: AnalyticsFilters): AnalyticsData {
     queryFn: async (): Promise<Transaction[]> => {
       if (!user) throw new Error('Not authenticated');
       const { data, error } = await getTransactions(user.id);
-      if (error) throw error;
+      if (error) throw new Error(typeof error === 'object' && 'message' in error ? (error as { message: string }).message : 'Failed to load transactions');
       return data ?? [];
     },
     enabled: !!user,
@@ -59,14 +59,22 @@ export function useAnalytics(filters: AnalyticsFilters): AnalyticsData {
    */
   const baseTransactions = useMemo(() => {
     if (!allTransactions) return [];
+    let filtered = allTransactions;
+
+    // Filter by account if specified
+    if (filters.accountId) {
+      filtered = filtered.filter((t) => t.account_id === filters.accountId);
+    }
+
+    // Filter by categories
     const ids = filters.categoryIds;
-    if (ids === undefined || ids === null) return allTransactions;
+    if (ids === undefined || ids === null) return filtered;
     if (ids.length === 0) return [];
     const idSet = new Set(ids);
-    return allTransactions.filter(
+    return filtered.filter(
       (t) => t.category_id !== null && idSet.has(t.category_id),
     );
-  }, [allTransactions, filters.categoryIds]);
+  }, [allTransactions, filters.categoryIds, filters.accountId]);
 
   const prevDateRange = useMemo(() => getPreviousPeriod(dateRange), [dateRange]);
 

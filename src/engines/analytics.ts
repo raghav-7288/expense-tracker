@@ -337,8 +337,8 @@ export function computeCategoryBreakdown(
         percentage: total > 0 ? Math.round((amount / total) * 100) : 0,
         count: amounts.length,
         avgTransaction: amounts.length > 0 ? amount / amounts.length : 0,
-        highestTransaction: Math.max(...amounts),
-        lowestTransaction: Math.min(...amounts),
+        highestTransaction: amounts.length > 0 ? Math.max(...amounts) : 0,
+        lowestTransaction: amounts.length > 0 ? Math.min(...amounts) : 0,
       };
     })
     .sort((a, b) => b.amount - a.amount);
@@ -836,6 +836,8 @@ export function getTransactionRankings(
     categoryName: t.categories?.name ?? 'Uncategorized',
     categoryColor: t.categories?.color ?? '#6b7280',
     type: t.type,
+    accountName: t.account?.name,
+    accountColor: t.account?.color,
   }));
 }
 
@@ -843,13 +845,22 @@ export function getTransactionRankings(
    CSV EXPORT
    ============================================================ */
 
+/** Escape a CSV field per RFC 4180: quote if it contains comma, quote, or newline. */
+function escapeCSVField(value: string): string {
+  if (value.includes(',') || value.includes('"') || value.includes('\n') || value.includes('\r')) {
+    return `"${value.replace(/"/g, '""')}"`;
+  }
+  return value;
+}
+
 export function generateCSV(transactions: Transaction[]): string {
-  const headers = ['Date', 'Type', 'Category', 'Description', 'Amount'];
+  const headers = ['Date', 'Type', 'Category', 'Account', 'Description', 'Amount'];
   const rows = transactions.map((t) => [
     t.date,
     t.type,
-    t.categories?.name ?? '',
-    `"${t.notes.replace(/"/g, '""')}"`,
+    escapeCSVField(t.categories?.name ?? ''),
+    escapeCSVField(t.account?.name ?? ''),
+    escapeCSVField(t.notes),
     String(t.amount),
   ]);
   return [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');

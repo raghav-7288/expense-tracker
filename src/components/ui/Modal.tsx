@@ -14,12 +14,17 @@ interface ModalProps {
 export default function Modal({ open, onClose, title, children, size = 'md' }: ModalProps) {
   const contentRef = useRef<HTMLDivElement>(null);
   const scrollYRef = useRef(0);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  });
 
   useEffect(() => {
     if (!open) return;
 
     function handleEscape(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') onCloseRef.current();
     }
 
     // Lock body scroll — works on iOS Safari by fixing position
@@ -44,7 +49,7 @@ export default function Modal({ open, onClose, title, children, size = 'md' }: M
       document.body.style.overflow = '';
       window.scrollTo(0, scrollYRef.current);
     };
-  }, [open, onClose]);
+  }, [open]);
 
   useEffect(() => {
     if (open && contentRef.current) {

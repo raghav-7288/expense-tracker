@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useCategories } from '@/hooks/useCategories';
+import { useAccounts } from '@/hooks/useAccounts';
 import { useCurrency } from '@/hooks/useCurrency';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -13,7 +14,8 @@ import type { Transaction, TransactionType } from '@/types';
 const transactionSchema = z.object({
   type: z.enum(['income', 'expense']),
   amount: z.coerce.number().positive('Amount must be greater than 0'),
-  category_id: z.string().optional(),
+  category_id: z.string().optional().transform((v) => v || undefined),
+  account_id: z.string().optional().transform((v) => v || undefined),
   date: z.string().min(1, 'Date is required'),
   notes: z.string().min(1, 'Description is required').max(500),
 });
@@ -44,6 +46,7 @@ export default function TransactionForm({
   loading = false,
 }: TransactionFormProps) {
   const currency = useCurrency();
+  const { data: accounts } = useAccounts();
   const {
     register,
     handleSubmit,
@@ -55,6 +58,7 @@ export default function TransactionForm({
       type: initialData?.type ?? 'expense',
       amount: initialData ? Number(initialData.amount) : undefined,
       category_id: initialData?.category_id ?? '',
+      account_id: initialData?.account_id ?? '',
       date: initialData?.date ?? getToday(),
       notes: initialData?.notes ?? '',
     },
@@ -66,6 +70,11 @@ export default function TransactionForm({
   const categoryOptions = (categories ?? []).map((c) => ({
     value: c.id,
     label: c.name,
+  }));
+
+  const accountOptions = (accounts ?? []).map((a) => ({
+    value: a.id,
+    label: a.name,
   }));
 
   return (
@@ -115,6 +124,16 @@ export default function TransactionForm({
         {...register('category_id')}
       />
 
+      {accountOptions.length > 0 && (
+        <Select
+          label="Account"
+          options={accountOptions}
+          placeholder="No account (general)"
+          error={errors.account_id?.message}
+          {...register('account_id')}
+        />
+      )}
+
       <Input
         label="Date"
         type="date"
@@ -122,7 +141,6 @@ export default function TransactionForm({
         error={errors.date?.message}
         {...register('date')}
       />
-
 
       <div className="flex gap-3 pt-4 sm:pt-3 border-t border-gray-100">
         <Button type="button" variant="secondary" onClick={onCancel} className="flex-1 touch-manipulation">

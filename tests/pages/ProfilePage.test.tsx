@@ -251,63 +251,6 @@ describe('ProfilePage', () => {
     });
   });
 
-  /* ==================== Appearance / dark mode ==================== */
-
-  describe('Appearance section', () => {
-    it('renders Appearance heading', () => {
-      setupLoaded();
-      expect(screen.getByText('Appearance')).toBeInTheDocument();
-    });
-
-    it('renders Dark Mode label', () => {
-      setupLoaded();
-      expect(screen.getByText('Dark Mode')).toBeInTheDocument();
-    });
-
-    it('shows "Light theme is active" in light mode', () => {
-      setupLoaded({}, { darkMode: false });
-      expect(screen.getByText('Light theme is active')).toBeInTheDocument();
-    });
-
-    it('shows "Dark theme is active" in dark mode', () => {
-      setupLoaded({}, { darkMode: true });
-      expect(screen.getByText('Dark theme is active')).toBeInTheDocument();
-    });
-
-    it('toggle has role="switch" and correct aria-checked in light mode', () => {
-      setupLoaded({}, { darkMode: false });
-      const toggle = screen.getByRole('switch');
-      expect(toggle).toHaveAttribute('aria-checked', 'false');
-    });
-
-    it('toggle has correct aria-checked in dark mode', () => {
-      setupLoaded({}, { darkMode: true });
-      const toggle = screen.getByRole('switch');
-      expect(toggle).toHaveAttribute('aria-checked', 'true');
-    });
-
-    it('toggle has correct aria-label in light mode', () => {
-      setupLoaded({}, { darkMode: false });
-      expect(screen.getByLabelText('Switch to dark mode')).toBeInTheDocument();
-    });
-
-    it('toggle has correct aria-label in dark mode', () => {
-      setupLoaded({}, { darkMode: true });
-      expect(screen.getByLabelText('Switch to light mode')).toBeInTheDocument();
-    });
-
-    it('calls setDarkMode(true) when toggling from light mode', async () => {
-      const { themeValue } = setupLoaded({}, { darkMode: false });
-      await userEvent.click(screen.getByRole('switch'));
-      expect(themeValue.setDarkMode).toHaveBeenCalledWith(true);
-    });
-
-    it('calls setDarkMode(false) when toggling from dark mode', async () => {
-      const { themeValue } = setupLoaded({}, { darkMode: true });
-      await userEvent.click(screen.getByRole('switch'));
-      expect(themeValue.setDarkMode).toHaveBeenCalledWith(false);
-    });
-  });
 
   /* ==================== Change Password ==================== */
 

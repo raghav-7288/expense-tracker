@@ -51,7 +51,21 @@ export default function RecentTransactions() {
                 <Avatar name={t.notes} color={t.categories?.color ?? '#6b7280'} size="sm" />
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-gray-900 truncate">{t.notes}</p>
-                  <p className="text-[11px] text-gray-400">{formatDateShort(t.date)}</p>
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-[11px] text-gray-400">{formatDateShort(t.date)}</p>
+                    {t.account && (
+                      <>
+                        <span className="text-[11px] text-gray-300">·</span>
+                        <span className="inline-flex items-center gap-0.5 text-[11px] text-gray-400 truncate">
+                          <span
+                            className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                            style={{ backgroundColor: t.account.color }}
+                          />
+                          {t.account.name}
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
               <span
