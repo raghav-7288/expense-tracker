@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">86.53% </span>
+                <span class="strong">86% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>45/52</span>
+                <span class='fraction'>43/50</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">83.33% </span>
+                <span class="strong">84.21% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>15/18</span>
+                <span class='fraction'>16/19</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.33% </span>
+                <span class="strong">93.02% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>42/45</span>
+                <span class='fraction'>40/43</span>
             </div>
         
             
@@ -175,7 +175,9 @@
 <a name='L110'></a><a href='#L110'>110</a>
 <a name='L111'></a><a href='#L111'>111</a>
 <a name='L112'></a><a href='#L112'>112</a>
-<a name='L113'></a><a href='#L113'>113</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -188,14 +190,22 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -216,8 +226,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -235,8 +243,6 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -279,15 +285,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
-<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { useQuery, useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { queryKeys } from '@/lib/queryKeys';
 import {
@@ -298,6 +302,14 @@ import {
 } from '@/services/transactions';
 import type { Transaction, CreateTransactionInput, UpdateTransactionInput, TransactionFilters } from '@/types';
 import toast from 'react-hot-toast';
+&nbsp;
+/** Invalidate all queries affected by transaction changes. */
+function invalidateTransactionRelated(queryClient: QueryClient) {
+  queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
+  queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
+  queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
+  queryClient.invalidateQueries({ queryKey: ['analytics'] as const });
+}
 &nbsp;
 export function useTransactions(filters?: TransactionFilters) {
   const { user } = useAuth();
@@ -326,9 +338,7 @@ export function useCreateTransaction() {
       return data;
     },
     onSuccess: () =&gt; {
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
-      queryClient.invalidateQueries({ queryKey: ['analytics'] as const });
+      invalidateTransactionRelated(queryClient);
       toast.success('Transaction created');
     },
     onError: (error: Error) =&gt; {
@@ -347,9 +357,7 @@ export function useUpdateTransaction() {
       return data;
     },
     onSuccess: () =&gt; {
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
-      queryClient.invalidateQueries({ queryKey: ['analytics'] as const });
+      invalidateTransactionRelated(queryClient);
       toast.success('Transaction updated');
     },
 <span class="fstat-no" title="function not covered" >    onError: (e</span>rror: Error) =&gt; {
@@ -390,9 +398,7 @@ export function useDeleteTransaction() {
       toast.error('Failed to delete transaction');
     },
     onSettled: () =&gt; {
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
-      queryClient.invalidateQueries({ queryKey: ['analytics'] as const });
+      invalidateTransactionRelated(queryClient);
     },
     onSuccess: () =&gt; {
       toast.success('Transaction deleted');
@@ -406,7 +412,7 @@ export function useDeleteTransaction() {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-07-18T10:32:32.232Z
+                at 2026-07-26T09:38:13.228Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

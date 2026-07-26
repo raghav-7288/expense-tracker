@@ -1,5 +1,7 @@
 export type TransactionType = 'income' | 'expense';
 
+export type AccountType = 'checking' | 'savings' | 'credit_card' | 'cash' | 'investment' | 'other';
+
 export interface Profile {
   id: string;
   email: string;
@@ -63,10 +65,44 @@ export interface MergedCategory {
 
 export type CategorySource = 'system' | 'user';
 
+export interface Account {
+  id: string;
+  user_id: string;
+  name: string;
+  type: AccountType;
+  initial_balance: number;
+  color: string;
+  icon: string;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateAccountInput {
+  user_id: string;
+  name: string;
+  type: AccountType;
+  initial_balance: number;
+  color?: string;
+  icon?: string;
+}
+
+export interface UpdateAccountInput {
+  name?: string;
+  type?: AccountType;
+  initial_balance?: number;
+  color?: string;
+  icon?: string;
+  is_active?: boolean;
+  sort_order?: number;
+}
+
 export interface Transaction {
   id: string;
   user_id: string;
   category_id: string | null;
+  account_id: string | null;
   type: TransactionType;
   amount: number;
   notes: string;
@@ -74,11 +110,13 @@ export interface Transaction {
   created_at: string;
   updated_at: string;
   categories?: Category | null;
+  account?: { id: string; name: string; color: string } | null;
 }
 
 export interface CreateTransactionInput {
   user_id: string;
   category_id: string | null;
+  account_id?: string | null;
   type: TransactionType;
   amount: number;
   notes: string;
@@ -87,6 +125,7 @@ export interface CreateTransactionInput {
 
 export interface UpdateTransactionInput {
   category_id?: string | null;
+  account_id?: string | null;
   type?: TransactionType;
   amount?: number;
   notes?: string;
@@ -125,11 +164,13 @@ export interface UpdateProfileInput {
 export interface TransactionFilters {
   type?: TransactionType | 'all';
   category_id?: string;
+  account_id?: string;
   date_from?: string;
   date_to?: string;
   search?: string;
   sort_by?: 'date' | 'amount' | 'notes';
   sort_order?: 'asc' | 'desc';
+  limit?: number;
 }
 
 export interface DashboardStats {
@@ -152,4 +193,3 @@ export interface CategoryBreakdown {
   color: string;
   percentage: number;
 }
-

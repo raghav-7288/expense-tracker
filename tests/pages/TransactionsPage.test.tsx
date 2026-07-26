@@ -128,8 +128,8 @@ describe('TransactionsPage', () => {
 
     renderWithProviders(<TransactionsPage />);
     await userEvent.click(screen.getByRole('button', { name: /CSV/i }));
-    expect(screen.getByText('Export')).toBeInTheDocument();
-    expect(screen.getByText('Import')).toBeInTheDocument();
+    expect(screen.getByText('Export CSV')).toBeInTheDocument();
+    expect(screen.getByText('Import CSV')).toBeInTheDocument();
   });
 
   it('renders filter bar with result count', () => {
@@ -147,7 +147,7 @@ describe('TransactionsPage', () => {
     } as never);
 
     renderWithProviders(<TransactionsPage />);
-    expect(screen.getByText('1 transaction')).toBeInTheDocument();
+    expect(screen.getByText('1 transaction found')).toBeInTheDocument();
   });
 
   it('shows page header with title', () => {

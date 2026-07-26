@@ -79,6 +79,7 @@ export function buildTransaction(overrides: Partial<Transaction> = {}): Transact
     id,
     user_id: 'user-123',
     category_id: 'cat-1',
+    account_id: null,
     type: 'expense',
     amount: 50.00,
     notes: `Transaction ${id}`,
@@ -95,6 +96,24 @@ export function buildTransaction(overrides: Partial<Transaction> = {}): Transact
       created_at: '2024-01-01T00:00:00Z',
       updated_at: '2024-01-01T00:00:00Z',
     },
+    ...overrides,
+  };
+}
+
+export function buildAccount(overrides: Partial<import('@/types').Account> = {}): import('@/types').Account {
+  const id = nextId();
+  return {
+    id,
+    user_id: 'user-123',
+    name: `Account ${id}`,
+    type: 'savings',
+    initial_balance: 10000,
+    color: '#3b82f6',
+    icon: 'wallet',
+    is_active: true,
+    sort_order: 0,
+    created_at: '2024-01-01T00:00:00Z',
+    updated_at: '2024-01-01T00:00:00Z',
     ...overrides,
   };
 }

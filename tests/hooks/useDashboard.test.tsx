@@ -9,10 +9,12 @@ import type { ReactNode } from 'react';
 
 const mockGetTransactions = vi.fn();
 const mockGetMonthlyStats = vi.fn();
+const mockGetTransactionTotals = vi.fn();
 
 vi.mock('@/services/transactions', () => ({
   getTransactions: (...args: unknown[]) => mockGetTransactions(...args),
   getMonthlyStats: (...args: unknown[]) => mockGetMonthlyStats(...args),
+  getTransactionTotals: (...args: unknown[]) => mockGetTransactionTotals(...args),
 }));
 
 function createWrapper() {
@@ -37,11 +39,11 @@ describe('useDashboardStats', () => {
   });
 
   it('calculates stats from transactions', async () => {
-    mockGetTransactions.mockResolvedValue({
+    mockGetTransactionTotals.mockResolvedValue({
       data: [
-        { type: 'income', amount: 1000, date: '2024-06-01' },
-        { type: 'expense', amount: 300, date: '2024-06-15' },
-        { type: 'income', amount: 500, date: '2024-05-01' },
+        { type: 'income', amount: 1000 },
+        { type: 'expense', amount: 300 },
+        { type: 'income', amount: 500 },
       ],
       error: null,
     });
@@ -53,7 +55,7 @@ describe('useDashboardStats', () => {
   });
 
   it('handles service error', async () => {
-    mockGetTransactions.mockResolvedValue({ data: null, error: { message: 'Failed' } });
+    mockGetTransactionTotals.mockResolvedValue({ data: null, error: { message: 'Failed' } });
 
     const { result } = renderHook(() => useDashboardStats(), { wrapper: createWrapper() });
     await waitFor(() => expect(result.current.isError).toBe(true));
@@ -66,7 +68,7 @@ describe('useRecentTransactions', () => {
   });
 
   it('returns limited recent transactions', async () => {
-    const txns = Array.from({ length: 10 }, (_, i) => ({
+    const txns = Array.from({ length: 5 }, (_, i) => ({
       id: String(i), type: 'expense', amount: 10, notes: `T${i}`,
       date: '2024-06-01', user_id: 'u1', category_id: null,
     }));
@@ -75,6 +77,11 @@ describe('useRecentTransactions', () => {
     const { result } = renderHook(() => useRecentTransactions(5), { wrapper: createWrapper() });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toHaveLength(5);
+    // Verify the service was called with limit parameter
+    expect(mockGetTransactions).toHaveBeenCalledWith(
+      'user-123',
+      expect.objectContaining({ limit: 5 }),
+    );
   });
 });
 

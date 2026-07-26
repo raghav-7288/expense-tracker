@@ -49,13 +49,20 @@ export default function CategoryFilter({
     }
   }, [open]);
 
-  // Focus search when opened
+  // Focus search when opened; reset search when closing via the toggle
   useEffect(() => {
     if (open) {
       requestAnimationFrame(() => searchRef.current?.focus());
-    } else {
+    }
+  }, [open]);
+
+  // When dropdown closes, reset search term
+  const prevOpenRef = useRef(open);
+  useEffect(() => {
+    if (prevOpenRef.current && !open) {
       setSearch('');
     }
+    prevOpenRef.current = open;
   }, [open]);
 
   const filteredCategories = categories.filter((cat) =>
@@ -114,7 +121,7 @@ export default function CategoryFilter({
         aria-haspopup="listbox"
         aria-label="Filter by category"
         className={cn(
-          'inline-flex items-center gap-1.5 px-3 py-2 sm:py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap',
+          'inline-flex items-center gap-1.5 px-3 h-9 sm:h-8 rounded-lg text-xs font-medium transition-all whitespace-nowrap',
           !isAllSelected && selectedCount > 0
             ? 'bg-primary-600 text-white shadow-sm'
             : !isAllSelected && selectedCount === 0

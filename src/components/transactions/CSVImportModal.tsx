@@ -57,7 +57,10 @@ function validateDate(dateStr: string): boolean {
   const regex = /^\d{4}-\d{2}-\d{2}$/;
   if (!regex.test(dateStr)) return false;
   const date = new Date(dateStr + 'T00:00:00');
-  return !isNaN(date.getTime());
+  if (isNaN(date.getTime())) return false;
+  // Verify no date rollover (e.g., Feb 30 → Mar 1)
+  const [y, m, d] = dateStr.split('-').map(Number) as [number, number, number];
+  return date.getFullYear() === y && date.getMonth() + 1 === m && date.getDate() === d;
 }
 
 function parseCSV(content: string): { rows: ParsedRow[]; errors: string[] } {
@@ -193,6 +196,7 @@ export default function CSVImportModal({ open, onClose }: CSVImportModalProps) {
         type: row.type,
         amount: row.amount,
         category_id: category?.id ?? null,
+        account_id: null,
         date: row.date,
         notes: row.notes ? `${row.description} — ${row.notes}` : row.description,
       });

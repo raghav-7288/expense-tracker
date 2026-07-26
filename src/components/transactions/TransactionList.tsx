@@ -32,8 +32,9 @@ export default function TransactionList({ transactions }: TransactionListProps) 
         type: data.type as 'income' | 'expense',
         amount: data.amount as number,
         category_id: (data.category_id as string) || null,
+        account_id: (data.account_id as string) || null,
         date: data.date as string,
-        notes: (data.notes as string) || undefined,
+        notes: data.notes as string,
       },
     });
     setEditingTransaction(null);
@@ -82,6 +83,15 @@ export default function TransactionList({ transactions }: TransactionListProps) 
                         <p className="text-sm font-medium text-gray-900 truncate max-w-[200px]">
                           {t.notes}
                         </p>
+                        {t.account && (
+                          <span className="inline-flex items-center gap-1 mt-0.5 text-[11px] text-gray-400">
+                            <span
+                              className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                              style={{ backgroundColor: t.account.color }}
+                            />
+                            {t.account.name}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </td>
@@ -165,6 +175,18 @@ export default function TransactionList({ transactions }: TransactionListProps) 
                   <>
                     <span className="text-[11px] text-gray-200">·</span>
                     <span className="text-[11px] text-gray-400 truncate">{t.categories.name}</span>
+                  </>
+                )}
+                {t.account && (
+                  <>
+                    <span className="text-[11px] text-gray-200">·</span>
+                    <span className="inline-flex items-center gap-0.5 text-[11px] text-gray-400 truncate">
+                      <span
+                        className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                        style={{ backgroundColor: t.account.color }}
+                      />
+                      {t.account.name}
+                    </span>
                   </>
                 )}
                 <Badge type={t.type} className="ml-auto flex-shrink-0" />

@@ -53,9 +53,11 @@ export default function CategoryChart() {
                   formatter={(value) => [formatCurrency(Number(value), currency)]}
                   contentStyle={{
                     borderRadius: '10px',
-                    border: 'none',
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                    border: darkMode ? '1px solid #344d65' : 'none',
+                    backgroundColor: darkMode ? '#243347' : '#fff',
+                    boxShadow: darkMode ? '0 8px 24px rgba(0,0,0,0.4)' : '0 4px 20px rgba(0,0,0,0.08)',
                     fontSize: '12px',
+                    color: darkMode ? '#e2e8f0' : undefined,
                   }}
                 />
               </PieChart>

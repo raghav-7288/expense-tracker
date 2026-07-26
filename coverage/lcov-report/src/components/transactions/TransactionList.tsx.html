@@ -30,9 +30,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">75% </span>
+                <span class="strong">73.33% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>21/28</span>
+                <span class='fraction'>22/30</span>
             </div>
         
             
@@ -303,7 +303,25 @@
 <a name='L238'></a><a href='#L238'>238</a>
 <a name='L239'></a><a href='#L239'>239</a>
 <a name='L240'></a><a href='#L240'>240</a>
-<a name='L241'></a><a href='#L241'>241</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L241'></a><a href='#L241'>241</a>
+<a name='L242'></a><a href='#L242'>242</a>
+<a name='L243'></a><a href='#L243'>243</a>
+<a name='L244'></a><a href='#L244'>244</a>
+<a name='L245'></a><a href='#L245'>245</a>
+<a name='L246'></a><a href='#L246'>246</a>
+<a name='L247'></a><a href='#L247'>247</a>
+<a name='L248'></a><a href='#L248'>248</a>
+<a name='L249'></a><a href='#L249'>249</a>
+<a name='L250'></a><a href='#L250'>250</a>
+<a name='L251'></a><a href='#L251'>251</a>
+<a name='L252'></a><a href='#L252'>252</a>
+<a name='L253'></a><a href='#L253'>253</a>
+<a name='L254'></a><a href='#L254'>254</a>
+<a name='L255'></a><a href='#L255'>255</a>
+<a name='L256'></a><a href='#L256'>256</a>
+<a name='L257'></a><a href='#L257'>257</a>
+<a name='L258'></a><a href='#L258'>258</a>
+<a name='L259'></a><a href='#L259'>259</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -381,6 +399,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -451,6 +475,18 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">24x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -576,10 +612,10 @@ export default function TransactionList({ transactions }: TransactionListProps) 
       input: {
         type: data.type as 'income' | 'expense',
         amount: data.amount as number,
-        description: data.description as string,
         category_id: (data.category_id as string) || null,
+        account_id: (data.account_id as string) || null,
         date: data.date as string,
-        notes: (data.notes as string) || null,
+        notes: data.notes as string,
       },
     });
 <span class="cstat-no" title="statement not covered" >    setEditingTransaction(null);</span>
@@ -618,18 +654,24 @@ export default function TransactionList({ transactions }: TransactionListProps) 
                 &lt;/th&gt;
               &lt;/tr&gt;
             &lt;/thead&gt;
-            &lt;tbody className="divide-y divide-gray-50"&gt;
+            &lt;tbody className="divide-y divide-gray-100"&gt;
               {transactions.map((t) =&gt; (
                 &lt;tr key={t.id} className="group hover:bg-gray-50/60 transition-colors"&gt;
                   &lt;td className="px-4 py-3"&gt;
                     &lt;div className="flex items-center gap-3"&gt;
-                      &lt;Avatar name={t.description} color={t.categories?.color ?? '#6b7280'} size="sm" /&gt;
+                      &lt;Avatar name={t.notes} color={t.categories?.color ?? '#6b7280'} size="sm" /&gt;
                       &lt;div className="min-w-0"&gt;
                         &lt;p className="text-sm font-medium text-gray-900 truncate max-w-[200px]"&gt;
-                          {t.description}
+                          {t.notes}
                         &lt;/p&gt;
-                        {t.notes &amp;&amp; (
-<span class="branch-1 cbranch-no" title="branch not covered" >                          &lt;p className="text-[11px] text-gray-400 truncate max-w-[200px]"&gt;{t.notes}&lt;/p&gt;</span>
+                        {t.account &amp;&amp; (
+<span class="branch-1 cbranch-no" title="branch not covered" >                          &lt;span className="inline-flex items-center gap-1 mt-0.5 text-[11px] text-gray-400"&gt;</span>
+                            &lt;span
+                              className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                              style={{ backgroundColor: t.account.color }}
+                            /&gt;
+                            {t.account.name}
+                          &lt;/span&gt;
                         )}
                       &lt;/div&gt;
                     &lt;/div&gt;
@@ -666,14 +708,14 @@ export default function TransactionList({ transactions }: TransactionListProps) 
                     &lt;div className="flex items-center justify-end gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity"&gt;
                       &lt;button
                         onClick={() =&gt; setEditingTransaction(t)}
-                        className="p-1.5 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                        className="p-1.5 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors duration-150"
                         aria-label="Edit transaction"
                       &gt;
                         &lt;Edit size={14} /&gt;
                       &lt;/button&gt;
                       &lt;button
                         onClick={() =&gt; setDeletingId(t.id)}
-                        className="p-1.5 rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50"
+                        className="p-1.5 rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors duration-150"
                         aria-label="Delete transaction"
                       &gt;
                         &lt;Trash2 size={14} /&gt;
@@ -694,11 +736,11 @@ export default function TransactionList({ transactions }: TransactionListProps) 
             key={t.id}
             className="bg-white rounded-xl border border-gray-200 shadow-sm p-3 sm:p-4 flex items-center gap-3 overflow-hidden"
           &gt;
-            &lt;Avatar name={t.description} color={t.categories?.color ?? '#6b7280'} /&gt;
+            &lt;Avatar name={t.notes} color={t.categories?.color ?? '#6b7280'} /&gt;
 &nbsp;
             &lt;div className="flex-1 min-w-0 overflow-hidden"&gt;
               &lt;div className="flex items-center justify-between gap-2"&gt;
-                &lt;p className="text-sm font-medium text-gray-900 truncate"&gt;{t.description}&lt;/p&gt;
+                &lt;p className="text-sm font-medium text-gray-900 truncate"&gt;{t.notes}&lt;/p&gt;
                 &lt;span
                   className={cn(
                     'text-sm font-semibold tabular-nums flex-shrink-0',
@@ -716,6 +758,18 @@ export default function TransactionList({ transactions }: TransactionListProps) 
                     &lt;span className="text-[11px] text-gray-400 truncate"&gt;{t.categories.name}&lt;/span&gt;
                   &lt;/&gt;
                 )}
+                {t.account &amp;&amp; (
+<span class="branch-1 cbranch-no" title="branch not covered" >                  &lt;&gt;</span>
+                    &lt;span className="text-[11px] text-gray-200"&gt;·&lt;/span&gt;
+                    &lt;span className="inline-flex items-center gap-0.5 text-[11px] text-gray-400 truncate"&gt;
+                      &lt;span
+                        className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                        style={{ backgroundColor: t.account.color }}
+                      /&gt;
+                      {t.account.name}
+                    &lt;/span&gt;
+                  &lt;/&gt;
+                )}
                 &lt;Badge type={t.type} className="ml-auto flex-shrink-0" /&gt;
               &lt;/div&gt;
             &lt;/div&gt;
@@ -723,14 +777,14 @@ export default function TransactionList({ transactions }: TransactionListProps) 
             &lt;div className="flex flex-col gap-1 flex-shrink-0"&gt;
               &lt;button
 <span class="fstat-no" title="function not covered" >                onClick={() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etEditingTransaction(t)}</span>
-                className="p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                className="p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors duration-150"
                 aria-label="Edit transaction"
               &gt;
                 &lt;Edit size={14} /&gt;
               &lt;/button&gt;
               &lt;button
 <span class="fstat-no" title="function not covered" >                onClick={() =&gt; <span class="cstat-no" title="statement not covered" >s</span>etDeletingId(t.id)}</span>
-                className="p-2 rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50"
+                className="p-2 rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors duration-150"
                 aria-label="Delete transaction"
               &gt;
                 &lt;Trash2 size={14} /&gt;
@@ -790,7 +844,7 @@ export default function TransactionList({ transactions }: TransactionListProps) 
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-07-18T10:32:32.232Z
+                at 2026-07-26T09:38:13.228Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

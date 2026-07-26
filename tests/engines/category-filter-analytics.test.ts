@@ -45,6 +45,7 @@ function txn(overrides: Partial<Transaction> = {}): Transaction {
     id: 'txn-1',
     user_id: 'u1',
     category_id: 'cat-food',
+    account_id: null,
     type: 'expense',
     amount: 100,
     notes: 'Test',

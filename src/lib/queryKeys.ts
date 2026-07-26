@@ -11,6 +11,11 @@ export const queryKeys = {
     hidden: (userId: string | undefined) =>
       ['categories', 'hidden', userId] as const,
   },
+  accounts: {
+    all: ['accounts'] as const,
+    list: (userId: string | undefined) => ['accounts', userId] as const,
+    balances: (userId: string | undefined) => ['accounts', 'balances', userId] as const,
+  },
   profile: {
     detail: (userId: string | undefined) => ['profile', userId] as const,
   },

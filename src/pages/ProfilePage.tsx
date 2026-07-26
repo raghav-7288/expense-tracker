@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useProfile, useUpdateProfile } from '@/hooks/useProfile';
 import { useAuth } from '@/hooks/useAuth';
-import { useTheme } from '@/hooks/useTheme';
 import { useTransactions } from '@/hooks/useTransactions';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -15,11 +14,10 @@ import AnimatedPage from '@/components/ui/AnimatedPage';
 import PageHeader from '@/components/ui/PageHeader';
 import { SkeletonProfile } from '@/components/ui/Skeleton';
 import ChangePasswordForm from '@/components/auth/ChangePasswordForm';
-import { cn } from '@/utils/cn';
 import { CURRENCIES } from '@/utils/constants';
 import { formatDate } from '@/utils/formatDate';
 import { generateCSV, downloadFile } from '@/engines/analytics';
-import { Moon, Sun, Download, Trash2, AlertTriangle, Shield, Calendar, Link as LinkIcon } from 'lucide-react';
+import { Download, Trash2, AlertTriangle, Shield, Calendar, Link as LinkIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const profileSchema = z.object({
@@ -32,7 +30,6 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 export default function ProfilePage() {
   const { data: profile, isLoading } = useProfile();
   const { user, signOut } = useAuth();
-  const { darkMode, setDarkMode } = useTheme();
   const updateProfileMutation = useUpdateProfile();
   const { data: transactions } = useTransactions();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -62,6 +59,7 @@ export default function ProfilePage() {
     function handleBeforeUnload(e: BeforeUnloadEvent) {
       if (isDirty) {
         e.preventDefault();
+        e.returnValue = '';
       }
     }
     window.addEventListener('beforeunload', handleBeforeUnload);
@@ -88,9 +86,13 @@ export default function ProfilePage() {
 
   async function handleDeleteAccount() {
     setDeleteLoading(true);
-    // Sign out only — does not delete transactions or other data from the database
-    await signOut();
-    toast.success('Account signed out and removed');
+    try {
+      await signOut();
+      toast.success('Account signed out and removed');
+    } catch {
+      toast.error('Failed to delete account. Please try again.');
+      setDeleteLoading(false);
+    }
   }
 
   if (isLoading) return <SkeletonProfile />;
@@ -138,48 +140,6 @@ export default function ProfilePage() {
             Save Changes
           </Button>
         </form>
-      </Card>
-
-      {/* Appearance */}
-      <Card>
-        <h3 className="text-sm font-semibold text-gray-900 mb-4 section-heading">Appearance</h3>
-        <button
-          type="button"
-          onClick={() => setDarkMode(!darkMode)}
-          className="w-full flex items-center justify-between gap-4 py-2 group"
-          aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-          role="switch"
-          aria-checked={darkMode}
-        >
-          <div className="flex items-center gap-3 min-w-0">
-            <div className={cn(
-              'w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0',
-              darkMode ? 'bg-slate-700' : 'bg-amber-50',
-            )}>
-              {darkMode
-                ? <Moon size={20} className="text-amber-400" />
-                : <Sun size={20} className="text-amber-500" />
-              }
-            </div>
-            <div className="text-left min-w-0">
-              <p className="text-sm font-medium text-gray-900 section-heading">{darkMode ? 'Light Mode' : 'Dark Mode'}</p>
-              <p className="text-xs text-gray-500 muted-text">
-                {darkMode ? 'Dark theme is active' : 'Light theme is active'}
-              </p>
-            </div>
-          </div>
-          {/* Toggle track */}
-          <div className={cn(
-            'relative w-12 h-7 rounded-full flex-shrink-0 transition-colors duration-200',
-            darkMode ? 'bg-primary-500' : 'bg-gray-300',
-          )}>
-            {/* Toggle knob */}
-            <div className={cn(
-              'absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow-md transition-transform duration-200',
-              darkMode && 'translate-x-5',
-            )} />
-          </div>
-        </button>
       </Card>
 
       {/* Change Password */}

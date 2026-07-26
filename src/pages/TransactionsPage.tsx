@@ -47,6 +47,7 @@ export default function TransactionsPage() {
       type: data.type as 'income' | 'expense',
       amount: data.amount as number,
       category_id: (data.category_id as string) || null,
+      account_id: (data.account_id as string) || null,
       date: data.date as string,
       notes: data.notes as string,
     });
@@ -96,14 +97,14 @@ export default function TransactionsPage() {
                     className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Download size={14} />
-                    Export
+                    Export CSV
                   </button>
                   <button
                     onClick={handleImportCSV}
                     className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
                   >
                     <Upload size={14} />
-                    Import
+                    Import CSV
                   </button>
                 </div>
               )}

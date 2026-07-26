@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">45.94% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>17/34</span>
+                <span class='fraction'>17/37</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">48.38% </span>
+                <span class="strong">44.11% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>15/31</span>
+                <span class='fraction'>15/34</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line low'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -241,7 +241,13 @@
 <a name='L176'></a><a href='#L176'>176</a>
 <a name='L177'></a><a href='#L177'>177</a>
 <a name='L178'></a><a href='#L178'>178</a>
-<a name='L179'></a><a href='#L179'>179</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L179'></a><a href='#L179'>179</a>
+<a name='L180'></a><a href='#L180'>180</a>
+<a name='L181'></a><a href='#L181'>181</a>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -302,6 +308,11 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -310,7 +321,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">13x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -435,6 +445,7 @@ import { SkeletonTable } from '@/components/ui/Skeleton';
 import { Plus, ChevronDown, Upload, Download, Receipt } from 'lucide-react';
 import { generateCSV, downloadFile } from '@/engines/analytics';
 import type { TransactionFilters } from '@/types';
+import toast from 'react-hot-toast';
 &nbsp;
 export default function TransactionsPage() {
   const [filters, setFilters] = useState&lt;TransactionFilters&gt;({
@@ -466,19 +477,24 @@ export default function TransactionsPage() {
 <span class="cstat-no" title="statement not covered" >    await createMutation.mutateAsync({</span>
       type: data.type as 'income' | 'expense',
       amount: data.amount as number,
-      description: data.description as string,
       category_id: (data.category_id as string) || null,
+      account_id: (data.account_id as string) || null,
       date: data.date as string,
-      notes: (data.notes as string) || null,
+      notes: data.notes as string,
     });
 <span class="cstat-no" title="statement not covered" >    setShowForm(false);</span>
   }
 &nbsp;
   function <span class="fstat-no" title="function not covered" >handleExportCSV() {</span>
 <span class="cstat-no" title="statement not covered" >    if (!transactions || transactions.length === 0) <span class="cstat-no" title="statement not covered" >return;</span></span>
-    const csv = <span class="cstat-no" title="statement not covered" >generateCSV(transactions);</span>
-    const date = <span class="cstat-no" title="statement not covered" >new Date().toISOString().split('T')[0] ?? 'export';</span>
-<span class="cstat-no" title="statement not covered" >    downloadFile(csv, `transactions-${date}.csv`, 'text/csv');</span>
+<span class="cstat-no" title="statement not covered" >    try {</span>
+      const csv = <span class="cstat-no" title="statement not covered" >generateCSV(transactions);</span>
+      const date = <span class="cstat-no" title="statement not covered" >new Date().toISOString().split('T')[0] ?? 'export';</span>
+<span class="cstat-no" title="statement not covered" >      downloadFile(csv, `transactions-${date}.csv`, 'text/csv');</span>
+<span class="cstat-no" title="statement not covered" >      toast.success(`Exported ${String(transactions.length)} transactions`);</span>
+    } catch {
+<span class="cstat-no" title="statement not covered" >      toast.error('Failed to export transactions');</span>
+    }
 <span class="cstat-no" title="statement not covered" >    setShowCSVMenu(false);</span>
   }
 &nbsp;
@@ -498,7 +514,6 @@ export default function TransactionsPage() {
             &lt;div className="relative" ref={csvMenuRef}&gt;
               &lt;Button
                 variant="secondary"
-                size="sm"
                 onClick={() =&gt; setShowCSVMenu((v) =&gt; !v)}
                 className="w-full sm:w-auto"
               &gt;
@@ -510,17 +525,17 @@ export default function TransactionsPage() {
                   &lt;button
                     onClick={handleExportCSV}
                     disabled={!transactions || transactions.length === 0}
-                    className="flex items-center gap-2 w-full px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
                   &gt;
                     &lt;Download size={14} /&gt;
-                    Export
+                    Export CSV
                   &lt;/button&gt;
                   &lt;button
                     onClick={handleImportCSV}
-                    className="flex items-center gap-2 w-full px-3 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+                    className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
                   &gt;
                     &lt;Upload size={14} /&gt;
-                    Import
+                    Import CSV
                   &lt;/button&gt;
                 &lt;/div&gt;
               )}
@@ -604,7 +619,7 @@ export default function TransactionsPage() {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-07-18T10:32:32.232Z
+                at 2026-07-26T09:38:13.228Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

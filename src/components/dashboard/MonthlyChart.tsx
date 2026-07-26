@@ -1,6 +1,7 @@
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { useMonthlyData } from '@/hooks/useDashboard';
 import { useCurrency } from '@/hooks/useCurrency';
+import { useTheme } from '@/hooks/useTheme';
 import { formatCompactCurrency } from '@/utils/formatCurrency';
 import { SkeletonChart } from '@/components/ui/Skeleton';
 import { TrendingUp } from 'lucide-react';
@@ -8,6 +9,7 @@ import { TrendingUp } from 'lucide-react';
 export default function MonthlyChart() {
   const { data: monthlyData, isLoading } = useMonthlyData();
   const currency = useCurrency();
+  const { darkMode } = useTheme();
 
   if (isLoading) return <SkeletonChart />;
 
@@ -43,15 +45,15 @@ export default function MonthlyChart() {
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={monthlyData} margin={{ top: 5, right: 5, left: -15, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={darkMode ? '#1e293b' : '#f1f5f9'} />
               <XAxis
                 dataKey="month"
-                tick={{ fontSize: 10, fill: '#94a3b8' }}
+                tick={{ fontSize: 10, fill: darkMode ? '#64748b' : '#94a3b8' }}
                 axisLine={false}
                 tickLine={false}
               />
               <YAxis
-                tick={{ fontSize: 10, fill: '#94a3b8' }}
+                tick={{ fontSize: 10, fill: darkMode ? '#64748b' : '#94a3b8' }}
                 axisLine={false}
                 tickLine={false}
                 width={45}
@@ -59,12 +61,14 @@ export default function MonthlyChart() {
               <Tooltip
                 contentStyle={{
                   borderRadius: '10px',
-                  border: 'none',
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                  border: darkMode ? '1px solid #344d65' : 'none',
+                  backgroundColor: darkMode ? '#243347' : '#fff',
+                  boxShadow: darkMode ? '0 8px 24px rgba(0,0,0,0.4)' : '0 4px 20px rgba(0,0,0,0.08)',
                   fontSize: '12px',
+                  color: darkMode ? '#e2e8f0' : undefined,
                 }}
                 formatter={(value) => [formatCompactCurrency(Number(value), currency)]}
-                cursor={{ fill: '#f8fafc' }}
+                cursor={{ fill: darkMode ? 'rgba(255,255,255,0.03)' : '#f8fafc' }}
               />
               <Bar dataKey="income" name="Income" fill="#10b981" radius={[4, 4, 0, 0]} barSize={14} />
               <Bar dataKey="expenses" name="Expenses" fill="#f43f5e" radius={[4, 4, 0, 0]} barSize={14} />

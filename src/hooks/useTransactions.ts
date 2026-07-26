@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { queryKeys } from '@/lib/queryKeys';
 import {
@@ -9,6 +9,14 @@ import {
 } from '@/services/transactions';
 import type { Transaction, CreateTransactionInput, UpdateTransactionInput, TransactionFilters } from '@/types';
 import toast from 'react-hot-toast';
+
+/** Invalidate all queries affected by transaction changes. */
+function invalidateTransactionRelated(queryClient: QueryClient) {
+  queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
+  queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
+  queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
+  queryClient.invalidateQueries({ queryKey: ['analytics'] as const });
+}
 
 export function useTransactions(filters?: TransactionFilters) {
   const { user } = useAuth();
@@ -37,9 +45,7 @@ export function useCreateTransaction() {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
-      queryClient.invalidateQueries({ queryKey: ['analytics'] as const });
+      invalidateTransactionRelated(queryClient);
       toast.success('Transaction created');
     },
     onError: (error: Error) => {
@@ -58,9 +64,7 @@ export function useUpdateTransaction() {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
-      queryClient.invalidateQueries({ queryKey: ['analytics'] as const });
+      invalidateTransactionRelated(queryClient);
       toast.success('Transaction updated');
     },
     onError: (error: Error) => {
@@ -101,9 +105,7 @@ export function useDeleteTransaction() {
       toast.error('Failed to delete transaction');
     },
     onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
-      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
-      queryClient.invalidateQueries({ queryKey: ['analytics'] as const });
+      invalidateTransactionRelated(queryClient);
     },
     onSuccess: () => {
       toast.success('Transaction deleted');

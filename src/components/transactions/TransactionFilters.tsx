@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useCategories } from '@/hooks/useCategories';
+import { useAccounts } from '@/hooks/useAccounts';
 import Input from '@/components/ui/Input';
 import { Search, SlidersHorizontal, X, Calendar } from 'lucide-react';
 import type { TransactionFilters } from '@/types';
@@ -14,6 +15,7 @@ type DateMode = 'none' | 'single' | 'range';
 
 export default function TransactionFilterBar({ filters, onChange, resultCount }: TransactionFiltersProps) {
   const { data: categories } = useCategories();
+  const { data: accounts } = useAccounts();
   const [dateModeOverride, setDateModeOverride] = useState<DateMode | null>(null);
 
   // Derive dateMode from filters, but allow local override for user interactions
@@ -64,12 +66,16 @@ export default function TransactionFilterBar({ filters, onChange, resultCount }:
     }
   }
 
-  const hasActiveFilters = !!(filters.search || (filters.type && filters.type !== 'all') || filters.category_id || filters.date_from || filters.date_to);
+  const hasActiveFilters = !!(filters.search || (filters.type && filters.type !== 'all') || filters.category_id || filters.account_id || filters.date_from || filters.date_to);
 
   function clearFilters() {
     setDateModeOverride(null);
     onChange({ sort_by: filters.sort_by, sort_order: filters.sort_order });
   }
+
+  const selectClass = "filter-select w-full sm:w-auto h-9 sm:h-8 px-3 pr-7 text-xs font-medium rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all cursor-pointer appearance-none touch-manipulation";
+
+  const selectClassTruncate = `${selectClass} sm:max-w-[150px] truncate`;
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
@@ -87,7 +93,7 @@ export default function TransactionFilterBar({ filters, onChange, resultCount }:
           {hasActiveFilters && (
             <button
               onClick={clearFilters}
-              className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors touch-manipulation"
             >
               <X size={12} />
               Clear
@@ -97,13 +103,13 @@ export default function TransactionFilterBar({ filters, onChange, resultCount }:
       </div>
 
       {/* Filters row */}
-      <div className="px-3 py-2.5 flex flex-wrap items-center gap-2">
+      <div className="px-3 py-3 flex flex-wrap items-center gap-2">
         <SlidersHorizontal size={14} className="text-gray-400 flex-shrink-0 hidden sm:block" />
         <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 w-full sm:w-auto sm:flex-1 min-w-0">
           <select
             value={filters.type ?? 'all'}
             onChange={(e) => onChange({ ...filters, type: e.target.value as TransactionFilters['type'] })}
-            className="w-full sm:w-auto px-2.5 py-2 sm:py-1.5 text-xs font-medium border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all touch-manipulation"
+            className={selectClass}
           >
             {typeOptions.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
@@ -113,18 +119,35 @@ export default function TransactionFilterBar({ filters, onChange, resultCount }:
           <select
             value={filters.category_id ?? ''}
             onChange={(e) => onChange({ ...filters, category_id: e.target.value || undefined })}
-            className="w-full sm:w-auto px-2.5 py-2 sm:py-1.5 text-xs font-medium border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all sm:max-w-[140px] truncate touch-manipulation"
+            className={selectClassTruncate}
           >
             {categoryOptions.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
             ))}
           </select>
 
+          {(accounts ?? []).length > 0 ? (
+            <select
+              value={filters.account_id ?? ''}
+              onChange={(e) => onChange({ ...filters, account_id: e.target.value || undefined })}
+              className={selectClassTruncate}
+            >
+              <option value="">All Accounts</option>
+              {(accounts ?? []).map((a) => (
+                <option key={a.id} value={a.id}>{a.name}</option>
+              ))}
+            </select>
+          ) : (
+            <select disabled className={`${selectClass} opacity-50 cursor-not-allowed`}>
+              <option>No Accounts</option>
+            </select>
+          )}
+
           {/* Date filter mode selector */}
           <select
             value={dateMode}
             onChange={(e) => handleDateModeChange(e.target.value as DateMode)}
-            className="w-full sm:w-auto px-2.5 py-2 sm:py-1.5 text-xs font-medium border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all touch-manipulation"
+            className={selectClass}
           >
             <option value="none">All Dates</option>
             <option value="single">Specific Date</option>
@@ -134,7 +157,7 @@ export default function TransactionFilterBar({ filters, onChange, resultCount }:
           <select
             value={`${filters.sort_by ?? 'date'}-${filters.sort_order ?? 'desc'}`}
             onChange={(e) => handleSortChange(e.target.value)}
-            className="w-full sm:w-auto px-2.5 py-2 sm:py-1.5 text-xs font-medium border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all touch-manipulation"
+            className={selectClass}
           >
             {sortOptions.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
@@ -159,17 +182,17 @@ export default function TransactionFilterBar({ filters, onChange, resultCount }:
                 onChange({ ...filters, date_from: val });
               }
             }}
-            className="flex-1 min-w-[130px] px-2.5 py-1.5 text-xs border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+            className="flex-1 min-w-[130px] h-8 px-3 text-xs font-medium rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
           />
           {dateMode === 'range' && (
             <>
-              <span className="text-xs text-gray-400">to</span>
+              <span className="text-xs text-gray-400 font-medium">to</span>
               <input
                 type="date"
                 aria-label="To date"
                 value={filters.date_to ?? ''}
                 onChange={(e) => onChange({ ...filters, date_to: e.target.value || undefined })}
-                className="flex-1 min-w-[130px] px-2.5 py-1.5 text-xs border border-gray-200 rounded-lg bg-white hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all"
+                className="flex-1 min-w-[130px] h-8 px-3 text-xs font-medium rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all"
               />
             </>
           )}
@@ -179,8 +202,8 @@ export default function TransactionFilterBar({ filters, onChange, resultCount }:
       {/* Result count */}
       {resultCount !== undefined && (
         <div className="px-4 py-2 border-t border-gray-100">
-          <span className="text-[11px] text-gray-400">
-            {resultCount} transaction{resultCount !== 1 ? 's' : ''}
+          <span className="text-[11px] text-gray-400 font-medium">
+            {resultCount} transaction{resultCount !== 1 ? 's' : ''} found
           </span>
         </div>
       )}

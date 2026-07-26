@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">73.33% </span>
-                <span class="quiet">Statements</span>
-                <span class='fraction'>11/15</span>
-            </div>
-        
-            
-            <div class='fl pad1y space-right2'>
-                <span class="strong">81.81% </span>
-                <span class="quiet">Branches</span>
-                <span class='fraction'>18/22</span>
-            </div>
-        
-            
-            <div class='fl pad1y space-right2'>
                 <span class="strong">75% </span>
-                <span class="quiet">Functions</span>
-                <span class='fraction'>3/4</span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>15/20</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">83.33% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>25/30</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">71.42% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>5/7</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">77.77% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>10/14</span>
+                <span class='fraction'>14/18</span>
             </div>
         
             
@@ -209,7 +209,16 @@
 <a name='L144'></a><a href='#L144'>144</a>
 <a name='L145'></a><a href='#L145'>145</a>
 <a name='L146'></a><a href='#L146'>146</a>
-<a name='L147'></a><a href='#L147'>147</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L147'></a><a href='#L147'>147</a>
+<a name='L148'></a><a href='#L148'>148</a>
+<a name='L149'></a><a href='#L149'>149</a>
+<a name='L150'></a><a href='#L150'>150</a>
+<a name='L151'></a><a href='#L151'>151</a>
+<a name='L152'></a><a href='#L152'>152</a>
+<a name='L153'></a><a href='#L153'>153</a>
+<a name='L154'></a><a href='#L154'>154</a>
+<a name='L155'></a><a href='#L155'>155</a>
+<a name='L156'></a><a href='#L156'>156</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -225,8 +234,8 @@
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -257,6 +266,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">17x</span>
+<span class="cline-any cline-yes">17x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -276,6 +286,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">17x</span>
 <span class="cline-any cline-yes">17x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">17x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -284,6 +299,9 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">17x</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -359,11 +377,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useCategories } from '@/hooks/useCategories';
+import { useAccounts } from '@/hooks/useAccounts';
 import { useCurrency } from '@/hooks/useCurrency';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
-import TextArea from '@/components/ui/TextArea';
 import { getToday } from '@/utils/formatDate';
 import { FileText, Calendar, IndianRupee, DollarSign, Euro, PoundSterling, JapaneseYen } from 'lucide-react';
 import type { Transaction, TransactionType } from '@/types';
@@ -371,10 +389,10 @@ import type { Transaction, TransactionType } from '@/types';
 const transactionSchema = z.object({
   type: z.enum(['income', 'expense']),
   amount: z.coerce.number().positive('Amount must be greater than 0'),
-  description: z.string().min(1, 'Description is required').max(200),
-  category_id: z.string().optional(),
+  category_id: z.string().optional().transform((v) =&gt; v || undefined),
+  account_id: z.string().optional().transform((v) =&gt; v || undefined),
   date: z.string().min(1, 'Date is required'),
-  notes: z.string().max(500).optional(),
+  notes: z.string().min(1, 'Description is required').max(500),
 });
 &nbsp;
 type TransactionFormData = z.infer&lt;typeof transactionSchema&gt;;
@@ -403,6 +421,7 @@ export default function TransactionForm({
   loading = false,
 }: TransactionFormProps) {
   const currency = useCurrency();
+  const { data: accounts } = useAccounts();
   const {
     register,
     handleSubmit,
@@ -413,8 +432,8 @@ export default function TransactionForm({
     defaultValues: {
       type: initialData?.type ?? 'expense',
       amount: initialData ? Number(initialData.amount) : undefined,
-      description: initialData?.description ?? '',
       category_id: initialData?.category_id ?? '',
+      account_id: initialData?.account_id ?? '',
       date: initialData?.date ?? getToday(),
       notes: initialData?.notes ?? '',
     },
@@ -428,21 +447,26 @@ export default function TransactionForm({
     label: c.name,
   }));
 &nbsp;
+  const accountOptions = (accounts ?? []).<span class="fstat-no" title="function not covered" >map((a</span>) =&gt; (<span class="cstat-no" title="statement not covered" >{</span>
+    value: a.id,
+    label: a.name,
+  }));
+&nbsp;
   return (
-    &lt;form onSubmit={<span class="fstat-no" title="function not covered" >handleSubmit((d</span>ata) =&gt; <span class="cstat-no" title="statement not covered" >onSubmit(data))</span>} className="space-y-5"&gt;
+    &lt;form onSubmit={<span class="fstat-no" title="function not covered" >handleSubmit((d</span>ata) =&gt; <span class="cstat-no" title="statement not covered" >onSubmit(data))</span>} className="space-y-4 sm:space-y-5"&gt;
       {/* Type toggle */}
       &lt;fieldset&gt;
         &lt;legend className="text-sm font-medium text-gray-700 mb-2"&gt;Transaction type&lt;/legend&gt;
         &lt;div className="txn-type-group grid grid-cols-2 gap-1.5 p-1.5 rounded-xl bg-gray-100"&gt;
-          &lt;label className="relative cursor-pointer"&gt;
+          &lt;label className="relative cursor-pointer touch-manipulation"&gt;
             &lt;input type="radio" value="expense" {...register('type')} className="peer sr-only" /&gt;
-            &lt;div className="txn-type-option txn-type-expense rounded-lg py-2.5 text-center text-sm font-bold transition-all peer-checked:bg-rose-500 peer-checked:text-white peer-checked:shadow-md peer-focus-visible:ring-2 peer-focus-visible:ring-rose-500/40"&gt;
+            &lt;div className="txn-type-option txn-type-expense rounded-lg py-3 sm:py-2.5 text-center text-sm font-bold transition-all peer-checked:bg-rose-500 peer-checked:text-white peer-checked:shadow-md peer-focus-visible:ring-2 peer-focus-visible:ring-rose-500/40"&gt;
               Expense
             &lt;/div&gt;
           &lt;/label&gt;
-          &lt;label className="relative cursor-pointer"&gt;
+          &lt;label className="relative cursor-pointer touch-manipulation"&gt;
             &lt;input type="radio" value="income" {...register('type')} className="peer sr-only" /&gt;
-            &lt;div className="txn-type-option txn-type-income rounded-lg py-2.5 text-center text-sm font-bold transition-all peer-checked:bg-emerald-500 peer-checked:text-white peer-checked:shadow-md peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500/40"&gt;
+            &lt;div className="txn-type-option txn-type-income rounded-lg py-3 sm:py-2.5 text-center text-sm font-bold transition-all peer-checked:bg-emerald-500 peer-checked:text-white peer-checked:shadow-md peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500/40"&gt;
               Income
             &lt;/div&gt;
           &lt;/label&gt;
@@ -460,11 +484,11 @@ export default function TransactionForm({
       /&gt;
 &nbsp;
       &lt;Input
-        label="Description"
+        label="Notes"
         placeholder="e.g. Grocery shopping at Trader Joe's"
         leftIcon={&lt;FileText size={15} /&gt;}
-        error={errors.description?.message}
-        {...register('description')}
+        error={errors.notes?.message}
+        {...register('notes')}
       /&gt;
 &nbsp;
       &lt;Select
@@ -475,6 +499,16 @@ export default function TransactionForm({
         {...register('category_id')}
       /&gt;
 &nbsp;
+      {accountOptions.length &gt; 0 &amp;&amp; (
+<span class="branch-1 cbranch-no" title="branch not covered" >        &lt;Select</span>
+          label="Account"
+          options={accountOptions}
+          placeholder="No account (general)"
+          error={errors.account_id?.message}
+          {...register('account_id')}
+        /&gt;
+      )}
+&nbsp;
       &lt;Input
         label="Date"
         type="date"
@@ -483,18 +517,11 @@ export default function TransactionForm({
         {...register('date')}
       /&gt;
 &nbsp;
-      &lt;TextArea
-        label="Notes"
-        placeholder="Add any additional details..."
-        error={errors.notes?.message}
-        {...register('notes')}
-      /&gt;
-&nbsp;
-      &lt;div className="flex gap-3 pt-3 border-t border-gray-100 sticky bottom-0 bg-white -mx-4 px-4 pb-1 sm:static sm:mx-0 sm:px-0 sm:pb-0"&gt;
-        &lt;Button type="button" variant="secondary" onClick={onCancel} className="flex-1"&gt;
+      &lt;div className="flex gap-3 pt-4 sm:pt-3 border-t border-gray-100"&gt;
+        &lt;Button type="button" variant="secondary" onClick={onCancel} className="flex-1 touch-manipulation"&gt;
           Cancel
         &lt;/Button&gt;
-        &lt;Button type="submit" loading={loading} className="flex-1"&gt;
+        &lt;Button type="submit" loading={loading} className="flex-1 touch-manipulation"&gt;
           {initialData ? 'Save Changes' : 'Add Transaction'}
         &lt;/Button&gt;
       &lt;/div&gt;
@@ -508,7 +535,7 @@ export default function TransactionForm({
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-07-18T10:32:32.232Z
+                at 2026-07-26T09:38:13.228Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>
