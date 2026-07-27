@@ -103,46 +103,42 @@ export async function getAccountBalance(accountId: string): Promise<{ balance: n
   return { balance, error: null };
 }
 
-/** Compute balances for all user accounts. */
+/** Compute balances for all user accounts via server-side SQL aggregation. */
 export async function getAllAccountBalances(userId: string): Promise<{ data: Array<{ account: Account; balance: number }> | null; error: unknown }> {
-  const { data: accounts, error: accError } = await supabase
-    .from('accounts')
-    .select('*')
-    .eq('user_id', userId)
-    .eq('is_active', true)
-    .order('sort_order', { ascending: true });
+  const { data, error } = await supabase.rpc('get_account_balances', { uid: userId });
 
-  if (accError || !accounts) return { data: null, error: accError };
+  if (error) return { data: null, error };
 
-  // Fetch all transactions for this user that have an account_id
-  const { data: transactions, error: txnError } = await supabase
-    .from('transactions')
-    .select('account_id, type, amount')
-    .eq('user_id', userId)
-    .not('account_id', 'is', null);
+  const rows = (data ?? []) as Array<{
+    account_id: string;
+    account_name: string;
+    account_type: string;
+    initial_balance: number;
+    color: string;
+    icon: string;
+    is_active: boolean;
+    sort_order: number;
+    created_at: string;
+    updated_at: string;
+    computed_balance: number;
+  }>;
 
-  if (txnError) return { data: null, error: txnError };
-
-  // Group by account_id
-  const balanceMap = new Map<string, { income: number; expenses: number }>();
-  for (const txn of transactions ?? []) {
-    const accId = txn.account_id as string;
-    if (!balanceMap.has(accId)) {
-      balanceMap.set(accId, { income: 0, expenses: 0 });
-    }
-    const entry = balanceMap.get(accId)!;
-    if (txn.type === 'income') {
-      entry.income += Number(txn.amount);
-    } else {
-      entry.expenses += Number(txn.amount);
-    }
-  }
-
-  const result = (accounts as Account[]).map((account) => {
-    const txns = balanceMap.get(account.id) ?? { income: 0, expenses: 0 };
-    const balance = (Number(account.initial_balance) || 0) + txns.income - txns.expenses;
-    return { account, balance };
-  });
+  const result = rows.map((row) => ({
+    account: {
+      id: row.account_id,
+      user_id: userId,
+      name: row.account_name,
+      type: row.account_type as Account['type'],
+      initial_balance: Number(row.initial_balance),
+      color: row.color,
+      icon: row.icon,
+      is_active: row.is_active,
+      sort_order: row.sort_order,
+      created_at: row.created_at,
+      updated_at: row.updated_at,
+    },
+    balance: Number(row.computed_balance),
+  }));
 
   return { data: result, error: null };
 }

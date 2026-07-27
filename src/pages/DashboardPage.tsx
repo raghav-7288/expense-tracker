@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useDashboardStats } from '@/hooks/useDashboard';
+import { useAccountBalances } from '@/hooks/useAccounts';
 import { useCurrency } from '@/hooks/useCurrency';
 import { useAuth } from '@/hooks/useAuth';
 import { formatCurrency } from '@/utils/formatCurrency';
@@ -18,6 +19,7 @@ import {
   TrendingUp,
   TrendingDown,
   PiggyBank,
+  Landmark,
   Plus,
   ArrowRight,
   BarChart3,
@@ -25,6 +27,7 @@ import {
 
 export default function DashboardPage() {
   const { data: stats, isLoading, isError, refetch } = useDashboardStats();
+  const { data: accountBalances } = useAccountBalances();
   const { user } = useAuth();
   const currency = useCurrency();
 
@@ -40,6 +43,7 @@ export default function DashboardPage() {
 
   const firstName = user?.user_metadata?.full_name?.split(' ')[0] ?? 'there';
   const netSavings = (stats?.monthlyIncome ?? 0) - (stats?.monthlyExpenses ?? 0);
+  const netAccountBalance = accountBalances?.reduce((sum, b) => sum + b.balance, 0) ?? 0;
 
   return (
     <div className="space-y-6">
@@ -71,12 +75,12 @@ export default function DashboardPage() {
 
       {/* Stats Grid */}
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {Array.from({ length: 4 }, (_, i) => <SkeletonCard key={i} />)}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+          {Array.from({ length: 5 }, (_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : (
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4"
           variants={staggerContainer}
           initial="hidden"
           animate="visible"
@@ -115,6 +119,15 @@ export default function DashboardPage() {
               icon={<PiggyBank size={18} />}
               variant="default"
               trend={netSavings >= 0 ? '🎉 You\'re saving!' : 'Spending exceeds income'}
+            />
+          </motion.div>
+          <motion.div variants={staggerItem} transition={gentle}>
+            <StatCard
+              title="Account Balance"
+              value={formatCurrency(netAccountBalance, currency)}
+              icon={<Landmark size={18} />}
+              variant="default"
+              trend={`Across ${accountBalances?.length ?? 0} account${(accountBalances?.length ?? 0) !== 1 ? 's' : ''}`}
             />
           </motion.div>
         </motion.div>

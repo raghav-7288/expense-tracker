@@ -9,12 +9,12 @@ import type { ReactNode } from 'react';
 
 const mockGetTransactions = vi.fn();
 const mockGetMonthlyStats = vi.fn();
-const mockGetTransactionTotals = vi.fn();
+const mockGetBalanceSummary = vi.fn();
 
 vi.mock('@/services/transactions', () => ({
   getTransactions: (...args: unknown[]) => mockGetTransactions(...args),
   getMonthlyStats: (...args: unknown[]) => mockGetMonthlyStats(...args),
-  getTransactionTotals: (...args: unknown[]) => mockGetTransactionTotals(...args),
+  getBalanceSummary: (...args: unknown[]) => mockGetBalanceSummary(...args),
 }));
 
 function createWrapper() {
@@ -38,24 +38,29 @@ describe('useDashboardStats', () => {
     vi.clearAllMocks();
   });
 
-  it('calculates stats from transactions', async () => {
-    mockGetTransactionTotals.mockResolvedValue({
-      data: [
-        { type: 'income', amount: 1000 },
-        { type: 'expense', amount: 300 },
-        { type: 'income', amount: 500 },
-      ],
+  it('calculates stats from server-side summary', async () => {
+    mockGetBalanceSummary.mockResolvedValue({
+      data: {
+        total_income: 1500,
+        total_expenses: 300,
+        monthly_income: 1000,
+        monthly_expenses: 200,
+      },
       error: null,
     });
 
     const { result } = renderHook(() => useDashboardStats(), { wrapper: createWrapper() });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toBeDefined();
-    expect(result.current.data!.totalIncome).toBeGreaterThan(0);
+    expect(result.current.data!.totalIncome).toBe(1500);
+    expect(result.current.data!.totalExpenses).toBe(300);
+    expect(result.current.data!.totalBalance).toBe(1200);
+    expect(result.current.data!.monthlyIncome).toBe(1000);
+    expect(result.current.data!.monthlyExpenses).toBe(200);
   });
 
   it('handles service error', async () => {
-    mockGetTransactionTotals.mockResolvedValue({ data: null, error: { message: 'Failed' } });
+    mockGetBalanceSummary.mockResolvedValue({ data: null, error: { message: 'Failed' } });
 
     const { result } = renderHook(() => useDashboardStats(), { wrapper: createWrapper() });
     await waitFor(() => expect(result.current.isError).toBe(true));

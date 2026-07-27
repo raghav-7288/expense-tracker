@@ -14,9 +14,13 @@ function buildChain(terminalValue: unknown) {
 }
 
 const mockFrom = vi.fn();
+const mockRpc = vi.fn();
 
 vi.mock('@/lib/supabase', () => ({
-  supabase: { from: (...args: unknown[]) => mockFrom(...args) },
+  supabase: {
+    from: (...args: unknown[]) => mockFrom(...args),
+    rpc: (...args: unknown[]) => mockRpc(...args),
+  },
 }));
 
 function buildAccount(overrides: Record<string, unknown> = {}) {
@@ -203,39 +207,51 @@ describe('accounts service', () => {
   });
 
   describe('getAllAccountBalances', () => {
-    it('computes balances for all active accounts', async () => {
-      const accounts = [
-        buildAccount({ id: 'acc-1', initial_balance: 10000 }),
-        buildAccount({ id: 'acc-2', name: 'Checking', initial_balance: 5000 }),
-      ];
-      const transactions = [
-        { account_id: 'acc-1', type: 'income', amount: 2000 },
-        { account_id: 'acc-1', type: 'expense', amount: 500 },
-        { account_id: 'acc-2', type: 'expense', amount: 1000 },
-      ];
-
-      const accountsChain = buildChain({ data: accounts, error: null });
-      const txnChain = buildChain({ data: transactions, error: null });
-
-      let callCount = 0;
-      mockFrom.mockImplementation(() => {
-        callCount++;
-        if (callCount === 1) return accountsChain;
-        return txnChain;
+    it('computes balances for all active accounts via RPC', async () => {
+      mockRpc.mockResolvedValue({
+        data: [
+          {
+            account_id: 'acc-1',
+            account_name: 'Savings',
+            account_type: 'savings',
+            initial_balance: 10000,
+            color: '#3b82f6',
+            icon: 'wallet',
+            is_active: true,
+            sort_order: 0,
+            created_at: '2024-01-01T00:00:00Z',
+            updated_at: '2024-01-01T00:00:00Z',
+            computed_balance: 11500,
+          },
+          {
+            account_id: 'acc-2',
+            account_name: 'Checking',
+            account_type: 'checking',
+            initial_balance: 5000,
+            color: '#3b82f6',
+            icon: 'wallet',
+            is_active: true,
+            sort_order: 1,
+            created_at: '2024-01-01T00:00:00Z',
+            updated_at: '2024-01-01T00:00:00Z',
+            computed_balance: 4000,
+          },
+        ],
+        error: null,
       });
 
       const result = await getAllAccountBalances('user-1');
 
       expect(result.data).toHaveLength(2);
-      // acc-1: 10000 + 2000 - 500 = 11500
+      // acc-1: computed_balance = 11500
       expect(result.data![0]!.balance).toBe(11500);
-      // acc-2: 5000 + 0 - 1000 = 4000
+      // acc-2: computed_balance = 4000
       expect(result.data![1]!.balance).toBe(4000);
+      expect(mockRpc).toHaveBeenCalledWith('get_account_balances', { uid: 'user-1' });
     });
 
-    it('returns null when accounts fetch fails', async () => {
-      const chain = buildChain({ data: null, error: { message: 'fail' } });
-      mockFrom.mockReturnValue(chain);
+    it('returns null when RPC fails', async () => {
+      mockRpc.mockResolvedValue({ data: null, error: { message: 'fail' } });
 
       const result = await getAllAccountBalances('user-1');
 
