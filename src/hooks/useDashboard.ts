@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { queryKeys } from '@/lib/queryKeys';
-import { getTransactions, getMonthlyStats, getTransactionTotals } from '@/services/transactions';
+import { getTransactions, getMonthlyStats, getBalanceSummary } from '@/services/transactions';
 import type { DashboardStats, MonthlyData, CategoryBreakdown, Transaction } from '@/types';
 import { getMonthStart, getMonthEnd, getMonthName } from '@/utils/formatDate';
 
@@ -13,40 +13,16 @@ export function useDashboardStats() {
     queryFn: async (): Promise<DashboardStats> => {
       if (!user) throw new Error('Not authenticated');
 
-      const monthStart = getMonthStart();
-      const monthEnd = getMonthEnd();
-
-      // Use lightweight query (type + amount only, no joins) for totals
-      const [allResult, monthResult] = await Promise.all([
-        getTransactionTotals(user.id),
-        getTransactionTotals(user.id, monthStart, monthEnd),
-      ]);
-
-      if (allResult.error) throw allResult.error;
-      if (monthResult.error) throw monthResult.error;
-
-      const all = allResult.data ?? [];
-      const monthly = monthResult.data ?? [];
-
-      const totalIncome = all
-        .filter((t) => t.type === 'income')
-        .reduce((sum, t) => sum + Number(t.amount), 0);
-      const totalExpenses = all
-        .filter((t) => t.type === 'expense')
-        .reduce((sum, t) => sum + Number(t.amount), 0);
-      const monthlyIncome = monthly
-        .filter((t) => t.type === 'income')
-        .reduce((sum, t) => sum + Number(t.amount), 0);
-      const monthlyExpenses = monthly
-        .filter((t) => t.type === 'expense')
-        .reduce((sum, t) => sum + Number(t.amount), 0);
+      const { data, error } = await getBalanceSummary(user.id);
+      if (error) throw error;
+      if (!data) throw new Error('No data returned');
 
       return {
-        totalBalance: totalIncome - totalExpenses,
-        totalIncome,
-        totalExpenses,
-        monthlyIncome,
-        monthlyExpenses,
+        totalBalance: data.total_income - data.total_expenses,
+        totalIncome: data.total_income,
+        totalExpenses: data.total_expenses,
+        monthlyIncome: data.monthly_income,
+        monthlyExpenses: data.monthly_expenses,
       };
     },
     enabled: !!user,

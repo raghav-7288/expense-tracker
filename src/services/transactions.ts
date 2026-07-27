@@ -235,3 +235,35 @@ export async function getTransactionTotals(userId: string, dateFrom?: string, da
   return { data, error };
 }
 
+/** Dashboard balance summary via server-side aggregation (single SQL query). */
+export interface BalanceSummary {
+  total_income: number;
+  total_expenses: number;
+  monthly_income: number;
+  monthly_expenses: number;
+}
+
+export async function getBalanceSummary(userId: string) {
+  const { data, error } = await supabase.rpc('get_balance_summary', { uid: userId });
+
+  if (error) return { data: null, error };
+
+  const row = Array.isArray(data) ? data[0] : data;
+  if (!row) {
+    return {
+      data: { total_income: 0, total_expenses: 0, monthly_income: 0, monthly_expenses: 0 } as BalanceSummary,
+      error: null,
+    };
+  }
+
+  return {
+    data: {
+      total_income: Number(row.total_income),
+      total_expenses: Number(row.total_expenses),
+      monthly_income: Number(row.monthly_income),
+      monthly_expenses: Number(row.monthly_expenses),
+    } as BalanceSummary,
+    error: null,
+  };
+}
+

@@ -7,14 +7,6 @@
 
 ## High Priority
 
-### 1. Server-Side Dashboard Aggregation
-**Category:** Performance  
-**Impact:** ⭐⭐⭐⭐⭐ | **Effort:** 2 days
-
-- Create PL/SQL function `get_balance_summary(uid)` that returns `total_income`, `total_expenses`, `monthly_income`, `monthly_expenses` in a single query
-- Eliminates fetching entire transaction history (~80-95% data reduction)
-- Users with 5000+ transactions currently wait 2-5s for dashboard load
-
 ### 2. Recurring Transactions
 **Category:** Feature  
 **Impact:** ⭐⭐⭐⭐⭐ | **Effort:** 3 days
@@ -41,22 +33,6 @@
 - Current: 500 rows = 500 HTTP requests (~30s)
 - After: 500 rows = 1 HTTP request (~1s)
 - Add duplicate detection (hash of date + amount + notes)
-
-### 5. Full-Text Search with Trigram Index
-**Category:** Performance  
-**Impact:** ⭐⭐⭐⭐ | **Effort:** 0.5 days
-
-- Enable `pg_trgm` extension and create GIN index on `transactions.notes`
-- Current ILIKE search does full table scan on 2000-char text fields
-- After: 10-100x faster search with fuzzy matching support
-
-### 6. Account Balance SQL Aggregation
-**Category:** Performance  
-**Impact:** ⭐⭐⭐⭐ | **Effort:** 1 day
-
-- Replace N+1 fetch pattern with single `GROUP BY account_id, type` JOIN query
-- Eliminates race condition between account and transaction fetches
-- Reduces memory usage (no JS-side grouping of all transactions)
 
 ---
 
@@ -256,11 +232,8 @@
 Sprint 1 (Week 1-2):
   → Quick Wins #1-5 (indexes, cache fix, rate limit)
   → Batch CSV Import (#4)
-  → Full-text search index (#5)
 
 Sprint 2 (Week 3-4):
-  → Dashboard SQL aggregation (#1)
-  → Account balance aggregation (#6)
   → Analytics lazy-loading (#10)
 
 Sprint 3 (Week 5-6):
@@ -283,8 +256,8 @@ Sprint 5 (Week 9-10):
 
 | Metric | Current | Target |
 |--------|---------|--------|
-| Dashboard load time (P95) | ~2s (estimated) | < 500ms |
-| Transaction search latency | ~500ms (table scan) | < 50ms (indexed) |
+| Dashboard load time (P95) | < 500ms (server-side aggregation ✅) | < 500ms |
+| Transaction search latency | < 50ms (trigram indexed ✅) | < 50ms |
 | CSV import (500 rows) | ~30s | < 2s |
 | Test coverage | 84.39% | > 90% |
 | Lighthouse Performance | Unknown | > 90 |
