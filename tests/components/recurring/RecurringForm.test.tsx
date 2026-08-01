@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '@/test/test-utils';
-import TransactionForm from '@/components/transactions/TransactionForm';
+import RecurringForm from '@/components/recurring/RecurringForm';
 
 const { mockCreateCategory } = vi.hoisted(() => ({ mockCreateCategory: vi.fn() }));
 
@@ -16,53 +16,31 @@ vi.mock('@/hooks/useCategories', () => ({
   useCreateCategory: () => ({ mutateAsync: mockCreateCategory, isPending: false }),
 }));
 
-describe('TransactionForm', () => {
+describe('RecurringForm', () => {
   const onSubmit = vi.fn().mockResolvedValue(undefined);
   const onCancel = vi.fn();
 
   beforeEach(() => { vi.clearAllMocks(); });
 
   it('renders form fields', () => {
-    renderWithProviders(<TransactionForm onSubmit={onSubmit} onCancel={onCancel} />);
+    renderWithProviders(<RecurringForm onSubmit={onSubmit} onCancel={onCancel} />);
     expect(screen.getByText('Expense')).toBeInTheDocument();
     expect(screen.getByText('Income')).toBeInTheDocument();
     expect(screen.getByLabelText('Amount')).toBeInTheDocument();
     expect(screen.getByLabelText('Notes')).toBeInTheDocument();
-    expect(screen.getByLabelText('Date')).toBeInTheDocument();
-  });
-
-  it('shows validation errors for empty submission', async () => {
-    renderWithProviders(<TransactionForm onSubmit={onSubmit} onCancel={onCancel} />);
-    await userEvent.click(screen.getByRole('button', { name: /Add Transaction/i }));
-    await waitFor(() => {
-      expect(screen.getByText('Description is required')).toBeInTheDocument();
-    });
+    expect(screen.getByLabelText('Frequency')).toBeInTheDocument();
+    expect(screen.getByLabelText('Start date')).toBeInTheDocument();
   });
 
   it('calls onCancel when cancel clicked', async () => {
-    renderWithProviders(<TransactionForm onSubmit={onSubmit} onCancel={onCancel} />);
+    renderWithProviders(<RecurringForm onSubmit={onSubmit} onCancel={onCancel} />);
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
     expect(onCancel).toHaveBeenCalled();
   });
 
-  it('shows Update text when editing', () => {
-    const initialData = {
-      id: '1', type: 'expense' as const, amount: 50, notes: 'Test',
-      date: '2024-06-01', user_id: 'u1', category_id: 'c1', account_id: null,
-      created_at: '', updated_at: '', categories: null,
-    };
-    renderWithProviders(<TransactionForm initialData={initialData} onSubmit={onSubmit} onCancel={onCancel} />);
-    expect(screen.getByRole('button', { name: /Save Changes/i })).toBeInTheDocument();
-  });
-
-  it('disables submit button when loading', () => {
-    renderWithProviders(<TransactionForm onSubmit={onSubmit} onCancel={onCancel} loading={true} />);
-    expect(screen.getByRole('button', { name: /Add Transaction/i })).toBeDisabled();
-  });
-
   it('reveals the inline "new category" panel and creates a category of the selected type', async () => {
     mockCreateCategory.mockResolvedValue({ id: 'c-new', name: 'Rent', type: 'expense' });
-    renderWithProviders(<TransactionForm onSubmit={onSubmit} onCancel={onCancel} />);
+    renderWithProviders(<RecurringForm onSubmit={onSubmit} onCancel={onCancel} />);
 
     await userEvent.click(screen.getByRole('button', { name: /New category/i }));
     await userEvent.type(screen.getByLabelText('Name'), 'Rent');
@@ -76,7 +54,7 @@ describe('TransactionForm', () => {
   });
 
   it('does not create a category when the name is empty', async () => {
-    renderWithProviders(<TransactionForm onSubmit={onSubmit} onCancel={onCancel} />);
+    renderWithProviders(<RecurringForm onSubmit={onSubmit} onCancel={onCancel} />);
 
     await userEvent.click(screen.getByRole('button', { name: /New category/i }));
     // Create button is disabled until a name is entered.

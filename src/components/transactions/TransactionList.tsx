@@ -14,7 +14,7 @@ import {
   useUpdateLoanTransaction,
   useDeleteLoanTransaction,
 } from '@/hooks/useTransactions';
-import { Edit, Trash2, HandCoins } from 'lucide-react';
+import { Edit, Trash2, HandCoins, Repeat } from 'lucide-react';
 import type { Transaction } from '@/types';
 
 interface TransactionListProps {
@@ -121,9 +121,16 @@ export default function TransactionList({ transactions }: TransactionListProps) 
                     <div className="flex items-center gap-3">
                       <Avatar name={t.notes} color={t.categories?.color ?? '#6b7280'} size="sm" />
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate max-w-[200px]">
-                          {t.notes}
-                        </p>
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate max-w-[200px]">
+                            {t.notes}
+                          </p>
+                          {t.recurring_id && (
+                            <span className="flex-shrink-0 text-primary-500" title="From a recurring schedule">
+                              <Repeat size={12} />
+                            </span>
+                          )}
+                        </div>
                         {t.account && (
                           <span className="inline-flex items-center gap-1 mt-0.5 text-[11px] text-gray-400">
                             <span
@@ -222,7 +229,12 @@ export default function TransactionList({ transactions }: TransactionListProps) 
 
             <div className="flex-1 min-w-0 overflow-hidden">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-sm font-medium text-gray-900 truncate">{t.notes}</p>
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <p className="text-sm font-medium text-gray-900 truncate">{t.notes}</p>
+                  {t.recurring_id && (
+                    <Repeat size={12} className="text-primary-500 flex-shrink-0" aria-label="Recurring" />
+                  )}
+                </div>
                 <span
                   className={cn(
                     'text-sm font-semibold tabular-nums flex-shrink-0',

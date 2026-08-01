@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTransactions, useCreateTransaction } from '@/hooks/useTransactions';
+import { useCreateRecurringTransaction } from '@/hooks/useRecurringTransactions';
 import TransactionList from '@/components/transactions/TransactionList';
 import TransactionFilterBar from '@/components/transactions/TransactionFilters';
 import TransactionForm from '@/components/transactions/TransactionForm';
@@ -28,6 +29,7 @@ export default function TransactionsPage() {
 
   const { data: transactions, isLoading, isError, refetch } = useTransactions(filters);
   const createMutation = useCreateTransaction();
+  const createRecurringMutation = useCreateRecurringTransaction();
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -43,6 +45,23 @@ export default function TransactionsPage() {
   }, [showCSVMenu]);
 
   async function handleCreate(data: Record<string, unknown>) {
+    // When the user toggled "repeat", persist a recurring rule instead of a
+    // one-off transaction. The generator materializes any occurrence due today.
+    if (data.is_recurring) {
+      await createRecurringMutation.mutateAsync({
+        type: data.type as 'income' | 'expense',
+        amount: data.amount as number,
+        notes: data.notes as string,
+        category_id: (data.category_id as string) || null,
+        account_id: (data.account_id as string) || null,
+        frequency: data.frequency as 'weekly' | 'monthly' | 'yearly',
+        start_date: data.date as string,
+        end_date: (data.end_date as string) || null,
+      });
+      setShowForm(false);
+      return;
+    }
+
     await createMutation.mutateAsync({
       type: data.type as 'income' | 'expense' | 'lent' | 'borrowed',
       amount: data.amount as number,
@@ -170,7 +189,8 @@ export default function TransactionsPage() {
         <TransactionForm
           onSubmit={handleCreate}
           onCancel={() => setShowForm(false)}
-          loading={createMutation.isPending}
+          loading={createMutation.isPending || createRecurringMutation.isPending}
+          allowRecurring
         />
       </Modal>
 

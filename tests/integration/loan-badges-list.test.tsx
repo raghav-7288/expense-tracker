@@ -19,6 +19,7 @@ vi.mock('@/hooks/useTransactions', () => ({
 vi.mock('@/hooks/useCurrency', () => ({ useCurrency: () => 'USD' }));
 vi.mock('@/hooks/useCategories', () => ({
   useCategories: () => ({ data: [], isLoading: false }),
+  useCreateCategory: () => ({ mutateAsync: vi.fn(), isPending: false }),
 }));
 
 describe('TransactionList – Loan Type Display', () => {

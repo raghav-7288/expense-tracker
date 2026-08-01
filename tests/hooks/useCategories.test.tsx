@@ -5,10 +5,13 @@ import { AuthContext } from '@/context/AuthContext';
 import { ThemeContext } from '@/context/ThemeContext';
 import { createTestQueryClient, createMockAuth } from '@/test/test-utils';
 import { useCategories, useCreateCategory, useUpdateCategory, useDeleteCategory, useHiddenCategories, useHideCategory, useRestoreCategory, useCopyCategory } from '@/hooks/useCategories';
+import toast from 'react-hot-toast';
 import type { ReactNode } from 'react';
 
 vi.mock('react-hot-toast', () => ({
-  default: { success: vi.fn(), error: vi.fn() },
+  // Callable default export (toast()) with .success / .error helpers attached,
+  // mirroring react-hot-toast's real API.
+  default: Object.assign(vi.fn(), { success: vi.fn(), error: vi.fn() }),
 }));
 
 const mockGetMergedCategories = vi.fn();
@@ -111,6 +114,23 @@ describe('useCreateCategory', () => {
     await expect(
       result.current.mutateAsync({ name: 'X', type: 'expense', color: '#000', icon: 'tag' })
     ).rejects.toThrow('Failed');
+  });
+
+  it('shows a friendly toast (and does not throw) when a live category already exists', async () => {
+    mockCreateUserCategory.mockResolvedValue({
+      data: null,
+      error: { code: '23505', message: 'duplicate key value violates unique constraint "uniq_user_categories_active_name_type"' },
+    });
+    const { result } = renderHook(() => useCreateCategory(), { wrapper: createWrapper() });
+
+    const returned = await result.current.mutateAsync({ name: '  Test  ', type: 'expense', color: '#000', icon: 'tag' });
+
+    // Benign no-op: resolves with null, informs via a neutral toast, and
+    // never fires the red error toast or the success toast.
+    expect(returned).toBeNull();
+    expect(toast).toHaveBeenCalledWith(expect.stringContaining('already exists'), expect.anything());
+    expect(toast.error).not.toHaveBeenCalled();
+    expect(toast.success).not.toHaveBeenCalled();
   });
 });
 
