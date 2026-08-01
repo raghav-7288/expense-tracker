@@ -41,7 +41,9 @@ export default function CategoryForm({
     resolver: zodResolver(categorySchema),
     defaultValues: {
       name: initialData?.name ?? '',
-      type: initialData?.type ?? 'expense',
+      // Categories are always income/expense (never loan types), so narrow
+      // the broader TransactionType down to the form's enum.
+      type: initialData?.type === 'income' ? 'income' : 'expense',
       color: initialData?.color ?? CATEGORY_COLORS[0],
       icon: initialData?.icon ?? CATEGORY_ICONS[0],
     },
