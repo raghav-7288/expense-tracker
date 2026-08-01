@@ -27,6 +27,8 @@ interface TransactionFormProps {
   onSubmit: (data: TransactionFormData) => Promise<void>;
   onCancel: () => void;
   loading?: boolean;
+  /** When true, type is locked (loan-linked transaction). */
+  isLoanLinked?: boolean;
 }
 
 function getCurrencyIcon(currency: string) {
@@ -44,6 +46,7 @@ export default function TransactionForm({
   onSubmit,
   onCancel,
   loading = false,
+  isLoanLinked = false,
 }: TransactionFormProps) {
   const currency = useCurrency();
   const { data: accounts } = useAccounts();
@@ -79,24 +82,43 @@ export default function TransactionForm({
 
   return (
     <form onSubmit={handleSubmit((data) => onSubmit(data))} className="space-y-4 sm:space-y-5">
-      {/* Type toggle */}
-      <fieldset>
-        <legend className="text-sm font-medium text-gray-700 mb-2">Transaction type</legend>
-        <div className="txn-type-group grid grid-cols-2 gap-1.5 p-1.5 rounded-xl bg-gray-100">
-          <label className="relative cursor-pointer touch-manipulation">
-            <input type="radio" value="expense" {...register('type')} className="peer sr-only" />
-            <div className="txn-type-option txn-type-expense rounded-lg py-3 sm:py-2.5 text-center text-sm font-bold transition-all peer-checked:bg-rose-500 peer-checked:text-white peer-checked:shadow-md peer-focus-visible:ring-2 peer-focus-visible:ring-rose-500/40">
-              Expense
-            </div>
-          </label>
-          <label className="relative cursor-pointer touch-manipulation">
-            <input type="radio" value="income" {...register('type')} className="peer sr-only" />
-            <div className="txn-type-option txn-type-income rounded-lg py-3 sm:py-2.5 text-center text-sm font-bold transition-all peer-checked:bg-emerald-500 peer-checked:text-white peer-checked:shadow-md peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500/40">
-              Income
-            </div>
-          </label>
+      {/* Type toggle — locked for loan-linked transactions */}
+      {isLoanLinked ? (
+        <div>
+          <p className="text-sm font-medium text-gray-700 mb-2">Transaction type</p>
+          <div className="flex items-center gap-2 rounded-lg bg-gray-50 border border-gray-200 px-3 py-2.5">
+            <span className={`text-sm font-bold ${initialData?.type === 'lent' ? 'text-blue-600' : 'text-amber-600'}`}>
+              {initialData?.type === 'lent' ? '↗ Lent' : '↙ Borrowed'}
+            </span>
+            <span className="text-[11px] text-gray-400 ml-auto">Linked to loan — type locked</span>
+            <input type="hidden" {...register('type')} />
+          </div>
+          {initialData?.loan_info?.loan && (
+            <p className="text-xs text-gray-500 mt-1.5">
+              {initialData.loan_info.event_type === 'disbursement' ? 'Disbursement to' : 'Repayment from'}{' '}
+              <span className="font-medium text-gray-700">{initialData.loan_info.loan.counterparty_name}</span>
+            </p>
+          )}
         </div>
-      </fieldset>
+      ) : (
+        <fieldset>
+          <legend className="text-sm font-medium text-gray-700 mb-2">Transaction type</legend>
+          <div className="txn-type-group grid grid-cols-2 gap-1.5 p-1.5 rounded-xl bg-gray-100">
+            <label className="relative cursor-pointer touch-manipulation">
+              <input type="radio" value="expense" {...register('type')} className="peer sr-only" />
+              <div className="txn-type-option txn-type-expense rounded-lg py-3 sm:py-2.5 text-center text-sm font-bold transition-all peer-checked:bg-rose-500 peer-checked:text-white peer-checked:shadow-md peer-focus-visible:ring-2 peer-focus-visible:ring-rose-500/40">
+                Expense
+              </div>
+            </label>
+            <label className="relative cursor-pointer touch-manipulation">
+              <input type="radio" value="income" {...register('type')} className="peer sr-only" />
+              <div className="txn-type-option txn-type-income rounded-lg py-3 sm:py-2.5 text-center text-sm font-bold transition-all peer-checked:bg-emerald-500 peer-checked:text-white peer-checked:shadow-md peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500/40">
+                Income
+              </div>
+            </label>
+          </div>
+        </fieldset>
+      )}
 
       <Input
         label="Amount"
@@ -116,13 +138,15 @@ export default function TransactionForm({
         {...register('notes')}
       />
 
-      <Select
-        label="Category"
-        options={categoryOptions}
-        placeholder="Select a category"
-        error={errors.category_id?.message}
-        {...register('category_id')}
-      />
+      {!isLoanLinked && (
+        <Select
+          label="Category"
+          options={categoryOptions}
+          placeholder="Select a category"
+          error={errors.category_id?.message}
+          {...register('category_id')}
+        />
+      )}
 
       {accountOptions.length > 0 && (
         <Select

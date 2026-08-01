@@ -4,22 +4,37 @@ import type {
   CreateTransactionInput,
   UpdateTransactionInput,
   TransactionFilters,
+  TransactionLoanInfo,
+  Loan,
 } from '@/types';
 
-// Select with joined category info from both system and user tables, plus account
+// Select with joined category info from both system and user tables, plus account and loan link
 const TRANSACTION_SELECT = `
   *,
   system_cat:system_categories(id, name, color, icon),
   user_cat:user_categories(id, name, color, icon),
-  account:accounts(id, name, color)
+  account:accounts(id, name, color),
+  loan_transactions(loan_id, event_type, loan:loans(*))
 `;
 
-/** Normalize the joined category and account into the flat shape the UI expects. */
+/** Normalize the joined category, account, and loan_info into the flat shape the UI expects. */
 function normalizeTransaction(row: Record<string, unknown>): Transaction {
   const systemCat = row.system_cat as { id: string; name: string; color: string; icon: string } | null;
   const userCat = row.user_cat as { id: string; name: string; color: string; icon: string } | null;
   const cat = systemCat ?? userCat ?? null;
   const account = row.account as { id: string; name: string; color: string } | null;
+
+  // loan_transactions is an array (one-to-many from supabase join), take the first entry
+  const loanLinks = row.loan_transactions as Array<{
+    loan_id: string;
+    event_type: 'disbursement' | 'repayment';
+    loan: Loan | null;
+  }> | null;
+  const loanLink = loanLinks && loanLinks.length > 0 ? loanLinks[0] : null;
+
+  const loanInfo: TransactionLoanInfo | null = loanLink
+    ? { loan_id: loanLink.loan_id, event_type: loanLink.event_type, loan: loanLink.loan ?? null }
+    : null;
 
   return {
     id: row.id as string,
@@ -43,6 +58,7 @@ function normalizeTransaction(row: Record<string, unknown>): Transaction {
       updated_at: '',
     } : null,
     account: account ?? null,
+    loan_info: loanInfo,
   };
 }
 
@@ -265,5 +281,126 @@ export async function getBalanceSummary(userId: string) {
     } as BalanceSummary,
     error: null,
   };
+}
+
+// ============================================
+// LOAN-LINKED TRANSACTION OPERATIONS
+// ============================================
+
+/**
+ * Recalculate a loan's outstanding_amount from its linked transactions.
+ * outstanding = principal - sum(repayment amounts)
+ */
+async function recalculateLoanOutstanding(loanId: string) {
+  // Get the loan principal
+  const { data: loan, error: loanError } = await supabase
+    .from('loans')
+    .select('principal_amount')
+    .eq('id', loanId)
+    .single();
+
+  if (loanError || !loan) return { error: loanError };
+
+  const principal = Number((loan as { principal_amount: number }).principal_amount);
+
+  // Sum all repayment transaction amounts for this loan
+  const { data: links, error: linksError } = await supabase
+    .from('loan_transactions')
+    .select('event_type, transaction:transactions(amount)')
+    .eq('loan_id', loanId);
+
+  if (linksError) return { error: linksError };
+
+  const repaidTotal = (links ?? [])
+    .filter((l) => (l as { event_type: string }).event_type === 'repayment')
+    .reduce((sum, l) => {
+      const txnArr = (l as unknown as { transaction: Array<{ amount: number }> | null }).transaction;
+      const txn = Array.isArray(txnArr) ? txnArr[0] : txnArr;
+      return sum + (txn ? Number(txn.amount) : 0);
+    }, 0);
+
+  const outstanding = Math.max(0, principal - repaidTotal);
+  const status = outstanding <= 0 ? 'settled' : repaidTotal > 0 ? 'partially_paid' : 'active';
+
+  const { error: updateError } = await supabase
+    .from('loans')
+    .update({ outstanding_amount: outstanding, status })
+    .eq('id', loanId);
+
+  return { error: updateError };
+}
+
+/**
+ * Update a loan-linked transaction (repayment or disbursement) and sync
+ * the parent loan's outstanding_amount/status.
+ */
+export async function updateLoanTransaction(
+  id: string,
+  input: UpdateTransactionInput,
+  loanId: string,
+) {
+  // 1. Update the transaction itself
+  const updateData: Record<string, unknown> = {};
+  if (input.amount !== undefined) updateData.amount = input.amount;
+  if (input.notes !== undefined) updateData.notes = input.notes;
+  if (input.date !== undefined) updateData.date = input.date;
+  if (input.account_id !== undefined) updateData.account_id = input.account_id;
+  // Type is intentionally NOT changeable for loan transactions
+
+  if (input.category_id !== undefined) {
+    const categoryColumns = await resolveCategoryColumns(input.category_id);
+    Object.assign(updateData, categoryColumns);
+  }
+
+  const { data, error } = await supabase
+    .from('transactions')
+    .update(updateData)
+    .eq('id', id)
+    .select(TRANSACTION_SELECT)
+    .single();
+
+  if (error || !data) return { data: null, error };
+
+  // 2. Recalculate the loan's outstanding from scratch
+  const { error: recalcError } = await recalculateLoanOutstanding(loanId);
+  if (recalcError) return { data: null, error: recalcError };
+
+  return { data: normalizeTransaction(data as Record<string, unknown>), error: null };
+}
+
+/**
+ * Delete a loan-linked transaction and sync the parent loan's outstanding_amount/status.
+ * For disbursement transactions: also deletes the entire loan.
+ * For repayment transactions: deletes the repayment and recalculates the loan.
+ */
+export async function deleteLoanTransaction(id: string, loanId: string, eventType: 'disbursement' | 'repayment') {
+  if (eventType === 'disbursement') {
+    // Deleting a disbursement means the whole loan should go — cascade via deleteLoan logic
+    // First, fetch all transaction ids linked to this loan
+    const { data: links, error: linksError } = await supabase
+      .from('loan_transactions')
+      .select('transaction_id')
+      .eq('loan_id', loanId);
+
+    if (linksError) return { error: linksError };
+
+    // Delete all linked transactions
+    if (links && links.length > 0) {
+      const txnIds = (links as Array<{ transaction_id: string }>).map((l) => l.transaction_id);
+      const { error: txnError } = await supabase.from('transactions').delete().in('id', txnIds);
+      if (txnError) return { error: txnError };
+    }
+
+    // Delete the loan itself
+    const { error } = await supabase.from('loans').delete().eq('id', loanId);
+    return { error };
+  }
+
+  // Repayment: just delete the transaction, then recalculate the loan
+  const { error: deleteError } = await supabase.from('transactions').delete().eq('id', id);
+  if (deleteError) return { error: deleteError };
+
+  const { error: recalcError } = await recalculateLoanOutstanding(loanId);
+  return { error: recalcError };
 }
 

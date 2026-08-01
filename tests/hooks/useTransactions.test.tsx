@@ -126,5 +126,28 @@ describe('useDeleteTransaction', () => {
     const { result } = renderHook(() => useDeleteTransaction(), { wrapper: createWrapper() });
     await expect(result.current.mutateAsync('1')).rejects.toThrow('Cannot delete');
   });
+
+  it('invalidates loan queries after delete so the Loans page refreshes', async () => {
+    // A deleted transaction may be a loan disbursement/repayment, so loan views
+    // (Loans page + Loan Summary card) must be refreshed too.
+    mockDeleteTransaction.mockResolvedValue({ error: null });
+    const queryClient = createTestQueryClient();
+    const authValue = createMockAuth();
+    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
+    function Wrapper({ children }: { children: ReactNode }) {
+      return (
+        <QueryClientProvider client={queryClient}>
+          <ThemeContext.Provider value={{ darkMode: false, setDarkMode: vi.fn() }}>
+            <AuthContext.Provider value={authValue}>{children}</AuthContext.Provider>
+          </ThemeContext.Provider>
+        </QueryClientProvider>
+      );
+    }
+    const { result } = renderHook(() => useDeleteTransaction(), { wrapper: Wrapper });
+    await result.current.mutateAsync('1');
+    await waitFor(() => {
+      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['loans'] });
+    });
+  });
 });
 

@@ -66,10 +66,11 @@ describe('DashboardPage', () => {
     } as never);
 
     renderWithProviders(<DashboardPage />);
-    expect(screen.getByText('Total Balance')).toBeInTheDocument();
+    expect(screen.getByText('Balance')).toBeInTheDocument();
     expect(screen.getByText('Income')).toBeInTheDocument();
     expect(screen.getByText('Expenses')).toBeInTheDocument();
     expect(screen.getByText('Net Savings')).toBeInTheDocument();
+    // Balance falls back to totalBalance (income - expenses) when no accounts
     expect(screen.getByText('$5,000.00')).toBeInTheDocument();
     expect(screen.getByText('$3,000.00')).toBeInTheDocument();
     expect(screen.getByText('$1,200.00')).toBeInTheDocument();
