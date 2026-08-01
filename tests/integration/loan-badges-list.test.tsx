@@ -13,6 +13,8 @@ import Badge from '@/components/ui/Badge';
 vi.mock('@/hooks/useTransactions', () => ({
   useUpdateTransaction: () => ({ mutateAsync: vi.fn(), isPending: false }),
   useDeleteTransaction: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  useUpdateLoanTransaction: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  useDeleteLoanTransaction: () => ({ mutateAsync: vi.fn(), isPending: false }),
 }));
 vi.mock('@/hooks/useCurrency', () => ({ useCurrency: () => 'USD' }));
 vi.mock('@/hooks/useCategories', () => ({

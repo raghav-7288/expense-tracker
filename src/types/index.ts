@@ -98,6 +98,13 @@ export interface UpdateAccountInput {
   sort_order?: number;
 }
 
+/** Loan linkage info attached to a transaction (if it's tied to a loan). */
+export interface TransactionLoanInfo {
+  loan_id: string;
+  event_type: LoanEventType;
+  loan?: Loan | null;
+}
+
 export interface Transaction {
   id: string;
   user_id: string;
@@ -111,6 +118,8 @@ export interface Transaction {
   updated_at: string;
   categories?: Category | null;
   account?: { id: string; name: string; color: string } | null;
+  /** Present when the transaction is linked to a loan (disbursement or repayment). */
+  loan_info?: TransactionLoanInfo | null;
 }
 
 export interface CreateTransactionInput {

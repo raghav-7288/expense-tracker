@@ -7,10 +7,14 @@ import { buildTransaction } from '@/test/factories';
 
 const mockMutateUpdate = vi.fn().mockResolvedValue({});
 const mockMutateDelete = vi.fn().mockResolvedValue({});
+const mockMutateLoanUpdate = vi.fn().mockResolvedValue({});
+const mockMutateLoanDelete = vi.fn().mockResolvedValue({});
 
 vi.mock('@/hooks/useTransactions', () => ({
   useUpdateTransaction: () => ({ mutateAsync: mockMutateUpdate, isPending: false }),
   useDeleteTransaction: () => ({ mutateAsync: mockMutateDelete, isPending: false }),
+  useUpdateLoanTransaction: () => ({ mutateAsync: mockMutateLoanUpdate, isPending: false }),
+  useDeleteLoanTransaction: () => ({ mutateAsync: mockMutateLoanDelete, isPending: false }),
 }));
 vi.mock('@/hooks/useCurrency', () => ({ useCurrency: () => 'USD' }));
 vi.mock('@/hooks/useCategories', () => ({
@@ -50,6 +54,52 @@ describe('TransactionList', () => {
     expect(screen.getAllByLabelText('Delete transaction').length).toBeGreaterThanOrEqual(1);
   });
 
+  it('shows loan badge and edit/delete for lent transactions with loan_info', () => {
+    const transactions = [buildTransaction({
+      id: 'L1',
+      notes: 'Lent to Rahul',
+      type: 'lent',
+      amount: 5000,
+      loan_info: { loan_id: 'loan-1', event_type: 'disbursement', loan: null },
+    })];
+    renderWithProviders(<TransactionList transactions={transactions} />);
+    // Loan transactions now have edit/delete buttons
+    expect(screen.getAllByLabelText('Edit transaction').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByLabelText('Delete transaction').length).toBeGreaterThanOrEqual(1);
+    // Shows a loan badge
+    expect(screen.getAllByText('Loan').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('shows repay badge and edit/delete for borrowed transactions with loan_info', () => {
+    const transactions = [buildTransaction({
+      id: 'B1',
+      notes: 'Borrowed from Priya',
+      type: 'borrowed',
+      amount: 10000,
+      loan_info: { loan_id: 'loan-2', event_type: 'repayment', loan: null },
+    })];
+    renderWithProviders(<TransactionList transactions={transactions} />);
+    expect(screen.getAllByLabelText('Edit transaction').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByLabelText('Delete transaction').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Repay').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('shows edit/delete on all rows in a mixed list (income/expense + loan)', () => {
+    const transactions = [
+      buildTransaction({ id: '1', notes: 'Groceries', type: 'expense' }),
+      buildTransaction({
+        id: '2',
+        notes: 'Lent to Rahul',
+        type: 'lent',
+        loan_info: { loan_id: 'loan-1', event_type: 'disbursement', loan: null },
+      }),
+    ];
+    renderWithProviders(<TransactionList transactions={transactions} />);
+    // Both rows get edit/delete (desktop + mobile = multiple)
+    expect(screen.getAllByLabelText('Edit transaction').length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByLabelText('Delete transaction').length).toBeGreaterThanOrEqual(2);
+  });
+
   it('opens edit modal on edit click', async () => {
     const transactions = [buildTransaction({ id: '1', notes: 'Test', amount: 10, type: 'expense', date: '2024-01-01' })];
     renderWithProviders(<TransactionList transactions={transactions} />);
@@ -75,6 +125,26 @@ describe('TransactionList', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Delete' }));
     await waitFor(() => {
       expect(mockMutateDelete).toHaveBeenCalledWith('1');
+    });
+  });
+
+  it('calls loan delete mutation for loan repayment transactions', async () => {
+    const transactions = [buildTransaction({
+      id: 'R1',
+      notes: 'Repayment from Rahul',
+      type: 'lent',
+      loan_info: { loan_id: 'loan-1', event_type: 'repayment', loan: null },
+    })];
+    renderWithProviders(<TransactionList transactions={transactions} />);
+    const deleteButtons = screen.getAllByLabelText('Delete transaction');
+    await userEvent.click(deleteButtons[0]!);
+    await userEvent.click(screen.getByRole('button', { name: 'Delete' }));
+    await waitFor(() => {
+      expect(mockMutateLoanDelete).toHaveBeenCalledWith({
+        id: 'R1',
+        loanId: 'loan-1',
+        eventType: 'repayment',
+      });
     });
   });
 

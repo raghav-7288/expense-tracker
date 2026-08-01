@@ -9,6 +9,8 @@ vi.mock('@/hooks/useTransactions', () => ({
   useCreateTransaction: () => ({ mutateAsync: vi.fn(), isPending: false }),
   useUpdateTransaction: () => ({ mutateAsync: vi.fn(), isPending: false }),
   useDeleteTransaction: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  useUpdateLoanTransaction: () => ({ mutateAsync: vi.fn(), isPending: false }),
+  useDeleteLoanTransaction: () => ({ mutateAsync: vi.fn(), isPending: false }),
 }));
 
 vi.mock('@/hooks/useCategories', () => ({

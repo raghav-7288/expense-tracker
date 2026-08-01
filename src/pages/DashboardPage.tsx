@@ -20,7 +20,6 @@ import {
   TrendingUp,
   TrendingDown,
   PiggyBank,
-  Landmark,
   Plus,
   ArrowRight,
   BarChart3,
@@ -44,7 +43,13 @@ export default function DashboardPage() {
 
   const firstName = user?.user_metadata?.full_name?.split(' ')[0] ?? 'there';
   const netSavings = (stats?.monthlyIncome ?? 0) - (stats?.monthlyExpenses ?? 0);
-  const netAccountBalance = accountBalances?.reduce((sum, b) => sum + b.balance, 0) ?? 0;
+
+  // Unified balance: use account balances as source of truth.
+  // Falls back to income - expenses if no accounts are set up.
+  const hasAccounts = accountBalances && accountBalances.length > 0;
+  const unifiedBalance = hasAccounts
+    ? accountBalances.reduce((sum, b) => sum + b.balance, 0)
+    : (stats?.totalBalance ?? 0);
 
   return (
     <div className="space-y-6">
@@ -74,25 +79,28 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Stats Grid */}
+      {/* Stats Section */}
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-          {Array.from({ length: 5 }, (_, i) => <SkeletonCard key={i} />)}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {Array.from({ length: 4 }, (_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : (
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4"
           variants={staggerContainer}
           initial="hidden"
           animate="visible"
         >
           <motion.div variants={staggerItem} transition={gentle}>
             <StatCard
-              title="Total Balance"
-              value={formatCurrency(stats?.totalBalance ?? 0, currency)}
+              title="Balance"
+              value={formatCurrency(unifiedBalance, currency)}
               icon={<Wallet size={18} />}
               variant="info"
-              trend="All time net worth"
+              trend={hasAccounts
+                ? `Across ${accountBalances.length} account${accountBalances.length !== 1 ? 's' : ''}`
+                : 'Net worth'
+              }
             />
           </motion.div>
           <motion.div variants={staggerItem} transition={gentle}>
@@ -118,17 +126,8 @@ export default function DashboardPage() {
               title="Net Savings"
               value={formatCurrency(netSavings, currency)}
               icon={<PiggyBank size={18} />}
-              variant="default"
+              variant={netSavings >= 0 ? 'success' : 'danger'}
               trend={netSavings >= 0 ? '🎉 You\'re saving!' : 'Spending exceeds income'}
-            />
-          </motion.div>
-          <motion.div variants={staggerItem} transition={gentle}>
-            <StatCard
-              title="Account Balance"
-              value={formatCurrency(netAccountBalance, currency)}
-              icon={<Landmark size={18} />}
-              variant="default"
-              trend={`Across ${accountBalances?.length ?? 0} account${(accountBalances?.length ?? 0) !== 1 ? 's' : ''}`}
             />
           </motion.div>
         </motion.div>

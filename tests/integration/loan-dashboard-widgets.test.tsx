@@ -56,8 +56,9 @@ describe('DashboardPage – Balance Widgets Unaffected by Loans', () => {
     } as never);
 
     renderWithProviders(<DashboardPage />);
-    expect(screen.getByText('Total Balance')).toBeInTheDocument();
-    expect(screen.getByText('$8,000.00')).toBeInTheDocument();
+    expect(screen.getByText('Balance')).toBeInTheDocument();
+    // Unified balance uses account balance ($50,000 from mock) as source of truth
+    expect(screen.getByText('$50,000.00')).toBeInTheDocument();
     expect(screen.getByText('Income')).toBeInTheDocument();
     expect(screen.getByText('$5,000.00')).toBeInTheDocument();
     expect(screen.getByText('Expenses')).toBeInTheDocument();
@@ -80,8 +81,8 @@ describe('DashboardPage – Balance Widgets Unaffected by Loans', () => {
 
     renderWithProviders(<DashboardPage />);
     expect(screen.getByText('Net Savings')).toBeInTheDocument();
-    // 4000 - 2500 = 1500
     expect(screen.getByText('$1,500.00')).toBeInTheDocument();
+    expect(screen.getByText('+$1,500.00')).toBeInTheDocument();
   });
 
   it('renders Loan Summary Card widget on dashboard', () => {

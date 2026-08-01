@@ -8,12 +8,26 @@ import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import TransactionForm from '@/components/transactions/TransactionForm';
-import { useUpdateTransaction, useDeleteTransaction } from '@/hooks/useTransactions';
-import { Edit, Trash2 } from 'lucide-react';
+import {
+  useUpdateTransaction,
+  useDeleteTransaction,
+  useUpdateLoanTransaction,
+  useDeleteLoanTransaction,
+} from '@/hooks/useTransactions';
+import { Edit, Trash2, HandCoins } from 'lucide-react';
 import type { Transaction } from '@/types';
 
 interface TransactionListProps {
   transactions: Transaction[];
+}
+
+/**
+ * Loan transactions (`lent` / `borrowed`) are disbursement/repayment records
+ * owned by a loan. They can now be edited/deleted from here and changes
+ * automatically sync back to the parent loan's outstanding_amount/status.
+ */
+function isLoanTransaction(t: Transaction): boolean {
+  return t.type === 'lent' || t.type === 'borrowed';
 }
 
 export default function TransactionList({ transactions }: TransactionListProps) {
@@ -23,25 +37,52 @@ export default function TransactionList({ transactions }: TransactionListProps) 
 
   const updateMutation = useUpdateTransaction();
   const deleteMutation = useDeleteTransaction();
+  const updateLoanMutation = useUpdateLoanTransaction();
+  const deleteLoanMutation = useDeleteLoanTransaction();
 
   async function handleUpdate(data: Record<string, unknown>) {
     if (!editingTransaction) return;
-    await updateMutation.mutateAsync({
-      id: editingTransaction.id,
-      input: {
-        type: data.type as 'income' | 'expense' | 'lent' | 'borrowed',
-        amount: data.amount as number,
-        category_id: (data.category_id as string) || null,
-        account_id: (data.account_id as string) || null,
-        date: data.date as string,
-        notes: data.notes as string,
-      },
-    });
+
+    if (isLoanTransaction(editingTransaction) && editingTransaction.loan_info) {
+      // Loan-linked: use the loan-aware update that syncs outstanding_amount
+      await updateLoanMutation.mutateAsync({
+        id: editingTransaction.id,
+        input: {
+          amount: data.amount as number,
+          account_id: (data.account_id as string) || null,
+          date: data.date as string,
+          notes: data.notes as string,
+        },
+        loanId: editingTransaction.loan_info.loan_id,
+      });
+    } else {
+      await updateMutation.mutateAsync({
+        id: editingTransaction.id,
+        input: {
+          type: data.type as 'income' | 'expense' | 'lent' | 'borrowed',
+          amount: data.amount as number,
+          category_id: (data.category_id as string) || null,
+          account_id: (data.account_id as string) || null,
+          date: data.date as string,
+          notes: data.notes as string,
+        },
+      });
+    }
     setEditingTransaction(null);
   }
 
   async function handleDelete(id: string) {
-    await deleteMutation.mutateAsync(id);
+    const txn = transactions.find((t) => t.id === id);
+    if (txn && isLoanTransaction(txn) && txn.loan_info) {
+      // Loan-linked: use the loan-aware delete that syncs outstanding_amount
+      await deleteLoanMutation.mutateAsync({
+        id,
+        loanId: txn.loan_info.loan_id,
+        eventType: txn.loan_info.event_type,
+      });
+    } else {
+      await deleteMutation.mutateAsync(id);
+    }
     setDeletingId(null);
   }
 
@@ -104,6 +145,17 @@ export default function TransactionList({ transactions }: TransactionListProps) 
                         />
                         {t.categories.name}
                       </span>
+                    ) : isLoanTransaction(t) ? (
+                      <span className={cn(
+                        'inline-flex items-center gap-1.5 text-xs',
+                        t.type === 'lent' ? 'text-blue-600' : 'text-amber-600',
+                      )}>
+                        <span className={cn(
+                          'w-2 h-2 rounded-full flex-shrink-0',
+                          t.type === 'lent' ? 'bg-blue-400' : 'bg-amber-400',
+                        )} />
+                        {t.loan_info?.event_type === 'repayment' ? 'Loan Repayment' : 'Loan Disbursement'}
+                      </span>
                     ) : (
                       <span className="text-xs text-gray-300">—</span>
                     )}
@@ -124,21 +176,32 @@ export default function TransactionList({ transactions }: TransactionListProps) 
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={() => setEditingTransaction(t)}
-                        className="p-1.5 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors duration-150"
-                        aria-label="Edit transaction"
-                      >
-                        <Edit size={14} />
-                      </button>
-                      <button
-                        onClick={() => setDeletingId(t.id)}
-                        className="p-1.5 rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors duration-150"
-                        aria-label="Delete transaction"
-                      >
-                        <Trash2 size={14} />
-                      </button>
+                    <div className="flex items-center justify-end gap-0.5">
+                      {isLoanTransaction(t) && t.loan_info && (
+                        <span
+                          className="inline-flex items-center gap-1 text-[11px] font-medium text-blue-600 px-1.5 py-0.5 rounded bg-blue-50 mr-1"
+                          title={`Linked to loan: ${t.loan_info.loan?.counterparty_name ?? ''} (${t.loan_info.event_type})`}
+                        >
+                          <HandCoins size={11} />
+                          {t.loan_info.event_type === 'disbursement' ? 'Loan' : 'Repay'}
+                        </span>
+                      )}
+                      <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button
+                          onClick={() => setEditingTransaction(t)}
+                          className="p-1.5 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors duration-150"
+                          aria-label="Edit transaction"
+                        >
+                          <Edit size={14} />
+                        </button>
+                        <button
+                          onClick={() => setDeletingId(t.id)}
+                          className="p-1.5 rounded-md text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors duration-150"
+                          aria-label="Delete transaction"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
                     </div>
                   </td>
                 </tr>
@@ -171,10 +234,20 @@ export default function TransactionList({ transactions }: TransactionListProps) 
               </div>
               <div className="flex items-center gap-2 mt-1 overflow-hidden">
                 <span className="text-[11px] text-gray-400 flex-shrink-0">{formatDateShort(t.date)}</span>
-                {t.categories && (
+                {t.categories ? (
                   <>
                     <span className="text-[11px] text-gray-200">·</span>
                     <span className="text-[11px] text-gray-400 truncate">{t.categories.name}</span>
+                  </>
+                ) : isLoanTransaction(t) && (
+                  <>
+                    <span className="text-[11px] text-gray-200">·</span>
+                    <span className={cn(
+                      'text-[11px] truncate',
+                      t.type === 'lent' ? 'text-blue-500' : 'text-amber-500',
+                    )}>
+                      {t.loan_info?.event_type === 'repayment' ? 'Loan Repayment' : 'Loan Disbursement'}
+                    </span>
                   </>
                 )}
                 {t.account && (
@@ -194,6 +267,15 @@ export default function TransactionList({ transactions }: TransactionListProps) 
             </div>
 
             <div className="flex flex-col gap-1 flex-shrink-0">
+              {isLoanTransaction(t) && t.loan_info && (
+                <span
+                  className="inline-flex items-center gap-1 text-[10px] font-medium text-blue-600 px-1.5 py-0.5 rounded bg-blue-50 self-end"
+                  title={`Linked: ${t.loan_info.loan?.counterparty_name ?? ''}`}
+                >
+                  <HandCoins size={10} />
+                  {t.loan_info.event_type === 'disbursement' ? 'Loan' : 'Repay'}
+                </span>
+              )}
               <button
                 onClick={() => setEditingTransaction(t)}
                 className="p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors duration-150"
@@ -217,14 +299,19 @@ export default function TransactionList({ transactions }: TransactionListProps) 
       <Modal
         open={!!editingTransaction}
         onClose={() => setEditingTransaction(null)}
-        title="Edit Transaction"
+        title={
+          editingTransaction?.loan_info
+            ? `Edit ${editingTransaction.loan_info.event_type === 'disbursement' ? 'Loan' : 'Repayment'} Transaction`
+            : 'Edit Transaction'
+        }
       >
         {editingTransaction && (
           <TransactionForm
             initialData={editingTransaction}
             onSubmit={handleUpdate}
             onCancel={() => setEditingTransaction(null)}
-            loading={updateMutation.isPending}
+            loading={updateMutation.isPending || updateLoanMutation.isPending}
+            isLoanLinked={!!editingTransaction.loan_info}
           />
         )}
       </Modal>
@@ -236,22 +323,37 @@ export default function TransactionList({ transactions }: TransactionListProps) 
         title="Delete Transaction"
         size="sm"
       >
-        <p className="text-sm text-gray-600 mb-4">
-          Are you sure you want to delete this transaction? This action cannot be undone.
-        </p>
-        <div className="flex gap-3">
-          <Button variant="secondary" onClick={() => setDeletingId(null)} className="flex-1">
-            Cancel
-          </Button>
-          <Button
-            variant="danger"
-            loading={deleteMutation.isPending}
-            onClick={() => deletingId && handleDelete(deletingId)}
-            className="flex-1"
-          >
-            Delete
-          </Button>
-        </div>
+        {(() => {
+          const txn = deletingId ? transactions.find((t) => t.id === deletingId) : null;
+          const isLoan = txn && isLoanTransaction(txn) && txn.loan_info;
+          const isDisbursement = isLoan && txn.loan_info?.event_type === 'disbursement';
+
+          return (
+            <>
+              <p className="text-sm text-gray-600 mb-4">
+                {isDisbursement
+                  ? `This is a loan disbursement. Deleting it will remove the entire loan (${txn.loan_info?.loan?.counterparty_name ?? ''}) and all its repayment records. This cannot be undone.`
+                  : isLoan
+                    ? `This is a loan repayment. Deleting it will add the amount back to the loan's outstanding balance (${txn.loan_info?.loan?.counterparty_name ?? ''}). This cannot be undone.`
+                    : 'Are you sure you want to delete this transaction? This action cannot be undone.'
+                }
+              </p>
+              <div className="flex gap-3">
+                <Button variant="secondary" onClick={() => setDeletingId(null)} className="flex-1">
+                  Cancel
+                </Button>
+                <Button
+                  variant="danger"
+                  loading={deleteMutation.isPending || deleteLoanMutation.isPending}
+                  onClick={() => deletingId && handleDelete(deletingId)}
+                  className="flex-1"
+                >
+                  {isDisbursement ? 'Delete Loan' : 'Delete'}
+                </Button>
+              </div>
+            </>
+          );
+        })()}
       </Modal>
     </>
   );
