@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAccounts } from '@/hooks/useAccounts';
 import { useCurrency } from '@/hooks/useCurrency';
+import { cn } from '@/utils/cn';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
@@ -74,6 +75,12 @@ export default function LoanForm({
 
   const selectedType = watch('type');
 
+  // In edit mode we lock the loan `type` and `principal_amount`: both are baked
+  // into the disbursement transaction created when the loan was recorded, so
+  // changing them would desync that transaction. `UpdateLoanInput` only allows
+  // counterparty_name / due_date / notes, so those are the editable fields.
+  const isEdit = !!initialData;
+
   const accountOptions = (accounts ?? []).map((a) => ({
     value: a.id,
     label: a.name,
@@ -84,20 +91,29 @@ export default function LoanForm({
       {/* Type toggle */}
       <fieldset>
         <legend className="text-sm font-medium text-gray-700 mb-2">Loan type</legend>
-        <div className="txn-type-group grid grid-cols-2 gap-1.5 p-1.5 rounded-xl bg-gray-100">
+        <div
+          className={cn(
+            'txn-type-group grid grid-cols-2 gap-1.5 p-1.5 rounded-xl bg-gray-100',
+            isEdit && 'pointer-events-none opacity-60',
+          )}
+          aria-disabled={isEdit || undefined}
+        >
           <label className="relative cursor-pointer touch-manipulation">
-            <input type="radio" value="lent" {...register('type')} className="peer sr-only" />
+            <input type="radio" value="lent" {...register('type')} tabIndex={isEdit ? -1 : undefined} className="peer sr-only" />
             <div className="txn-type-option txn-type-expense rounded-lg py-3 sm:py-2.5 text-center text-sm font-bold transition-all peer-checked:bg-rose-500 peer-checked:text-white peer-checked:shadow-md peer-focus-visible:ring-2 peer-focus-visible:ring-rose-500/40">
               I Lent
             </div>
           </label>
           <label className="relative cursor-pointer touch-manipulation">
-            <input type="radio" value="borrowed" {...register('type')} className="peer sr-only" />
+            <input type="radio" value="borrowed" {...register('type')} tabIndex={isEdit ? -1 : undefined} className="peer sr-only" />
             <div className="txn-type-option txn-type-income rounded-lg py-3 sm:py-2.5 text-center text-sm font-bold transition-all peer-checked:bg-emerald-500 peer-checked:text-white peer-checked:shadow-md peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-500/40">
               I Borrowed
             </div>
           </label>
         </div>
+        {isEdit && (
+          <p className="mt-1.5 text-[11px] text-gray-400">Loan type can't be changed after a loan is created.</p>
+        )}
       </fieldset>
 
       <Input
@@ -114,11 +130,14 @@ export default function LoanForm({
         step="0.01"
         placeholder="0.00"
         leftIcon={getCurrencyIcon(currency)}
+        readOnly={isEdit}
+        className={isEdit ? 'bg-gray-50 text-gray-500 cursor-not-allowed' : undefined}
+        helperText={isEdit ? "Amount can't be changed after a loan is created." : undefined}
         error={errors.principal_amount?.message}
         {...register('principal_amount')}
       />
 
-      {accountOptions.length > 0 && (
+      {!isEdit && accountOptions.length > 0 && (
         <Select
           label="Account"
           options={accountOptions}
@@ -132,7 +151,7 @@ export default function LoanForm({
         label="Due date (optional)"
         type="date"
         leftIcon={<Calendar size={15} />}
-        min={getToday()}
+        min={isEdit ? undefined : getToday()}
         error={errors.due_date?.message}
         {...register('due_date')}
       />

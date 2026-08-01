@@ -241,7 +241,7 @@ describe('loans service', () => {
   describe('recordRepayment', () => {
     it('records a partial repayment and updates loan status', async () => {
       const loan = rawLoan({ outstanding_amount: 5000, status: 'active' });
-      const txn = { id: 'txn-repay-1', type: 'income', amount: 2000 };
+      const txn = { id: 'txn-repay-1', type: 'lent', amount: 2000 };
       const updatedLoan = { ...loan, outstanding_amount: 3000, status: 'partially_paid' };
 
       let callCount = 0;
@@ -289,7 +289,7 @@ describe('loans service', () => {
 
     it('fully settles a loan when repaying the full outstanding amount', async () => {
       const loan = rawLoan({ outstanding_amount: 3000, status: 'partially_paid' });
-      const txn = { id: 'txn-repay-2', type: 'income', amount: 3000 };
+      const txn = { id: 'txn-repay-2', type: 'lent', amount: 3000 };
       const settledLoan = { ...loan, outstanding_amount: 0, status: 'settled' };
 
       let callCount = 0;
@@ -328,7 +328,7 @@ describe('loans service', () => {
 
     it('caps repayment at outstanding amount to prevent overpayment', async () => {
       const loan = rawLoan({ outstanding_amount: 1000, status: 'partially_paid' });
-      const txn = { id: 'txn-repay-3', type: 'income', amount: 1000 };
+      const txn = { id: 'txn-repay-3', type: 'lent', amount: 1000 };
       const settledLoan = { ...loan, outstanding_amount: 0, status: 'settled' };
 
       let callCount = 0;
@@ -367,9 +367,9 @@ describe('loans service', () => {
       expect(result.data?.status).toBe('settled');
     });
 
-    it('creates an expense transaction for borrowed loan repayments', async () => {
+    it('records a loan-event transaction (not expense) for borrowed loan repayments', async () => {
       const loan = rawLoan({ type: 'borrowed', counterparty_name: 'Priya', outstanding_amount: 5000 });
-      const txn = { id: 'txn-repay-4', type: 'expense', amount: 2000 };
+      const txn = { id: 'txn-repay-4', type: 'borrowed', amount: 2000 };
       const updatedLoan = { ...loan, outstanding_amount: 3000, status: 'partially_paid' };
 
       let callCount = 0;
@@ -402,7 +402,7 @@ describe('loans service', () => {
         date: '2026-08-15',
       });
 
-      // For borrowed loans, repayment creates expense (money going out)
+      // For borrowed loans, repayment is a loan event (money going out) — not an expense
       expect(result.data?.outstanding_amount).toBe(3000);
       expect(mockFrom).toHaveBeenCalledWith('transactions');
     });

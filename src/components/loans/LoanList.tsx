@@ -1,17 +1,19 @@
 import { useState } from 'react';
 import { useCurrency } from '@/hooks/useCurrency';
-import { useDeleteLoan, useRecordRepayment } from '@/hooks/useLoans';
+import { useDeleteLoan, useRecordRepayment, useUpdateLoan } from '@/hooks/useLoans';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { formatDate } from '@/utils/formatDate';
 import { cn } from '@/utils/cn';
 import Card from '@/components/ui/Card';
 import Modal from '@/components/ui/Modal';
 import RepaymentForm from '@/components/loans/RepaymentForm';
+import LoanForm from '@/components/loans/LoanForm';
 import {
   HandCoins,
   ArrowDownLeft,
   Calendar,
   MoreVertical,
+  Pencil,
   Trash2,
   BanknoteArrowDown,
   CheckCircle2,
@@ -50,8 +52,10 @@ function getStatusBadge(status: string) {
 export default function LoanList({ loans }: LoanListProps) {
   const currency = useCurrency();
   const deleteMutation = useDeleteLoan();
+  const updateMutation = useUpdateLoan();
   const repaymentMutation = useRecordRepayment();
   const [repayLoan, setRepayLoan] = useState<Loan | null>(null);
+  const [editLoan, setEditLoan] = useState<Loan | null>(null);
   const [menuOpen, setMenuOpen] = useState<string | null>(null);
 
   async function handleRepayment(data: { amount: number; date: string; notes?: string; account_id?: string }) {
@@ -64,6 +68,21 @@ export default function LoanList({ loans }: LoanListProps) {
       account_id: data.account_id ?? null,
     });
     setRepayLoan(null);
+  }
+
+  async function handleEdit(data: Record<string, unknown>) {
+    if (!editLoan) return;
+    // Only counterparty_name / due_date / notes are editable — type and
+    // principal are locked in the form to keep the disbursement transaction in sync.
+    await updateMutation.mutateAsync({
+      id: editLoan.id,
+      input: {
+        counterparty_name: data.counterparty_name as string,
+        due_date: (data.due_date as string) || null,
+        notes: (data.notes as string) || null,
+      },
+    });
+    setEditLoan(null);
   }
 
   function handleDelete(id: string) {
@@ -129,6 +148,13 @@ export default function LoanList({ loans }: LoanListProps) {
                               Record Repayment
                             </button>
                           )}
+                          <button
+                            onClick={() => { setEditLoan(loan); setMenuOpen(null); }}
+                            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                          >
+                            <Pencil size={14} />
+                            Edit
+                          </button>
                           <button
                             onClick={() => handleDelete(loan.id)}
                             className="flex items-center gap-2 w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
@@ -216,6 +242,22 @@ export default function LoanList({ loans }: LoanListProps) {
             onSubmit={handleRepayment}
             onCancel={() => setRepayLoan(null)}
             loading={repaymentMutation.isPending}
+          />
+        )}
+      </Modal>
+
+      {/* Edit Loan Modal */}
+      <Modal
+        open={!!editLoan}
+        onClose={() => setEditLoan(null)}
+        title="Edit Loan"
+      >
+        {editLoan && (
+          <LoanForm
+            initialData={editLoan}
+            onSubmit={handleEdit}
+            onCancel={() => setEditLoan(null)}
+            loading={updateMutation.isPending}
           />
         )}
       </Modal>

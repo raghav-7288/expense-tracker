@@ -129,17 +129,26 @@ export async function updateLoan(id: string, input: UpdateLoanInput) {
 }
 
 export async function deleteLoan(id: string) {
-  // First delete linked transactions
-  const { data: links } = await supabase
+  // Fetch linked transaction ids BEFORE deleting the loan (deleting the loan
+  // cascade-removes the loan_transactions rows, so we'd lose the references).
+  const { data: links, error: linksError } = await supabase
     .from('loan_transactions')
     .select('transaction_id')
     .eq('loan_id', id);
 
+  if (linksError) return { error: linksError };
+
+  // Delete the linked transactions (disbursement + repayments). This also
+  // cascade-removes their loan_transactions rows via the transaction_id FK.
   if (links && links.length > 0) {
     const txnIds = links.map((l) => (l as { transaction_id: string }).transaction_id);
-    await supabase.from('transactions').delete().in('id', txnIds);
+    const { error: txnError } = await supabase.from('transactions').delete().in('id', txnIds);
+    // Surface the error and stop — leaves the loan intact so the user can retry,
+    // rather than silently orphaning transactions or half-deleting.
+    if (txnError) return { error: txnError };
   }
 
+  // Delete the loan itself (cascade-removes any remaining loan_transactions rows).
   const { error } = await supabase
     .from('loans')
     .delete()
@@ -170,9 +179,14 @@ export async function recordRepayment(input: RecordRepaymentInput) {
   const newStatus = newOutstanding <= 0 ? 'settled' : 'partially_paid';
 
   // 2. Create repayment transaction
-  // If the loan was "lent", repayment is money coming back (income-like but we use 'borrowed' type reversed)
-  // Actually: if you lent money, repayment = income. If you borrowed, repayment = expense.
-  const transactionType = typedLoan.type === 'lent' ? 'income' : 'expense';
+  // A repayment is a LOAN EVENT, not income/expense. Repaying (or being repaid)
+  // principal just converts a receivable/payable back into cash — it is NOT new
+  // income or a new expense. Tagging the transaction with the loan's own type
+  // ('lent' / 'borrowed') keeps it out of every income/expense calculation
+  // (get_balance_summary, get_account_balances, dashboard charts, and analytics
+  // all sum ONLY 'income'/'expense'). The disbursement-vs-repayment distinction
+  // is preserved separately via loan_transactions.event_type.
+  const transactionType = typedLoan.type; // 'lent' or 'borrowed'
   const notes = input.notes
     ?? (typedLoan.type === 'lent'
       ? `Repayment from ${typedLoan.counterparty_name}`

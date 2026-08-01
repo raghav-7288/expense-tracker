@@ -223,12 +223,17 @@ describe('Loans E2E Flow', () => {
       expect(result.data?.outstanding_amount).toBe(3000);
       expect(result.data?.status).toBe('partially_paid');
 
-      // A repayment transaction should be created (income for lent loans)
+      // A repayment transaction should be created as a LOAN event (type 'lent'),
+      // NOT income — so it never pollutes income/expense or balance totals.
       const repaymentTxn = transactionsStore.find(
-        (t) => t.type === 'income' && t.amount === 2000,
+        (t) => t.type === 'lent' && t.amount === 2000 && t.notes === 'Repayment from Rahul',
       );
       expect(repaymentTxn).toBeDefined();
       expect(repaymentTxn?.notes).toBe('Repayment from Rahul');
+
+      // It must NOT be recorded as income/expense
+      const incomeTxn = transactionsStore.find((t) => t.type === 'income' || t.type === 'expense');
+      expect(incomeTxn).toBeUndefined();
 
       // Junction record should be created
       const loanTxnLink = loanTransactionsStore.find(
@@ -284,7 +289,7 @@ describe('Loans E2E Flow', () => {
       expect(transactionsStore[0]?.notes).toContain('Borrowed from Priya');
     });
 
-    it('repayment on borrowed loan creates expense transaction', async () => {
+    it('repayment on borrowed loan creates a loan-event transaction (not expense)', async () => {
       const loanId = 'loan-borrowed-1';
       loansStore.push({
         id: loanId,
@@ -309,12 +314,19 @@ describe('Loans E2E Flow', () => {
       expect(result.data?.outstanding_amount).toBe(6000);
       expect(result.data?.status).toBe('partially_paid');
 
-      // For borrowed loans, repayment is an expense (money going out)
+      // For borrowed loans, repayment is a LOAN event tagged 'borrowed' (money
+      // going out), NOT an expense — so it stays out of income/expense totals.
       const repaymentTxn = transactionsStore.find(
-        (t) => t.type === 'expense' && t.amount === 4000,
+        (t) => t.type === 'borrowed' && t.amount === 4000,
       );
       expect(repaymentTxn).toBeDefined();
       expect(repaymentTxn?.notes).toContain('Repaid to Priya');
+
+      // It must NOT be recorded as income/expense
+      const incomeExpenseTxn = transactionsStore.find(
+        (t) => t.type === 'income' || t.type === 'expense',
+      );
+      expect(incomeExpenseTxn).toBeUndefined();
     });
   });
 
@@ -433,8 +445,9 @@ describe('Loans E2E Flow', () => {
       expect(result.data?.outstanding_amount).toBe(0);
       expect(result.data?.status).toBe('settled');
 
-      // Transaction amount should be capped at 500, not 9999
-      const repayTxn = transactionsStore.find((t) => t.type === 'income');
+      // Transaction amount should be capped at 500, not 9999.
+      // Repayment is a loan event (type 'lent'), never income.
+      const repayTxn = transactionsStore.find((t) => t.type === 'lent' && t.notes?.toString().includes('Repayment'));
       expect(repayTxn?.amount).toBe(500);
     });
 

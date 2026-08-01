@@ -556,23 +556,29 @@ describe('Analytics – Edge Cases with Loans', () => {
     expect(summary.savings).toBe(0);
   });
 
-  it('repayment transactions (income/expense from loan context) DO appear in analytics', () => {
-    // When a loan is repaid, the system creates a real income/expense transaction
-    // These SHOULD appear in analytics since they represent real money movement
+  it('repayment transactions are loan events (lent/borrowed) and are EXCLUDED from analytics', () => {
+    // When a loan is repaid, the system creates a LOAN-EVENT transaction tagged
+    // with the loan's own type ('lent'/'borrowed') — never income/expense.
+    // Repaying principal is not new income/expense, so it must NOT appear in analytics.
     const transactions = [
-      txn({ id: '1', type: 'income', amount: 2000, notes: 'Repayment from Rahul', date: '2026-07-15',
+      // Real income/expense that SHOULD appear
+      txn({ id: 'real-inc', type: 'income', amount: 5000, notes: 'Salary', date: '2026-07-01' }),
+      txn({ id: 'real-exp', type: 'expense', amount: 1200, notes: 'Rent', date: '2026-07-03' }),
+      // Loan repayments — tagged lent/borrowed, must be excluded
+      txn({ id: '1', type: 'lent', amount: 2000, notes: 'Repayment from Rahul', date: '2026-07-15',
         categories: null, category_id: null }),
-      txn({ id: '2', type: 'expense', amount: 3000, notes: 'Repaid to Priya', date: '2026-07-20',
+      txn({ id: '2', type: 'borrowed', amount: 3000, notes: 'Repaid to Priya', date: '2026-07-20',
         categories: null, category_id: null }),
     ];
 
-    // These are type income/expense so they pass the filter
+    // The useAnalytics hook filters to income/expense only, dropping loan events
     const filtered = transactions.filter((t) => t.type === 'income' || t.type === 'expense');
     expect(filtered.length).toBe(2);
 
     const summary = computeSummary(filtered, [], filtered, RANGE);
-    expect(summary.totalIncome).toBe(2000);
-    expect(summary.totalExpenses).toBe(3000);
+    // Only the real salary/rent count — repayments are gone
+    expect(summary.totalIncome).toBe(5000);
+    expect(summary.totalExpenses).toBe(1200);
   });
 
   it('large number of loans does not affect analytics performance characteristics', () => {

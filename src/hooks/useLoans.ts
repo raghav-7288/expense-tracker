@@ -139,18 +139,23 @@ export function useDeleteLoan() {
 
       queryClient.setQueriesData<Loan[]>(
         { queryKey: queryKeys.loans.all },
-        (old) => old?.filter((l) => l.id !== id),
+        // `loans.all` (['loans']) partially matches the list caches (Loan[])
+        // AND the summary/detail caches, which hold plain objects — not arrays.
+        // Guard with Array.isArray so we never call .filter() on a non-array
+        // (which previously threw "old.filter is not a function" and made the
+        // whole delete fail with "Failed to delete loan").
+        (old) => (Array.isArray(old) ? old.filter((l) => l.id !== id) : old),
       );
 
       return { previousQueries };
     },
-    onError: (_error, _id, context) => {
+    onError: (error: Error, _id, context) => {
       if (context?.previousQueries) {
         for (const [queryKey, data] of context.previousQueries) {
           queryClient.setQueryData(queryKey, data);
         }
       }
-      toast.error('Failed to delete loan');
+      toast.error(error.message || 'Failed to delete loan');
     },
     onSettled: () => {
       invalidateLoanRelated(queryClient);
