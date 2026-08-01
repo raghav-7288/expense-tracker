@@ -15,6 +15,7 @@ const CategoriesPage = lazy(() => import('@/pages/CategoriesPage'));
 const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
 const AnalyticsPage = lazy(() => import('@/pages/AnalyticsPage'));
 const AccountsPage = lazy(() => import('@/pages/AccountsPage'));
+const LoansPage = lazy(() => import('@/pages/LoansPage'));
 
 function PageFallback() {
   return (
@@ -48,6 +49,7 @@ export default function AppRouter() {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/analytics" element={<AnalyticsPage />} />
             <Route path="/transactions" element={<TransactionsPage />} />
+            <Route path="/loans" element={<LoansPage />} />
             <Route path="/accounts" element={<AccountsPage />} />
             <Route path="/categories" element={<CategoriesPage />} />
             <Route path="/profile" element={<ProfilePage />} />

@@ -11,6 +11,7 @@ import RecentTransactions from '@/components/dashboard/RecentTransactions';
 import MonthlyChart from '@/components/dashboard/MonthlyChart';
 import CategoryChart from '@/components/dashboard/CategoryChart';
 import AccountBalances from '@/components/dashboard/AccountBalances';
+import LoanSummaryCard from '@/components/loans/LoanSummaryCard';
 import ErrorState from '@/components/ui/ErrorState';
 import SectionHeader from '@/components/ui/SectionHeader';
 import { SkeletonCard } from '@/components/ui/Skeleton';
@@ -166,8 +167,9 @@ export default function DashboardPage() {
           </div>
           <RecentTransactions />
         </div>
-        <div>
+        <div className="space-y-4">
           <AccountBalances />
+          <LoanSummaryCard />
         </div>
       </div>
     </div>

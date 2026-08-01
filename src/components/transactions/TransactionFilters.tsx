@@ -37,6 +37,8 @@ export default function TransactionFilterBar({ filters, onChange, resultCount }:
     { value: 'all', label: 'All Types' },
     { value: 'income', label: 'Income' },
     { value: 'expense', label: 'Expense' },
+    { value: 'lent', label: 'Lent' },
+    { value: 'borrowed', label: 'Borrowed' },
   ];
 
   const sortOptions = [

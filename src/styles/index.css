@@ -197,6 +197,31 @@ body.dark-mode .peer:checked ~ .txn-type-income {
 }
 
 /* =========================================
+   LOAN REPAYMENT PROGRESS BAR
+   ========================================= */
+.loan-track {
+  background-color: #e5e7eb; /* gray-200 */
+}
+.loan-track-fill--lent {
+  background-color: #3b82f6; /* blue-500 */
+}
+.loan-track-fill--borrowed {
+  background-color: #f59e0b; /* amber-500 */
+}
+
+/* Dark mode: lighter track so the bar is clearly visible against the card,
+   and brighter fills so repayment progress pops. */
+body.dark-mode .loan-track {
+  background-color: #334155 !important; /* slate-700 */
+}
+body.dark-mode .loan-track-fill--lent {
+  background-color: #60a5fa !important; /* blue-400 */
+}
+body.dark-mode .loan-track-fill--borrowed {
+  background-color: #fbbf24 !important; /* amber-400 */
+}
+
+/* =========================================
    THEME TOGGLE BUTTON (Nav)
    ========================================= */
 .nav-theme-toggle {
@@ -524,6 +549,10 @@ body.dark-mode tr:hover {
 /* ── Colored hovers ── */
 body.dark-mode [class*="hover:bg-red-50"]:hover {
   background: rgba(244, 63, 94, 0.12) !important;
+  color: #fca5a5 !important;
+}
+body.dark-mode [class*="hover:bg-red-100"]:hover {
+  background: rgba(244, 63, 94, 0.18) !important;
   color: #fca5a5 !important;
 }
 body.dark-mode [class*="hover:bg-primary-50"]:hover,

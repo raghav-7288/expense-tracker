@@ -67,6 +67,8 @@ export function useMonthlyData() {
       }
 
       for (const row of data ?? []) {
+        // Exclude loan transactions from income/expense monthly charts
+        if (row.type === 'lent' || row.type === 'borrowed') continue;
         const month = (row.date as string).substring(0, 7) + '-01';
         const entry = monthMap.get(month);
         if (entry) {
