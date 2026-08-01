@@ -8,6 +8,7 @@ import {
   useLoans,
   useLoanSummary,
   useCreateLoan,
+  useUpdateLoan,
   useDeleteLoan,
   useRecordRepayment,
 } from '@/hooks/useLoans';
@@ -19,6 +20,7 @@ vi.mock('react-hot-toast', () => ({
 
 const mockGetLoans = vi.fn();
 const mockCreateLoan = vi.fn();
+const mockUpdateLoan = vi.fn();
 const mockDeleteLoan = vi.fn();
 const mockRecordRepayment = vi.fn();
 const mockGetLoanSummary = vi.fn();
@@ -27,7 +29,7 @@ vi.mock('@/services/loans', () => ({
   getLoans: (...args: unknown[]) => mockGetLoans(...args),
   getLoan: vi.fn(),
   createLoan: (...args: unknown[]) => mockCreateLoan(...args),
-  updateLoan: vi.fn(),
+  updateLoan: (...args: unknown[]) => mockUpdateLoan(...args),
   deleteLoan: (...args: unknown[]) => mockDeleteLoan(...args),
   recordRepayment: (...args: unknown[]) => mockRecordRepayment(...args),
   getLoanTransactions: vi.fn(),
@@ -167,6 +169,44 @@ describe('useCreateLoan', () => {
   });
 });
 
+describe('useUpdateLoan', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('updates editable loan fields (counterparty, due date, notes)', async () => {
+    const updatedLoan = {
+      id: 'loan-1',
+      counterparty_name: 'Rahul Kumar',
+      due_date: '2026-10-01',
+      notes: 'Updated note',
+    };
+    mockUpdateLoan.mockResolvedValue({ data: updatedLoan, error: null });
+
+    const { result } = renderHook(() => useUpdateLoan(), { wrapper: createWrapper() });
+    const data = await result.current.mutateAsync({
+      id: 'loan-1',
+      input: { counterparty_name: 'Rahul Kumar', due_date: '2026-10-01', notes: 'Updated note' },
+    });
+
+    expect(mockUpdateLoan).toHaveBeenCalledWith('loan-1', {
+      counterparty_name: 'Rahul Kumar',
+      due_date: '2026-10-01',
+      notes: 'Updated note',
+    });
+    expect(data?.counterparty_name).toBe('Rahul Kumar');
+  });
+
+  it('handles update error', async () => {
+    mockUpdateLoan.mockResolvedValue({ data: null, error: { message: 'Update failed' } });
+
+    const { result } = renderHook(() => useUpdateLoan(), { wrapper: createWrapper() });
+    await expect(
+      result.current.mutateAsync({ id: 'loan-1', input: { counterparty_name: 'X' } }),
+    ).rejects.toThrow('Update failed');
+  });
+});
+
 describe('useDeleteLoan', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -178,6 +218,49 @@ describe('useDeleteLoan', () => {
     const { result } = renderHook(() => useDeleteLoan(), { wrapper: createWrapper() });
     await result.current.mutateAsync('loan-1');
     expect(mockDeleteLoan).toHaveBeenCalledWith('loan-1');
+  });
+
+  it('does not crash when a loan summary/detail object is cached (regression)', async () => {
+    // The `loans.all` (['loans']) key partially matches list caches (arrays)
+    // AND summary/detail caches (objects). The optimistic updater must not call
+    // .filter() on the object caches, otherwise the whole delete throws
+    // "old.filter is not a function" → "Failed to delete loan".
+    const queryClient = createTestQueryClient();
+    const authValue = createMockAuth();
+
+    // Seed a list cache (Loan[]) and a summary cache (LoanSummary object)
+    queryClient.setQueryData(['loans', 'user-123', undefined], [
+      { id: 'loan-1', counterparty_name: 'Rahul' },
+      { id: 'loan-2', counterparty_name: 'Priya' },
+    ]);
+    queryClient.setQueryData(['loans', 'summary', 'user-123'], {
+      totalLent: 5000, totalBorrowed: 0, outstandingLent: 5000, outstandingBorrowed: 0,
+      netReceivable: 5000, activeLoansCount: 2, settledLoansCount: 0,
+    });
+    mockDeleteLoan.mockResolvedValue({ error: null });
+
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={queryClient}>
+        <ThemeContext.Provider value={{ darkMode: false, setDarkMode: vi.fn() }}>
+          <AuthContext.Provider value={authValue}>{children}</AuthContext.Provider>
+        </ThemeContext.Provider>
+      </QueryClientProvider>
+    );
+
+    const { result } = renderHook(() => useDeleteLoan(), { wrapper });
+
+    // Must resolve, not reject
+    await result.current.mutateAsync('loan-1');
+    expect(mockDeleteLoan).toHaveBeenCalledWith('loan-1');
+
+    // List cache had loan-1 optimistically removed
+    const list = queryClient.getQueryData(['loans', 'user-123', undefined]) as Array<{ id: string }>;
+    expect(list.some((l) => l.id === 'loan-1')).toBe(false);
+    expect(list.some((l) => l.id === 'loan-2')).toBe(true);
+
+    // Summary object cache is untouched (no crash)
+    const summary = queryClient.getQueryData(['loans', 'summary', 'user-123']) as { totalLent: number };
+    expect(summary.totalLent).toBe(5000);
   });
 
   it('handles delete error', async () => {
