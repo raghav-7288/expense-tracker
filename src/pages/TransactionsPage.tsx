@@ -44,7 +44,7 @@ export default function TransactionsPage() {
 
   async function handleCreate(data: Record<string, unknown>) {
     await createMutation.mutateAsync({
-      type: data.type as 'income' | 'expense',
+      type: data.type as 'income' | 'expense' | 'lent' | 'borrowed',
       amount: data.amount as number,
       category_id: (data.category_id as string) || null,
       account_id: (data.account_id as string) || null,

@@ -56,10 +56,16 @@ export function useAnalytics(filters: AnalyticsFilters): AnalyticsData {
    * automatically respects the category filter.
    * `null` / `undefined` → all transactions (no category filter).
    * `[]` → empty set (explicit "no categories selected").
+   *
+   * Also excludes loan transactions (lent/borrowed) from analytics by default
+   * since they are not real income/expenses.
    */
   const baseTransactions = useMemo(() => {
     if (!allTransactions) return [];
-    let filtered = allTransactions;
+    // Exclude loan transactions from analytics
+    let filtered = allTransactions.filter(
+      (t) => t.type === 'income' || t.type === 'expense',
+    );
 
     // Filter by account if specified
     if (filters.accountId) {

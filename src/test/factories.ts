@@ -1,4 +1,4 @@
-import type { Profile, Category, Transaction, MergedCategory } from '@/types';
+import type { Profile, Category, Transaction, MergedCategory, Loan } from '@/types';
 
 let idCounter = 0;
 function nextId() {
@@ -117,3 +117,22 @@ export function buildAccount(overrides: Partial<import('@/types').Account> = {})
     ...overrides,
   };
 }
+
+export function buildLoan(overrides: Partial<Loan> = {}): Loan {
+  const id = nextId();
+  return {
+    id,
+    user_id: 'user-123',
+    counterparty_name: 'Test Person',
+    type: 'lent',
+    principal_amount: 5000,
+    outstanding_amount: 5000,
+    status: 'active',
+    due_date: '2026-09-01',
+    notes: null,
+    created_at: '2026-08-01T10:00:00Z',
+    updated_at: '2026-08-01T10:00:00Z',
+    ...overrides,
+  };
+}
+

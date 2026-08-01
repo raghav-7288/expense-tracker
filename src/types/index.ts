@@ -1,4 +1,4 @@
-export type TransactionType = 'income' | 'expense';
+export type TransactionType = 'income' | 'expense' | 'lent' | 'borrowed';
 
 export type AccountType = 'checking' | 'savings' | 'credit_card' | 'cash' | 'investment' | 'other';
 
@@ -192,4 +192,79 @@ export interface CategoryBreakdown {
   amount: number;
   color: string;
   percentage: number;
+}
+
+// ============================================
+// LOANS
+// ============================================
+
+export type LoanType = 'lent' | 'borrowed';
+export type LoanStatus = 'active' | 'partially_paid' | 'settled';
+export type LoanEventType = 'disbursement' | 'repayment';
+
+export interface Loan {
+  id: string;
+  user_id: string;
+  counterparty_name: string;
+  type: LoanType;
+  principal_amount: number;
+  outstanding_amount: number;
+  status: LoanStatus;
+  due_date: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateLoanInput {
+  user_id: string;
+  counterparty_name: string;
+  type: LoanType;
+  principal_amount: number;
+  outstanding_amount: number;
+  status?: LoanStatus;
+  due_date?: string | null;
+  notes?: string | null;
+  account_id?: string | null;
+}
+
+export interface UpdateLoanInput {
+  counterparty_name?: string;
+  due_date?: string | null;
+  notes?: string | null;
+  outstanding_amount?: number;
+  status?: LoanStatus;
+}
+
+export interface LoanTransaction {
+  id: string;
+  loan_id: string;
+  transaction_id: string;
+  event_type: LoanEventType;
+  created_at: string;
+  transaction?: Transaction;
+}
+
+export interface RecordRepaymentInput {
+  loan_id: string;
+  amount: number;
+  date: string;
+  notes?: string;
+  account_id?: string | null;
+}
+
+export interface LoanFilters {
+  type?: LoanType | 'all';
+  status?: LoanStatus | 'all';
+  search?: string;
+}
+
+export interface LoanSummary {
+  totalLent: number;
+  totalBorrowed: number;
+  outstandingLent: number;
+  outstandingBorrowed: number;
+  netReceivable: number;
+  activeLoansCount: number;
+  settledLoansCount: number;
 }

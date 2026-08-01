@@ -29,7 +29,7 @@ export default function TransactionList({ transactions }: TransactionListProps) 
     await updateMutation.mutateAsync({
       id: editingTransaction.id,
       input: {
-        type: data.type as 'income' | 'expense',
+        type: data.type as 'income' | 'expense' | 'lent' | 'borrowed',
         amount: data.amount as number,
         category_id: (data.category_id as string) || null,
         account_id: (data.account_id as string) || null,
@@ -117,10 +117,10 @@ export default function TransactionList({ transactions }: TransactionListProps) 
                   <td className="px-4 py-3 text-right">
                     <span
                       className={cn('text-sm font-semibold tabular-nums',
-                        t.type === 'income' ? 'text-emerald-600' : 'text-red-600',
+                        t.type === 'income' ? 'text-emerald-600' : t.type === 'expense' ? 'text-red-600' : t.type === 'lent' ? 'text-blue-600' : 'text-amber-600',
                     )}
                     >
-                      {t.type === 'income' ? '+' : '-'}{formatCurrency(Number(t.amount), currency)}
+                      {t.type === 'income' ? '+' : t.type === 'expense' ? '-' : t.type === 'lent' ? '↗' : '↙'}{formatCurrency(Number(t.amount), currency)}
                     </span>
                   </td>
                   <td className="px-4 py-3">
@@ -163,10 +163,10 @@ export default function TransactionList({ transactions }: TransactionListProps) 
                 <span
                   className={cn(
                     'text-sm font-semibold tabular-nums flex-shrink-0',
-                    t.type === 'income' ? 'text-emerald-600' : 'text-red-600',
+                    t.type === 'income' ? 'text-emerald-600' : t.type === 'expense' ? 'text-red-600' : t.type === 'lent' ? 'text-blue-600' : 'text-amber-600',
                   )}
                 >
-                  {t.type === 'income' ? '+' : '-'}{formatCurrency(Number(t.amount), currency)}
+                  {t.type === 'income' ? '+' : t.type === 'expense' ? '-' : t.type === 'lent' ? '↗' : '↙'}{formatCurrency(Number(t.amount), currency)}
                 </span>
               </div>
               <div className="flex items-center gap-2 mt-1 overflow-hidden">

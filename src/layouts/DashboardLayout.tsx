@@ -17,6 +17,7 @@ import {
   Moon,
   ChevronRight,
   Landmark,
+  HandCoins,
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import toast from 'react-hot-toast';
@@ -25,6 +26,7 @@ const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/analytics', icon: BarChart3, label: 'Analytics' },
   { to: '/transactions', icon: ArrowLeftRight, label: 'Transactions' },
+  { to: '/loans', icon: HandCoins, label: 'Loans' },
   { to: '/accounts', icon: Landmark, label: 'Accounts' },
   { to: '/categories', icon: Tag, label: 'Categories' },
 ];
@@ -33,6 +35,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/dashboard': 'Dashboard',
   '/analytics': 'Analytics',
   '/transactions': 'Transactions',
+  '/loans': 'Loans',
   '/accounts': 'Accounts',
   '/categories': 'Categories',
   '/profile': 'Profile',
@@ -155,7 +158,7 @@ export default function DashboardLayout() {
           {/* Sign out */}
           <button
             onClick={handleSignOut}
-            className="nav-link flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-[13px] font-medium text-gray-500 hover:bg-red-50 hover:text-red-600 transition-all"
+            className="nav-link flex items-center gap-2.5 w-full px-3 py-2 rounded-lg text-[13px] font-medium text-gray-500 bg-red-50 hover:bg-red-100 hover:text-red-600 transition-all"
           >
             <LogOut size={17} className="text-gray-400" aria-hidden="true" />
             <span>Sign Out</span>

@@ -32,5 +32,13 @@ export const queryKeys = {
   analytics: {
     all: (userId: string | undefined) => ['analytics', userId] as const,
   },
+  loans: {
+    all: ['loans'] as const,
+    list: (userId: string | undefined, filters?: unknown) =>
+      ['loans', userId, filters] as const,
+    detail: (id: string) => ['loans', 'detail', id] as const,
+    transactions: (loanId: string) => ['loans', 'transactions', loanId] as const,
+    summary: (userId: string | undefined) => ['loans', 'summary', userId] as const,
+  },
 } as const;
 

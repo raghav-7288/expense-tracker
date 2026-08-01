@@ -45,39 +45,60 @@ export default function RecentTransactions() {
         </div>
       ) : (
         <div className="divide-y divide-gray-50">
-          {transactions.map((t) => (
-            <div key={t.id} className="flex items-center justify-between px-4 sm:px-5 py-3 hover:bg-gray-50/50 transition-colors gap-3">
-              <div className="flex items-center gap-3 min-w-0">
-                <Avatar name={t.notes} color={t.categories?.color ?? '#6b7280'} size="sm" />
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">{t.notes}</p>
-                  <div className="flex items-center gap-1.5">
-                    <p className="text-[11px] text-gray-400">{formatDateShort(t.date)}</p>
-                    {t.account && (
-                      <>
-                        <span className="text-[11px] text-gray-300">·</span>
-                        <span className="inline-flex items-center gap-0.5 text-[11px] text-gray-400 truncate">
-                          <span
-                            className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                            style={{ backgroundColor: t.account.color }}
-                          />
-                          {t.account.name}
+          {transactions.map((t) => {
+            const isLoan = t.type === 'lent' || t.type === 'borrowed';
+            const colorClass = t.type === 'income'
+              ? 'text-emerald-600'
+              : t.type === 'expense'
+                ? 'text-red-600'
+                : t.type === 'lent'
+                  ? 'text-blue-600'
+                  : 'text-amber-600';
+            const prefix = t.type === 'income' ? '+' : t.type === 'expense' ? '-' : t.type === 'lent' ? '↗' : '↙';
+
+            return (
+              <div key={t.id} className="flex items-center justify-between px-4 sm:px-5 py-3 hover:bg-gray-50/50 transition-colors gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <Avatar name={t.notes} color={t.categories?.color ?? (isLoan ? (t.type === 'lent' ? '#3b82f6' : '#f59e0b') : '#6b7280')} size="sm" />
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-sm font-medium text-gray-900 truncate">{t.notes}</p>
+                      {isLoan && (
+                        <span
+                          className={cn(
+                            'inline-flex items-center px-1.5 py-0.5 text-[10px] font-medium rounded-full flex-shrink-0',
+                            t.type === 'lent' ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600',
+                          )}
+                        >
+                          {t.type === 'lent' ? 'Lent' : 'Borrowed'}
                         </span>
-                      </>
-                    )}
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-[11px] text-gray-400">{formatDateShort(t.date)}</p>
+                      {t.account && (
+                        <>
+                          <span className="text-[11px] text-gray-300">·</span>
+                          <span className="inline-flex items-center gap-0.5 text-[11px] text-gray-400 truncate">
+                            <span
+                              className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                              style={{ backgroundColor: t.account.color }}
+                            />
+                            {t.account.name}
+                          </span>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
+                <span
+                  className={cn('text-sm font-semibold tabular-nums flex-shrink-0', colorClass)}
+                >
+                  {prefix}{formatCurrency(Number(t.amount), currency)}
+                </span>
               </div>
-              <span
-                className={cn(
-                  'text-sm font-semibold tabular-nums flex-shrink-0',
-                  t.type === 'income' ? 'text-emerald-600' : 'text-red-600',
-                )}
-              >
-                {t.type === 'income' ? '+' : '-'}{formatCurrency(Number(t.amount), currency)}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </Card>
