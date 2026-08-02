@@ -46,11 +46,6 @@ export function useAnalytics(filters: AnalyticsFilters): AnalyticsData {
     staleTime: 5 * 60 * 1000,
   });
 
-  const dateRange: DateRange = useMemo(
-    () => getDateRange(filters.preset, filters.customRange),
-    [filters.preset, filters.customRange],
-  );
-
   /**
    * Pre-filter by selected categories so every downstream computation
    * automatically respects the category filter.
@@ -59,6 +54,9 @@ export function useAnalytics(filters: AnalyticsFilters): AnalyticsData {
    *
    * Also excludes loan transactions (lent/borrowed) from analytics by default
    * since they are not real income/expenses.
+   *
+   * Computed before `dateRange` so the "All Time" preset can bound its range
+   * to the account/category-filtered data set.
    */
   const baseTransactions = useMemo(() => {
     if (!allTransactions) return [];
@@ -81,6 +79,17 @@ export function useAnalytics(filters: AnalyticsFilters): AnalyticsData {
       (t) => t.category_id !== null && idSet.has(t.category_id),
     );
   }, [allTransactions, filters.categoryIds, filters.accountId]);
+
+  /**
+   * For "All Time" the range is derived from the (already account/category
+   * filtered) `baseTransactions` so charts and averages stay bounded to the
+   * user's real data. For every other preset the transactions arg is ignored,
+   * so the existing preset → range logic is reused unchanged.
+   */
+  const dateRange: DateRange = useMemo(
+    () => getDateRange(filters.preset, filters.customRange, baseTransactions),
+    [filters.preset, filters.customRange, baseTransactions],
+  );
 
   const prevDateRange = useMemo(() => getPreviousPeriod(dateRange), [dateRange]);
 
@@ -176,11 +185,14 @@ export function useAnalytics(filters: AnalyticsFilters): AnalyticsData {
 
   const monthlyReport = useMemo(() => {
     if (currentTransactions.length === 0 && prevTransactions.length === 0) return null;
-    const label = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(
-      new Date(dateRange.startDate + 'T00:00:00'),
-    );
+    const label =
+      filters.preset === 'allTime'
+        ? 'All Time'
+        : new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(
+            new Date(dateRange.startDate + 'T00:00:00'),
+          );
     return computeMonthlyReport(currentTransactions, prevTransactions, label);
-  }, [currentTransactions, prevTransactions, dateRange]);
+  }, [currentTransactions, prevTransactions, dateRange, filters.preset]);
 
   const yearlyReport = useMemo(() => {
     const year = new Date().getFullYear();

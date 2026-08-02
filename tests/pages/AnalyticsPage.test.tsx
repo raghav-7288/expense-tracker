@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { screen } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
 import { renderWithProviders } from '@/test/test-utils';
 import AnalyticsPage from '@/pages/AnalyticsPage';
 
@@ -118,6 +118,102 @@ describe('AnalyticsPage', () => {
     renderWithProviders(<AnalyticsPage />);
     expect(screen.getByText('Investments')).toBeInTheDocument();
     expect(screen.getByTestId('investment-tracker')).toBeInTheDocument();
+  });
+
+  it('renders the "All Time" filter button', () => {
+    mockUseAnalytics.mockReturnValue(mockAnalytics as never);
+    renderWithProviders(<AnalyticsPage />);
+    expect(screen.getByText('All Time')).toBeInTheDocument();
+  });
+
+  it('selects "All Time" by default on first visit', () => {
+    mockUseAnalytics.mockReturnValue(mockAnalytics as never);
+    mockUseAnalytics.mockClear();
+    renderWithProviders(<AnalyticsPage />);
+
+    // The All Time preset is the active button…
+    expect(screen.getByText('All Time')).toHaveAttribute('aria-pressed', 'true');
+    // …and no other preset is active by default.
+    expect(screen.getByText('This Month')).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByText('This Year')).toHaveAttribute('aria-pressed', 'false');
+
+    // The whole analytics tree is driven by the allTime filter → all data.
+    expect(mockUseAnalytics).toHaveBeenCalledWith(
+      expect.objectContaining({ preset: 'allTime', type: 'all' }),
+    );
+  });
+
+  it('switching to another date filter still works and re-computes analytics', () => {
+    mockUseAnalytics.mockReturnValue(mockAnalytics as never);
+    renderWithProviders(<AnalyticsPage />);
+
+    // Default active = All Time
+    expect(screen.getByText('All Time')).toHaveAttribute('aria-pressed', 'true');
+
+    // Switch to This Month
+    fireEvent.click(screen.getByText('This Month'));
+    expect(screen.getByText('This Month')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByText('All Time')).toHaveAttribute('aria-pressed', 'false');
+    expect(mockUseAnalytics).toHaveBeenLastCalledWith(
+      expect.objectContaining({ preset: 'thisMonth' }),
+    );
+
+    // Switch to This Year
+    fireEvent.click(screen.getByText('This Year'));
+    expect(screen.getByText('This Year')).toHaveAttribute('aria-pressed', 'true');
+    expect(mockUseAnalytics).toHaveBeenLastCalledWith(
+      expect.objectContaining({ preset: 'thisYear' }),
+    );
+  });
+
+  it('restores the "All Time" default on a fresh visit (no persisted state)', () => {
+    mockUseAnalytics.mockReturnValue(mockAnalytics as never);
+
+    // First visit: change the filter away from the default
+    const first = renderWithProviders(<AnalyticsPage />);
+    fireEvent.click(screen.getByText('This Month'));
+    expect(screen.getByText('This Month')).toHaveAttribute('aria-pressed', 'true');
+
+    // Leave the page
+    first.unmount();
+
+    // Return to the page: default is restored to All Time
+    renderWithProviders(<AnalyticsPage />);
+    expect(screen.getByText('All Time')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByText('This Month')).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  it('keeps All Time active alongside the Category and Account filters', () => {
+    mockUseAnalytics.mockReturnValue(mockAnalytics as never);
+    mockUseAnalytics.mockClear();
+    renderWithProviders(<AnalyticsPage />);
+
+    // Account filter present, All Time remains the active date preset
+    expect(screen.getByText('All Time')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('combobox')).toBeInTheDocument(); // account <select>
+
+    // Analytics is invoked with the default all-data preset and no category/account restriction
+    const firstCallArg = mockUseAnalytics.mock.calls[0]?.[0] as { preset: string; categoryIds?: unknown; accountId?: unknown };
+    expect(firstCallArg.preset).toBe('allTime');
+    expect(firstCallArg.categoryIds).toBeUndefined();
+    expect(firstCallArg.accountId).toBeUndefined();
+  });
+
+  it('clears a previously selected custom range when switching to All Time', () => {
+    mockUseAnalytics.mockReturnValue(mockAnalytics as never);
+    renderWithProviders(<AnalyticsPage />);
+
+    // Select Custom → custom date inputs appear
+    fireEvent.click(screen.getByText('Custom'));
+    expect(screen.getByLabelText('Start date')).toBeInTheDocument();
+
+    // Switch to All Time → custom inputs disappear (range cleared)
+    fireEvent.click(screen.getByText('All Time'));
+    expect(screen.queryByLabelText('Start date')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('End date')).not.toBeInTheDocument();
+
+    // The All Time button is now the active preset
+    expect(screen.getByText('All Time')).toHaveAttribute('aria-pressed', 'true');
   });
 });
 

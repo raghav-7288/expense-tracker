@@ -9,6 +9,7 @@ interface TimeRangeFilterProps {
 }
 
 const PRESETS: { value: TimeRangePreset; label: string }[] = [
+  { value: 'allTime', label: 'All Time' },
   { value: 'today', label: 'Today' },
   { value: 'yesterday', label: 'Yesterday' },
   { value: 'last7', label: '7 Days' },

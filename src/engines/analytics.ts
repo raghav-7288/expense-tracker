@@ -43,14 +43,40 @@ function addDays(dateStr: string, days: number): string {
   return toLocalISODate(d);
 }
 
+/**
+ * Compute the "All Time" date range from the actual transaction data.
+ *
+ * Returns the tightest range `[earliest date, latest date]` that still
+ * includes every transaction, so downstream computations (series, summary,
+ * averages) stay bounded to real data instead of an arbitrary epoch window.
+ * Falls back to today→today when there are no transactions.
+ */
+export function getAllTimeRange(transactions: Transaction[]): DateRange {
+  const today = toLocalISODate(new Date());
+  if (transactions.length === 0) {
+    return { startDate: today, endDate: today };
+  }
+
+  let min = transactions[0]!.date;
+  let max = transactions[0]!.date;
+  for (const t of transactions) {
+    if (t.date < min) min = t.date;
+    if (t.date > max) max = t.date;
+  }
+  return { startDate: min, endDate: max };
+}
+
 export function getDateRange(
   preset: TimeRangePreset,
   customRange?: DateRange,
+  transactions?: Transaction[],
 ): DateRange {
   const now = new Date();
   const today = toLocalISODate(now);
 
   switch (preset) {
+    case 'allTime':
+      return getAllTimeRange(transactions ?? []);
     case 'today':
       return { startDate: today, endDate: today };
     case 'yesterday': {
