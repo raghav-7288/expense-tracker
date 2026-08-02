@@ -55,6 +55,9 @@ export default function AppRouter() {
               <Route index element={<TransactionsPage />} />
               <Route path="recurring" element={<RecurringPage />} />
               <Route path="loans" element={<LoansPage />} />
+              {/* Unknown sub-path stays inside the hub (falls back to the All tab)
+                  instead of bouncing out to /dashboard via the top-level splat. */}
+              <Route path="*" element={<Navigate to="/transactions" replace />} />
             </Route>
             <Route path="/accounts" element={<AccountsPage />} />
             <Route path="/categories" element={<CategoriesPage />} />

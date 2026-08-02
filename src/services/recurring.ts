@@ -111,12 +111,38 @@ function addMonths(date: Date, n: number): Date {
   return d;
 }
 
-/** Advance a YYYY-MM-DD date string by one recurrence interval. */
-export function advanceDate(dateStr: string, frequency: RecurrenceFrequency): string {
-  const base = parseISO(dateStr);
-  if (frequency === 'weekly') return toISO(addDays(base, 7));
-  if (frequency === 'monthly') return toISO(addMonths(base, 1));
-  return toISO(addMonths(base, 12)); // yearly
+/** Whole calendar months between two YYYY-MM-DD strings (b - a). */
+function monthsBetween(aStr: string, bStr: string): number {
+  const a = parseISO(aStr);
+  const b = parseISO(bStr);
+  return (b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth());
+}
+
+/** Whole days between two YYYY-MM-DD strings (b - a). */
+function daysBetween(aStr: string, bStr: string): number {
+  return Math.round((parseISO(bStr).getTime() - parseISO(aStr).getTime()) / 86_400_000);
+}
+
+/**
+ * The date of the k-th occurrence (0-based), ALWAYS anchored on startDate.
+ * Anchoring (rather than stepping off the previous due date) is what prevents
+ * month-end / leap-day drift: e.g. a monthly rule started on the 31st yields
+ * Jan 31 → Feb 28 → Mar 31 → Apr 30 (not a permanent slide to the 28th), and a
+ * yearly rule on Feb 29 restores to Feb 29 on the next leap year.
+ */
+export function nthOccurrence(startDate: string, frequency: RecurrenceFrequency, k: number): string {
+  const base = parseISO(startDate);
+  if (frequency === 'weekly') return toISO(addDays(base, 7 * k));
+  if (frequency === 'monthly') return toISO(addMonths(base, k));
+  return toISO(addMonths(base, 12 * k)); // yearly
+}
+
+/** The 0-based occurrence index a given due date represents, relative to startDate. */
+function occurrenceIndex(startDate: string, frequency: RecurrenceFrequency, dateStr: string): number {
+  if (frequency === 'weekly') return Math.max(0, Math.round(daysBetween(startDate, dateStr) / 7));
+  const months = monthsBetween(startDate, dateStr);
+  if (frequency === 'monthly') return Math.max(0, months);
+  return Math.max(0, Math.round(months / 12)); // yearly
 }
 
 // ============================================
@@ -205,6 +231,63 @@ export async function deleteRecurringTransaction(id: string) {
 // Safety cap so a malformed rule can never spin into an unbounded loop.
 const MAX_OCCURRENCES_PER_RULE = 366;
 
+export interface DueOccurrencePlan {
+  /** Dates (YYYY-MM-DD) that should be materialized now, in chronological order. */
+  dueDates: string[];
+  /** The cursor to persist back to the rule (next occurrence not yet generated). */
+  nextDueDate: string;
+  /** false once the schedule has passed its end_date. */
+  isActive: boolean;
+}
+
+/**
+ * Pure scheduling core. Given a rule's schedule and "today", computes which
+ * occurrences are due (anchored on start_date so month-end / leap-day schedules
+ * never drift), the new cursor to persist, and whether the rule is still active.
+ *
+ * Kept side-effect free so the date logic is exhaustively unit-testable.
+ */
+export function planDueOccurrences(
+  schedule: {
+    startDate: string;
+    nextDueDate: string;
+    endDate: string | null;
+    frequency: RecurrenceFrequency;
+  },
+  today: string,
+  maxOccurrences: number = MAX_OCCURRENCES_PER_RULE,
+): DueOccurrencePlan {
+  const { startDate, nextDueDate, endDate, frequency } = schedule;
+
+  const dueDates: string[] = [];
+  // Re-anchor: derive the occurrence index of the stored cursor, then always
+  // compute subsequent dates from start_date rather than stepping off the last
+  // (possibly clamped) date.
+  let k = occurrenceIndex(startDate, frequency, nextDueDate);
+  let due = nthOccurrence(startDate, frequency, k);
+  let isActive = true;
+
+  // Comparing YYYY-MM-DD strings lexicographically is chronologically correct.
+  while (due <= today && dueDates.length < maxOccurrences) {
+    if (endDate && due > endDate) {
+      isActive = false;
+      break;
+    }
+
+    dueDates.push(due);
+    k += 1;
+    due = nthOccurrence(startDate, frequency, k);
+
+    // The rule has reached the end of its schedule.
+    if (endDate && due > endDate) {
+      isActive = false;
+      break;
+    }
+  }
+
+  return { dueDates, nextDueDate: due, isActive };
+}
+
 /**
  * Materialize any transactions that are due from the user's active recurring
  * rules. Safe to call on every app load — it only creates transactions whose
@@ -231,55 +314,46 @@ export async function generateDueTransactions(
 
   for (const rule of rules as Array<Record<string, unknown>>) {
     const ruleId = rule.id as string;
-    const frequency = rule.frequency as RecurrenceFrequency;
-    const endDate = (rule.end_date ?? null) as string | null;
+    const prevNextDue = rule.next_due_date as string;
+    const prevActive = rule.is_active as boolean;
 
-    const toInsert: Array<Record<string, unknown>> = [];
-    let dueDate = rule.next_due_date as string;
-    let active = true;
-    let iterations = 0;
+    const { dueDates, nextDueDate, isActive } = planDueOccurrences(
+      {
+        startDate: rule.start_date as string,
+        nextDueDate: prevNextDue,
+        endDate: (rule.end_date ?? null) as string | null,
+        frequency: rule.frequency as RecurrenceFrequency,
+      },
+      today,
+    );
 
-    // Comparing YYYY-MM-DD strings lexicographically is chronologically correct.
-    while (dueDate <= today && iterations < MAX_OCCURRENCES_PER_RULE) {
-      if (endDate && dueDate > endDate) {
-        active = false;
-        break;
-      }
-
-      toInsert.push({
+    if (dueDates.length > 0) {
+      const toInsert = dueDates.map((date) => ({
         user_id: userId,
         type: rule.type,
         amount: rule.amount,
         notes: rule.notes,
-        date: dueDate,
+        date,
         account_id: rule.account_id ?? null,
         system_category_id: rule.system_category_id ?? null,
         user_category_id: rule.user_category_id ?? null,
         recurring_id: ruleId,
-      });
+      }));
 
-      dueDate = advanceDate(dueDate, frequency);
-      iterations++;
-
-      // The rule has reached the end of its schedule.
-      if (endDate && dueDate > endDate) {
-        active = false;
-        break;
-      }
-    }
-
-    if (toInsert.length > 0) {
       const { error: insertError } = await supabase.from('transactions').insert(toInsert);
       if (insertError) return { generated, error: insertError };
       generated += toInsert.length;
     }
 
     // Advance the rule's cursor (and deactivate it if the schedule has ended).
-    const { error: updateError } = await supabase
-      .from('recurring_transactions')
-      .update({ next_due_date: dueDate, is_active: active })
-      .eq('id', ruleId);
-    if (updateError) return { generated, error: updateError };
+    // Skip the write when nothing changed to avoid a needless round-trip.
+    if (nextDueDate !== prevNextDue || isActive !== prevActive) {
+      const { error: updateError } = await supabase
+        .from('recurring_transactions')
+        .update({ next_due_date: nextDueDate, is_active: isActive })
+        .eq('id', ruleId);
+      if (updateError) return { generated, error: updateError };
+    }
   }
 
   return { generated, error: null };

@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { useCategoryBreakdown } from '@/hooks/useDashboard';
 import { useCurrency } from '@/hooks/useCurrency';
@@ -6,7 +7,7 @@ import { SkeletonPieChart } from '@/components/ui/Skeleton';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { PieChart as PieChartIcon } from 'lucide-react';
 
-export default function CategoryChart() {
+function CategoryChart() {
   const { data: breakdown, isLoading } = useCategoryBreakdown();
   const currency = useCurrency();
   const { darkMode } = useTheme();
@@ -82,3 +83,8 @@ export default function CategoryChart() {
     </div>
   );
 }
+
+// Propless and driven entirely by its own React Query hooks — memo keeps the
+// recharts pie subtree from re-rendering when the parent dashboard re-renders.
+export default memo(CategoryChart);
+

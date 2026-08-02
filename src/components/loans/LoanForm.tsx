@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAccounts } from '@/hooks/useAccounts';
@@ -59,7 +59,7 @@ export default function LoanForm({
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     formState: { errors },
   } = useForm<LoanFormData>({
     resolver: zodResolver(loanSchema) as never,
@@ -73,7 +73,7 @@ export default function LoanForm({
     },
   });
 
-  const selectedType = watch('type');
+  const selectedType = useWatch({ control, name: 'type' });
 
   // In edit mode we lock the loan `type` and `principal_amount`: both are baked
   // into the disbursement transaction created when the loan was recorded, so

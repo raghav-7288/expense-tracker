@@ -307,6 +307,38 @@ describe('categories service', () => {
       expect(result.data).toEqual(cat);
     });
 
+    it('trims the name before insert (so "Test " collides with "Test" in the partial unique index)', async () => {
+      // The uniqueness the migration enforces is on the *stored* name. If the
+      // service didn't trim, "Test " would slip past the index as a distinct
+      // value and users could create near-duplicate categories.
+      const chain = buildChain({ data: { id: '1', name: 'Test' }, error: null });
+      mockFrom.mockReturnValue(chain);
+
+      await createUserCategory({ user_id: 'u1', name: '  Test  ', type: 'expense', color: '#000', icon: 'tag' });
+
+      expect(chain.insert).toHaveBeenCalledWith(
+        expect.objectContaining({ user_id: 'u1', name: 'Test', type: 'expense' }),
+      );
+    });
+
+    it('passes a Postgres unique violation (23505) straight through for the hook to translate', async () => {
+      // Post-012 the only user-triggerable unique index on user_categories is
+      // the partial (WHERE deleted_at IS NULL) one, so a 23505 means "a LIVE
+      // category with this name+type already exists". The service must surface
+      // the raw error object (code intact) — useCreateCategory turns it into a
+      // friendly toast rather than a hard failure.
+      const error = {
+        code: '23505',
+        message: 'duplicate key value violates unique constraint "uniq_user_categories_active_name_type"',
+      };
+      mockFrom.mockReturnValue(buildChain({ data: null, error }));
+
+      const result = await createUserCategory({ user_id: 'u1', name: 'Groceries', type: 'expense', color: '#000', icon: 'tag' });
+      expect(result.data).toBeNull();
+      expect(result.error).toEqual(error);
+      expect((result.error as { code?: string }).code).toBe('23505');
+    });
+
     it('returns error on failure', async () => {
       const error = { message: 'Duplicate' };
       mockFrom.mockReturnValue(buildChain({ data: null, error }));
@@ -336,6 +368,28 @@ describe('categories service', () => {
 
       const result = await deleteUserCategory('1', 'user-1');
       expect(result.error).toBeNull();
+    });
+
+    it('sets deleted_at (soft delete) and never issues a hard DELETE, scoped to id + user', async () => {
+      // This is the crux of the whole feature: the row must SURVIVE so that
+      // (a) historical transactions still resolve their category via the FK
+      // join, and (b) after migration 012 the name can be reused because the
+      // partial unique index ignores rows where deleted_at IS NOT NULL.
+      const chain = buildChain({ error: null });
+      mockFrom.mockReturnValue(chain);
+
+      await deleteUserCategory('cat-1', 'user-1');
+
+      // UPDATE ... SET deleted_at = <timestamp>
+      expect(chain.update).toHaveBeenCalledTimes(1);
+      const payload = chain.update.mock.calls[0][0] as { deleted_at?: unknown };
+      expect(payload).toHaveProperty('deleted_at');
+      expect(typeof payload.deleted_at).toBe('string');
+      // Never a destructive delete — the row is kept.
+      expect(chain.delete).not.toHaveBeenCalled();
+      // Scoped to the owning user's specific row (RLS-friendly).
+      expect(chain.eq).toHaveBeenCalledWith('id', 'cat-1');
+      expect(chain.eq).toHaveBeenCalledWith('user_id', 'user-1');
     });
 
     it('returns error on failure', async () => {

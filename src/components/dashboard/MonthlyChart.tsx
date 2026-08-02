@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { useMonthlyData } from '@/hooks/useDashboard';
 import { useCurrency } from '@/hooks/useCurrency';
@@ -6,7 +7,7 @@ import { formatCompactCurrency } from '@/utils/formatCurrency';
 import { SkeletonChart } from '@/components/ui/Skeleton';
 import { TrendingUp } from 'lucide-react';
 
-export default function MonthlyChart() {
+function MonthlyChart() {
   const { data: monthlyData, isLoading } = useMonthlyData();
   const currency = useCurrency();
   const { darkMode } = useTheme();
@@ -79,3 +80,9 @@ export default function MonthlyChart() {
     </div>
   );
 }
+
+// Propless and driven entirely by its own React Query hooks — memo keeps the
+// (relatively expensive) recharts subtree from re-rendering when the parent
+// dashboard re-renders for unrelated reasons.
+export default memo(MonthlyChart);
+

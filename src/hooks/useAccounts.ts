@@ -92,7 +92,12 @@ export function useDeleteAccount() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
+      // Deleting an account sets its transactions' account_id to NULL (FK ON
+      // DELETE SET NULL), which changes account-based analytics and the
+      // dashboard's unified balance — refresh those too, not just the list.
       queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
+      queryClient.invalidateQueries({ queryKey: ['analytics'] as const });
       toast.success('Account deleted');
     },
     onError: (error: Error) => {

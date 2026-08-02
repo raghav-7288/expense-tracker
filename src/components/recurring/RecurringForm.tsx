@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useCategories, useCreateCategory } from '@/hooks/useCategories';
@@ -66,7 +66,7 @@ export default function RecurringForm({ initialData, onSubmit, onCancel, loading
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     setValue,
     formState: { errors },
   } = useForm<RecurringFormData>({
@@ -83,7 +83,7 @@ export default function RecurringForm({ initialData, onSubmit, onCancel, loading
     },
   });
 
-  const selectedType = watch('type');
+  const selectedType = useWatch({ control, name: 'type' });
   const { data: categories } = useCategories(selectedType);
 
   // ── Inline "create category" panel state ────────────────────────────────
@@ -106,6 +106,11 @@ export default function RecurringForm({ initialData, onSubmit, onCancel, loading
     if (!pendingCategoryId) return;
     if ((categories ?? []).some((c) => c.id === pendingCategoryId)) {
       setValue('category_id', pendingCategoryId);
+      // Reset the one-shot latch now that the just-created category exists in
+      // the refreshed list and has been selected. This is a legitimate
+      // "act once when awaited async data arrives" effect, not derived-state
+      // syncing, so the set-state-in-effect heuristic is safe to waive here.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPendingCategoryId(null);
     }
   }, [categories, pendingCategoryId, setValue]);
@@ -120,15 +125,21 @@ export default function RecurringForm({ initialData, onSubmit, onCancel, loading
   async function handleCreateCategory() {
     const name = newName.trim();
     if (!name) return;
-    const created = await createCategoryMutation.mutateAsync({
-      name,
-      // Category type follows the recurring transaction type (income/expense).
-      type: selectedType === 'income' ? 'income' : 'expense',
-      color: newColor,
-      icon: newIcon,
-    });
-    if (created?.id) setPendingCategoryId(created.id);
-    resetNewCategory();
+    try {
+      const created = await createCategoryMutation.mutateAsync({
+        name,
+        // Category type follows the recurring transaction type (income/expense).
+        type: selectedType === 'income' ? 'income' : 'expense',
+        color: newColor,
+        icon: newIcon,
+      });
+      if (created?.id) setPendingCategoryId(created.id);
+      resetNewCategory();
+    } catch {
+      // The error toast is surfaced by the mutation's onError. Swallow the
+      // rejection (avoids an unhandled promise rejection) and keep the panel
+      // open with the entered values so the user can retry.
+    }
   }
 
   const categoryOptions = (categories ?? []).map((c) => ({ value: c.id, label: c.name }));

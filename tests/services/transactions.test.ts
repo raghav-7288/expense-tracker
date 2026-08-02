@@ -172,6 +172,25 @@ describe('transactions service', () => {
       // All three rows returned
       expect(result.data).toHaveLength(3);
     });
+
+    // Regression: normalizeTransaction previously dropped recurring_id, which
+    // silently broke the 🔁 badge in TransactionList and severed the UI's link
+    // between a generated transaction and its recurring rule.
+    it('preserves recurring_id for transactions generated from a recurring rule', async () => {
+      const rows = [rawRow({ id: 'txn-gen', notes: 'Rent', recurring_id: 'rule-1' })];
+      mockFrom.mockReturnValue(buildChain({ data: rows, error: null }));
+
+      const result = await getTransactions('user-1');
+      expect(result.data?.[0]?.recurring_id).toBe('rule-1');
+    });
+
+    it('normalizes a missing recurring_id to null for one-off transactions', async () => {
+      const rows = [rawRow({ id: 'txn-oneoff', notes: 'Coffee' })];
+      mockFrom.mockReturnValue(buildChain({ data: rows, error: null }));
+
+      const result = await getTransactions('user-1');
+      expect(result.data?.[0]?.recurring_id).toBeNull();
+    });
   });
 
   describe('getTransaction', () => {
@@ -182,6 +201,14 @@ describe('transactions service', () => {
       const result = await getTransaction('txn-1');
       expect(result.data?.category_id).toBe('uc-1');
       expect(result.data?.categories?.name).toBe('Custom');
+    });
+
+    it('preserves recurring_id on a single generated transaction', async () => {
+      const row = rawRow({ id: 'txn-gen', recurring_id: 'rule-42' });
+      mockFrom.mockReturnValue(buildChain({ data: row, error: null }));
+
+      const result = await getTransaction('txn-gen');
+      expect(result.data?.recurring_id).toBe('rule-42');
     });
 
     it('returns error on failure', async () => {

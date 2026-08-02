@@ -59,6 +59,9 @@ function normalizeTransaction(row: Record<string, unknown>): Transaction {
     } : null,
     account: account ?? null,
     loan_info: loanInfo,
+    // Preserve the link to the recurring rule so the UI can render the 🔁 badge
+    // and trace generated transactions back to their schedule.
+    recurring_id: (row.recurring_id ?? null) as string | null,
   };
 }
 
@@ -234,22 +237,6 @@ export async function getMonthlyStats(userId: string, year: number) {
   return { data, error };
 }
 
-/**
- * Lightweight query for dashboard totals — fetches only type + amount
- * without joins, significantly reducing payload for users with many transactions.
- */
-export async function getTransactionTotals(userId: string, dateFrom?: string, dateTo?: string) {
-  let query = supabase
-    .from('transactions')
-    .select('type, amount')
-    .eq('user_id', userId);
-
-  if (dateFrom) query = query.gte('date', dateFrom);
-  if (dateTo) query = query.lte('date', dateTo);
-
-  const { data, error } = await query;
-  return { data, error };
-}
 
 /** Dashboard balance summary via server-side aggregation (single SQL query). */
 export interface BalanceSummary {

@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { cn } from '@/utils/cn';
 import type { ReactNode } from 'react';
 
@@ -10,7 +11,7 @@ interface StatCardProps {
   subtitle?: string;
 }
 
-export default function StatCard({ title, value, icon, trend, variant = 'default', subtitle }: StatCardProps) {
+function StatCard({ title, value, icon, trend, variant = 'default', subtitle }: StatCardProps) {
   return (
     <div
       className={cn(
@@ -69,3 +70,8 @@ export default function StatCard({ title, value, icon, trend, variant = 'default
     </div>
   );
 }
+
+// Pure presentational leaf rendered several times per dashboard — memo avoids
+// re-rendering the four cards when the parent re-renders with identical props.
+export default memo(StatCard);
+

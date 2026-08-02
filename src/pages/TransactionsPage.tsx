@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useTransactions, useCreateTransaction } from '@/hooks/useTransactions';
 import { useCreateRecurringTransaction } from '@/hooks/useRecurringTransactions';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import TransactionList from '@/components/transactions/TransactionList';
 import TransactionFilterBar from '@/components/transactions/TransactionFilters';
 import TransactionForm from '@/components/transactions/TransactionForm';
@@ -27,7 +28,17 @@ export default function TransactionsPage() {
   const [showCSVMenu, setShowCSVMenu] = useState(false);
   const csvMenuRef = useRef<HTMLDivElement>(null);
 
-  const { data: transactions, isLoading, isError, refetch } = useTransactions(filters);
+  // Debounce ONLY the search term so typing doesn't fire a Supabase query per
+  // keystroke. Every other filter (type, category, account, date, sort) still
+  // applies immediately. The search box itself stays fully responsive because
+  // it's controlled by `filters` — only the query input is debounced.
+  const debouncedSearch = useDebouncedValue(filters.search, 300);
+  const queryFilters = useMemo(
+    () => ({ ...filters, search: debouncedSearch }),
+    [filters, debouncedSearch],
+  );
+
+  const { data: transactions, isLoading, isError, refetch } = useTransactions(queryFilters);
   const createMutation = useCreateTransaction();
   const createRecurringMutation = useCreateRecurringTransaction();
 

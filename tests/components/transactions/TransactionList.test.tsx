@@ -174,4 +174,21 @@ describe('TransactionList', () => {
     renderWithProviders(<TransactionList transactions={transactions} />);
     expect(screen.getAllByText('Jun 15, 2024').length).toBeGreaterThanOrEqual(1);
   });
+
+  // Regression: the 🔁 badge is driven by transaction.recurring_id. A bug in
+  // normalizeTransaction dropped that field, so the badge silently never rendered.
+  it('renders the recurring 🔁 badge only for transactions from a recurring rule', () => {
+    const transactions = [buildTransaction({ id: 'gen-1', notes: 'Rent', recurring_id: 'rule-1' })];
+    renderWithProviders(<TransactionList transactions={transactions} />);
+    // Desktop table exposes it via title, mobile via aria-label — at least one of each.
+    expect(screen.getAllByTitle('From a recurring schedule').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByLabelText('Recurring').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('does not render the recurring 🔁 badge for a one-off transaction', () => {
+    const transactions = [buildTransaction({ id: 'oneoff-1', notes: 'Coffee', recurring_id: null })];
+    renderWithProviders(<TransactionList transactions={transactions} />);
+    expect(screen.queryByTitle('From a recurring schedule')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Recurring')).not.toBeInTheDocument();
+  });
 });

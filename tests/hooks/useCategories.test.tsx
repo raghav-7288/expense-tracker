@@ -132,6 +132,46 @@ describe('useCreateCategory', () => {
     expect(toast.error).not.toHaveBeenCalled();
     expect(toast.success).not.toHaveBeenCalled();
   });
+
+  it('re-creating the name of a previously deleted category succeeds (post-012 contract)', async () => {
+    // After migration 012 the partial unique index ignores soft-deleted rows,
+    // so the service inserts a fresh row and returns it — the hook must treat
+    // this as a normal success (data + success toast), NOT a duplicate.
+    mockCreateUserCategory.mockResolvedValue({ data: { id: 'fresh', name: 'Test', type: 'expense' }, error: null });
+    const { result } = renderHook(() => useCreateCategory(), { wrapper: createWrapper() });
+
+    const returned = await result.current.mutateAsync({ name: 'Test', type: 'expense', color: '#000', icon: 'tag' });
+
+    expect(returned).toEqual({ id: 'fresh', name: 'Test', type: 'expense' });
+    await waitFor(() => expect(toast.success).toHaveBeenCalledWith('Category created'));
+    expect(toast.error).not.toHaveBeenCalled();
+  });
+
+  it('invalidates the whole categories prefix so every consumer refreshes immediately', async () => {
+    // Regression: a new category must appear at once in the Categories page,
+    // the transaction/recurring form dropdowns, and the filters. Those are
+    // distinct query keys under ['categories'], so the create must invalidate
+    // the prefix (React Query matches by prefix).
+    mockCreateUserCategory.mockResolvedValue({ data: { id: '1', name: 'New' }, error: null });
+
+    const queryClient = createTestQueryClient();
+    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
+    const authValue = createMockAuth();
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={queryClient}>
+        <ThemeContext.Provider value={{ darkMode: false, setDarkMode: vi.fn() }}>
+          <AuthContext.Provider value={authValue}>{children}</AuthContext.Provider>
+        </ThemeContext.Provider>
+      </QueryClientProvider>
+    );
+
+    const { result } = renderHook(() => useCreateCategory(), { wrapper });
+    await result.current.mutateAsync({ name: 'New', type: 'expense', color: '#000', icon: 'tag' });
+
+    await waitFor(() =>
+      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['categories'] }),
+    );
+  });
 });
 
 describe('useUpdateCategory', () => {
