@@ -1,6 +1,7 @@
 import type { TransactionType } from '@/types';
 
 export type TimeRangePreset =
+  | 'allTime'
   | 'today'
   | 'yesterday'
   | 'last7'

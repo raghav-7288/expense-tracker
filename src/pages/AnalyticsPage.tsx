@@ -37,7 +37,7 @@ import InvestmentTracker from '@/components/analytics/InvestmentTracker';
 
 export default function AnalyticsPage() {
   const [filters, setFilters] = useState<AnalyticsFilters>({
-    preset: 'thisMonth',
+    preset: 'allTime',
     type: 'all',
   });
 

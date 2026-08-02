@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   getDateRange,
+  getAllTimeRange,
   getPreviousPeriod,
   filterTransactions,
   computeSummary,
@@ -131,6 +132,80 @@ describe('getDateRange', () => {
     const r = getDateRange('custom');
     expect(r.startDate).toBe('2024-06-15');
     expect(r.endDate).toBe('2024-06-15');
+  });
+
+  it('allTime without transactions defaults to today', () => {
+    const r = getDateRange('allTime');
+    expect(r.startDate).toBe('2024-06-15');
+    expect(r.endDate).toBe('2024-06-15');
+  });
+
+  it('allTime spans earliest → latest transaction date', () => {
+    const r = getDateRange('allTime', undefined, [
+      txn({ id: 'a', date: '2022-03-04' }),
+      txn({ id: 'b', date: '2024-01-20' }),
+      txn({ id: 'c', date: '2023-11-30' }),
+    ]);
+    expect(r.startDate).toBe('2022-03-04');
+    expect(r.endDate).toBe('2024-01-20');
+  });
+
+  it('allTime ignores customRange argument', () => {
+    const r = getDateRange('allTime', { startDate: '2024-03-01', endDate: '2024-03-31' }, [
+      txn({ id: 'a', date: '2021-01-01' }),
+      txn({ id: 'b', date: '2025-12-31' }),
+    ]);
+    expect(r.startDate).toBe('2021-01-01');
+    expect(r.endDate).toBe('2025-12-31');
+  });
+});
+
+// --------------- getAllTimeRange ---------------
+
+describe('getAllTimeRange', () => {
+  beforeEach(() => { vi.useFakeTimers(); vi.setSystemTime(new Date('2024-06-15T12:00:00')); });
+  afterEach(() => { vi.useRealTimers(); });
+
+  it('returns today→today for an empty list (no transactions)', () => {
+    const r = getAllTimeRange([]);
+    expect(r.startDate).toBe('2024-06-15');
+    expect(r.endDate).toBe('2024-06-15');
+  });
+
+  it('returns a single-day range for exactly one transaction', () => {
+    const r = getAllTimeRange([txn({ date: '2023-02-14' })]);
+    expect(r.startDate).toBe('2023-02-14');
+    expect(r.endDate).toBe('2023-02-14');
+  });
+
+  it('spans the earliest and latest dates regardless of order', () => {
+    const r = getAllTimeRange([
+      txn({ id: '1', date: '2023-07-15' }),
+      txn({ id: '2', date: '2020-01-01' }),
+      txn({ id: '3', date: '2024-05-31' }),
+      txn({ id: '4', date: '2021-12-25' }),
+    ]);
+    expect(r.startDate).toBe('2020-01-01');
+    expect(r.endDate).toBe('2024-05-31');
+  });
+
+  it('includes future-dated transactions', () => {
+    const r = getAllTimeRange([
+      txn({ id: '1', date: '2024-01-01' }),
+      txn({ id: '2', date: '2030-01-01' }),
+    ]);
+    expect(r.endDate).toBe('2030-01-01');
+  });
+
+  it('handles a large dataset efficiently', () => {
+    const many = Array.from({ length: 10000 }, (_, i) =>
+      txn({ id: `t-${i}`, date: `20${10 + (i % 15)}-0${(i % 9) + 1}-15` }),
+    );
+    const start = performance.now();
+    const r = getAllTimeRange(many);
+    const elapsed = performance.now() - start;
+    expect(elapsed).toBeLessThan(50);
+    expect(r.startDate <= r.endDate).toBe(true);
   });
 });
 

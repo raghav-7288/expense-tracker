@@ -158,5 +158,174 @@ describe('useAnalytics', () => {
     // Expense categories should only include expense transactions
     expect(result.current.expenseCategories).toBeDefined();
   });
+
+  // ── "All Time" preset ────────────────────────────────────
+  describe('allTime preset', () => {
+    function makeTxn(over: Record<string, unknown>) {
+      return {
+        id: 'x', user_id: 'user-123', category_id: 'c1', account_id: null,
+        type: 'expense', amount: 100, notes: 'n',
+        date: '2022-01-01',
+        created_at: '', updated_at: '',
+        categories: { id: 'c1', user_id: 'user-123', name: 'Food', type: 'expense', color: '#f00', icon: 'utensils', created_at: '', updated_at: '' },
+        ...over,
+      };
+    }
+
+    it('spans the earliest → latest transaction dates (removes date restriction)', async () => {
+      const transactions = [
+        makeTxn({ id: '1', date: '2020-01-15', type: 'expense', amount: 200 }),
+        makeTxn({ id: '2', date: '2021-06-10', type: 'income', amount: 900 }),
+        makeTxn({ id: '3', date: '2023-03-20', type: 'expense', amount: 300 }),
+      ];
+      mockGetTransactions.mockResolvedValue({ data: transactions, error: null });
+
+      const filters: AnalyticsFilters = { preset: 'allTime', type: 'all' };
+      const { result } = renderHook(() => useAnalytics(filters), { wrapper: createWrapper() });
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      expect(result.current.dateRange.startDate).toBe('2020-01-15');
+      expect(result.current.dateRange.endDate).toBe('2023-03-20');
+      // Every transaction is included in the summary
+      expect(result.current.summary?.totalExpenses).toBe(500);
+      expect(result.current.summary?.totalIncome).toBe(900);
+      expect(result.current.summary?.transactionCount).toBe(3);
+    });
+
+    it('the AnalyticsPage default filters populate every widget from the full history', async () => {
+      const transactions = [
+        makeTxn({ id: '1', date: '2019-01-01', type: 'income', amount: 1000 }),
+        makeTxn({ id: '2', date: '2021-06-15', type: 'expense', amount: 400 }),
+        makeTxn({ id: '3', date: '2024-03-10', type: 'expense', amount: 600 }),
+      ];
+      mockGetTransactions.mockResolvedValue({ data: transactions, error: null });
+
+      // Exactly the object AnalyticsPage initializes its filter state with.
+      const pageDefaultFilters: AnalyticsFilters = { preset: 'allTime', type: 'all' };
+      const { result } = renderHook(() => useAnalytics(pageDefaultFilters), { wrapper: createWrapper() });
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      // Range covers the entire transaction history
+      expect(result.current.dateRange.startDate).toBe('2019-01-01');
+      expect(result.current.dateRange.endDate).toBe('2024-03-10');
+
+      // Summary cards reflect all data
+      expect(result.current.summary?.transactionCount).toBe(3);
+      expect(result.current.summary?.totalIncome).toBe(1000);
+      expect(result.current.summary?.totalExpenses).toBe(1000);
+
+      // Charts / tables / rankings / reports are all populated from the full history
+      expect(result.current.expenseCategories.length).toBeGreaterThan(0);
+      expect(result.current.monthlySeries.length).toBeGreaterThan(0);
+      expect(result.current.largestTransactions).toHaveLength(3);
+      expect(result.current.monthlyReport?.monthLabel).toBe('All Time');
+    });
+
+    it('includes a single-transaction user (edge case)', async () => {
+      mockGetTransactions.mockResolvedValue({
+        data: [makeTxn({ id: '1', date: '2019-09-09', type: 'expense', amount: 42 })],
+        error: null,
+      });
+
+      const filters: AnalyticsFilters = { preset: 'allTime', type: 'all' };
+      const { result } = renderHook(() => useAnalytics(filters), { wrapper: createWrapper() });
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      expect(result.current.dateRange.startDate).toBe('2019-09-09');
+      expect(result.current.dateRange.endDate).toBe('2019-09-09');
+      expect(result.current.summary?.totalExpenses).toBe(42);
+      expect(result.current.summary?.transactionCount).toBe(1);
+    });
+
+    it('handles a user with no transactions', async () => {
+      mockGetTransactions.mockResolvedValue({ data: [], error: null });
+
+      const filters: AnalyticsFilters = { preset: 'allTime', type: 'all' };
+      const { result } = renderHook(() => useAnalytics(filters), { wrapper: createWrapper() });
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      expect(result.current.summary?.transactionCount).toBe(0);
+      expect(result.current.summary?.totalExpenses).toBe(0);
+      expect(result.current.summary?.totalIncome).toBe(0);
+    });
+
+    it('respects the account filter when computing the range and totals', async () => {
+      const transactions = [
+        makeTxn({ id: '1', date: '2020-01-01', account_id: 'acc-1', amount: 100 }),
+        makeTxn({ id: '2', date: '2024-12-31', account_id: 'acc-2', amount: 500 }),
+        makeTxn({ id: '3', date: '2022-05-05', account_id: 'acc-1', amount: 150 }),
+      ];
+      mockGetTransactions.mockResolvedValue({ data: transactions, error: null });
+
+      const filters: AnalyticsFilters = { preset: 'allTime', type: 'all', accountId: 'acc-1' };
+      const { result } = renderHook(() => useAnalytics(filters), { wrapper: createWrapper() });
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      // Range bounded to acc-1 transactions only (2020-01-01 → 2022-05-05)
+      expect(result.current.dateRange.startDate).toBe('2020-01-01');
+      expect(result.current.dateRange.endDate).toBe('2022-05-05');
+      expect(result.current.summary?.totalExpenses).toBe(250); // 100 + 150
+      expect(result.current.summary?.transactionCount).toBe(2);
+    });
+
+    it('respects multiple category selections combined with All Time', async () => {
+      const transactions = [
+        makeTxn({ id: '1', date: '2021-01-01', category_id: 'cat-food', amount: 100,
+          categories: { id: 'cat-food', user_id: 'user-123', name: 'Food', type: 'expense', color: '#f00', icon: 'utensils', created_at: '', updated_at: '' } }),
+        makeTxn({ id: '2', date: '2021-02-01', category_id: 'cat-transport', amount: 200,
+          categories: { id: 'cat-transport', user_id: 'user-123', name: 'Transport', type: 'expense', color: '#00f', icon: 'car', created_at: '', updated_at: '' } }),
+        makeTxn({ id: '3', date: '2021-03-01', category_id: 'cat-fun', amount: 300,
+          categories: { id: 'cat-fun', user_id: 'user-123', name: 'Fun', type: 'expense', color: '#808', icon: 'music', created_at: '', updated_at: '' } }),
+      ];
+      mockGetTransactions.mockResolvedValue({ data: transactions, error: null });
+
+      const filters: AnalyticsFilters = {
+        preset: 'allTime', type: 'all', categoryIds: ['cat-food', 'cat-transport'],
+      };
+      const { result } = renderHook(() => useAnalytics(filters), { wrapper: createWrapper() });
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      // Only Food + Transport counted; range bounded to those (2021-01-01 → 2021-02-01)
+      expect(result.current.summary?.totalExpenses).toBe(300);
+      expect(result.current.summary?.transactionCount).toBe(2);
+      expect(result.current.dateRange.startDate).toBe('2021-01-01');
+      expect(result.current.dateRange.endDate).toBe('2021-02-01');
+      expect(result.current.expenseCategories.map((c) => c.name).sort()).toEqual(['Food', 'Transport']);
+    });
+
+    it('ignores a stale customRange when switching to All Time', async () => {
+      const transactions = [
+        makeTxn({ id: '1', date: '2018-01-01', amount: 100 }),
+        makeTxn({ id: '2', date: '2024-01-01', amount: 100 }),
+      ];
+      mockGetTransactions.mockResolvedValue({ data: transactions, error: null });
+
+      const filters: AnalyticsFilters = {
+        preset: 'allTime', type: 'all',
+        customRange: { startDate: '2024-03-01', endDate: '2024-03-31' },
+      };
+      const { result } = renderHook(() => useAnalytics(filters), { wrapper: createWrapper() });
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      // The custom range must NOT be used — full span wins
+      expect(result.current.dateRange.startDate).toBe('2018-01-01');
+      expect(result.current.dateRange.endDate).toBe('2024-01-01');
+      expect(result.current.summary?.transactionCount).toBe(2);
+    });
+
+    it('labels the monthly report "All Time"', async () => {
+      const transactions = [
+        makeTxn({ id: '1', date: '2020-01-15', type: 'income', amount: 1000 }),
+        makeTxn({ id: '2', date: '2023-03-20', type: 'expense', amount: 300 }),
+      ];
+      mockGetTransactions.mockResolvedValue({ data: transactions, error: null });
+
+      const filters: AnalyticsFilters = { preset: 'allTime', type: 'all' };
+      const { result } = renderHook(() => useAnalytics(filters), { wrapper: createWrapper() });
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      expect(result.current.monthlyReport?.monthLabel).toBe('All Time');
+    });
+  });
 });
 
