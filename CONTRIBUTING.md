@@ -18,7 +18,7 @@ Be respectful and constructive. We welcome contributors of all experience levels
    ```bash
    npm install
    ```
-4. **Set up** the environment — see [INSTALLATION.md](INSTALLATION.md)
+4. **Set up** the environment — see [INSTALLATION.md](docs/INSTALLATION.md)
 5. **Create** a feature branch:
    ```bash
    git checkout -b feature/your-feature-name

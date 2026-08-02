@@ -3,6 +3,7 @@ import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/hooks/useTheme';
+import { useGenerateDueTransactions } from '@/hooks/useRecurringTransactions';
 import {
   LayoutDashboard,
   BarChart3,
@@ -17,7 +18,6 @@ import {
   Moon,
   ChevronRight,
   Landmark,
-  HandCoins,
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import toast from 'react-hot-toast';
@@ -26,16 +26,18 @@ const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/analytics', icon: BarChart3, label: 'Analytics' },
   { to: '/transactions', icon: ArrowLeftRight, label: 'Transactions' },
-  { to: '/loans', icon: HandCoins, label: 'Loans' },
   { to: '/accounts', icon: Landmark, label: 'Accounts' },
   { to: '/categories', icon: Tag, label: 'Categories' },
 ];
 
+// Recurring & Loans live inside the Transactions hub (/transactions/*), so the
+// breadcrumb resolves them by longest-matching path prefix.
 const PAGE_TITLES: Record<string, string> = {
   '/dashboard': 'Dashboard',
   '/analytics': 'Analytics',
   '/transactions': 'Transactions',
-  '/loans': 'Loans',
+  '/transactions/recurring': 'Recurring',
+  '/transactions/loans': 'Loans',
   '/accounts': 'Accounts',
   '/categories': 'Categories',
   '/profile': 'Profile',
@@ -48,13 +50,21 @@ export default function DashboardLayout() {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Materialize any recurring transactions that came due since last visit.
+  useGenerateDueTransactions();
+
   async function handleSignOut() {
     await signOut();
     toast.success('Signed out');
     navigate('/login');
   }
 
-  const currentTitle = PAGE_TITLES[location.pathname] ?? 'Dashboard';
+  // Resolve the breadcrumb title by the longest path that matches the current
+  // location, so nested routes (e.g. /transactions/loans) resolve correctly.
+  const currentTitle =
+    Object.entries(PAGE_TITLES)
+      .filter(([path]) => location.pathname === path || location.pathname.startsWith(`${path}/`))
+      .sort((a, b) => b[0].length - a[0].length)[0]?.[1] ?? 'Dashboard';
   const userInitial = (user?.user_metadata?.full_name ?? user?.email ?? 'U').charAt(0).toUpperCase();
   const userName = user?.user_metadata?.full_name ?? user?.email ?? '';
 

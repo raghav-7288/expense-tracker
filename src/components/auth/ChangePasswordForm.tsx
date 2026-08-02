@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuth } from '@/hooks/useAuth';
@@ -54,12 +54,12 @@ export default function ChangePasswordForm() {
     formState: { errors },
     reset,
     setError,
-    watch,
+    control,
   } = useForm<PasswordFormData>({
     resolver: zodResolver(passwordSchema),
   });
 
-  const passwordValue = watch('password') ?? '';
+  const passwordValue = useWatch({ control, name: 'password' }) ?? '';
   const strength = passwordValue.length > 0 ? getPasswordStrength(passwordValue) : null;
 
   async function onSubmit(data: PasswordFormData) {

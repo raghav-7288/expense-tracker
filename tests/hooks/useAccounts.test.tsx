@@ -233,5 +233,36 @@ describe('useDeleteAccount', () => {
 
     expect(toast.default.error).toHaveBeenCalled();
   });
+
+  it('invalidates accounts, transactions, dashboard, and analytics after delete', async () => {
+    // Deleting an account nulls its transactions' account_id (FK SET NULL), which
+    // changes account-based analytics and the dashboard's unified balance — all
+    // four caches must refresh, not just the accounts list.
+    mockDeleteAccount.mockResolvedValue({ error: null });
+
+    const queryClient = createTestQueryClient();
+    const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries');
+    const authValue = createMockAuth();
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={queryClient}>
+        <ThemeContext.Provider value={{ darkMode: false, setDarkMode: vi.fn() }}>
+          <AuthContext.Provider value={authValue}>{children}</AuthContext.Provider>
+        </ThemeContext.Provider>
+      </QueryClientProvider>
+    );
+
+    const { result } = renderHook(() => useDeleteAccount(), { wrapper });
+    await act(async () => {
+      await result.current.mutateAsync('1');
+    });
+
+    const invalidatedKeys = invalidateSpy.mock.calls.map(
+      (c) => (c[0] as { queryKey: unknown[] }).queryKey,
+    );
+    expect(invalidatedKeys).toContainEqual(['accounts']);
+    expect(invalidatedKeys).toContainEqual(['transactions']);
+    expect(invalidatedKeys).toContainEqual(['dashboard']);
+    expect(invalidatedKeys).toContainEqual(['analytics']);
+  });
 });
 

@@ -81,8 +81,11 @@ describe('DashboardPage – Balance Widgets Unaffected by Loans', () => {
 
     renderWithProviders(<DashboardPage />);
     expect(screen.getByText('Net Savings')).toBeInTheDocument();
+    // Net Savings = monthlyIncome (4000) - monthlyExpenses (2500) = 1500.
+    // The Net Savings card shows the plain amount (no "+" sign) — consistent
+    // with DashboardPage.test.tsx. The signed "+" display is a loan-widget
+    // convention (LoanSummaryCard), not used here.
     expect(screen.getByText('$1,500.00')).toBeInTheDocument();
-    expect(screen.getByText('+$1,500.00')).toBeInTheDocument();
   });
 
   it('renders Loan Summary Card widget on dashboard', () => {

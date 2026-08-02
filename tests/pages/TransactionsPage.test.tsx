@@ -15,6 +15,7 @@ vi.mock('@/hooks/useTransactions', () => ({
 
 vi.mock('@/hooks/useCategories', () => ({
   useCategories: () => ({ data: [], isLoading: false }),
+  useCreateCategory: () => ({ mutateAsync: vi.fn(), isPending: false }),
 }));
 
 vi.mock('@/hooks/useCurrency', () => ({

@@ -4,6 +4,10 @@ export const queryKeys = {
     list: (userId: string | undefined, filters?: unknown) =>
       ['transactions', userId, filters] as const,
   },
+  recurringTransactions: {
+    all: ['recurringTransactions'] as const,
+    list: (userId: string | undefined) => ['recurringTransactions', userId] as const,
+  },
   categories: {
     all: ['categories'] as const,
     list: (userId: string | undefined, type?: string) =>

@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { getToday } from '@/utils/formatDate';
 import type {
   Loan,
   CreateLoanInput,
@@ -87,7 +88,10 @@ export async function createLoan(input: CreateLoanInput) {
       type: transactionType,
       amount: loanData.principal_amount,
       notes,
-      date: new Date().toISOString().split('T')[0],
+      // Local calendar date — consistent with getToday() used everywhere else
+      // (recurring generator, etc.). Using new Date().toISOString() here would
+      // record a UTC date, landing the disbursement on the wrong day near midnight.
+      date: getToday(),
       account_id: account_id ?? null,
     })
     .select()

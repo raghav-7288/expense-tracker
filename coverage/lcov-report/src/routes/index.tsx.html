@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">50% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>11/22</span>
+                <span class='fraction'>13/26</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">8.33% </span>
+                <span class="strong">7.14% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/12</span>
+                <span class='fraction'>1/14</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">91.66% </span>
+                <span class="strong">92.85% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>11/12</span>
+                <span class='fraction'>13/14</span>
             </div>
         
             
@@ -125,13 +125,31 @@
 <a name='L60'></a><a href='#L60'>60</a>
 <a name='L61'></a><a href='#L61'>61</a>
 <a name='L62'></a><a href='#L62'>62</a>
-<a name='L63'></a><a href='#L63'>63</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -187,10 +205,23 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import AuthLayout from '@/layouts/AuthLayout';
 import DashboardLayout from '@/layouts/DashboardLayout';
+import TransactionsLayout from '@/layouts/TransactionsLayout';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 &nbsp;
 // Lazy-loaded pages for code splitting
@@ -200,10 +231,12 @@ const ForgotPasswordPage = <span class="fstat-no" title="function not covered" >
 const ResetPasswordPage = <span class="fstat-no" title="function not covered" >lazy(() =&gt; <span class="cstat-no" title="statement not covered" >i</span>mport('@/pages/ResetPasswordPage'));</span>
 const DashboardPage = <span class="fstat-no" title="function not covered" >lazy(() =&gt; <span class="cstat-no" title="statement not covered" >i</span>mport('@/pages/DashboardPage'));</span>
 const TransactionsPage = <span class="fstat-no" title="function not covered" >lazy(() =&gt; <span class="cstat-no" title="statement not covered" >i</span>mport('@/pages/TransactionsPage'));</span>
+const RecurringPage = <span class="fstat-no" title="function not covered" >lazy(() =&gt; <span class="cstat-no" title="statement not covered" >i</span>mport('@/pages/RecurringPage'));</span>
 const CategoriesPage = <span class="fstat-no" title="function not covered" >lazy(() =&gt; <span class="cstat-no" title="statement not covered" >i</span>mport('@/pages/CategoriesPage'));</span>
 const ProfilePage = <span class="fstat-no" title="function not covered" >lazy(() =&gt; <span class="cstat-no" title="statement not covered" >i</span>mport('@/pages/ProfilePage'));</span>
 const AnalyticsPage = <span class="fstat-no" title="function not covered" >lazy(() =&gt; <span class="cstat-no" title="statement not covered" >i</span>mport('@/pages/AnalyticsPage'));</span>
 const AccountsPage = <span class="fstat-no" title="function not covered" >lazy(() =&gt; <span class="cstat-no" title="statement not covered" >i</span>mport('@/pages/AccountsPage'));</span>
+const LoansPage = <span class="fstat-no" title="function not covered" >lazy(() =&gt; <span class="cstat-no" title="statement not covered" >i</span>mport('@/pages/LoansPage'));</span>
 &nbsp;
 function <span class="fstat-no" title="function not covered" >PageFallback() {</span>
 <span class="cstat-no" title="statement not covered" >  return (</span>
@@ -236,10 +269,22 @@ export default function AppRouter() {
           &gt;
             &lt;Route path="/dashboard" element={&lt;DashboardPage /&gt;} /&gt;
             &lt;Route path="/analytics" element={&lt;AnalyticsPage /&gt;} /&gt;
-            &lt;Route path="/transactions" element={&lt;TransactionsPage /&gt;} /&gt;
+            {/* Transactions hub: all / recurring / loans as sub-tabs */}
+            &lt;Route path="/transactions" element={&lt;TransactionsLayout /&gt;}&gt;
+              &lt;Route index element={&lt;TransactionsPage /&gt;} /&gt;
+              &lt;Route path="recurring" element={&lt;RecurringPage /&gt;} /&gt;
+              &lt;Route path="loans" element={&lt;LoansPage /&gt;} /&gt;
+              {/* Unknown sub-path stays inside the hub (falls back to the All tab)
+                  instead of bouncing out to /dashboard via the top-level splat. */}
+              &lt;Route path="*" element={&lt;Navigate to="/transactions" replace /&gt;} /&gt;
+            &lt;/Route&gt;
             &lt;Route path="/accounts" element={&lt;AccountsPage /&gt;} /&gt;
             &lt;Route path="/categories" element={&lt;CategoriesPage /&gt;} /&gt;
             &lt;Route path="/profile" element={&lt;ProfilePage /&gt;} /&gt;
+&nbsp;
+            {/* Back-compat: old top-level routes now live under /transactions */}
+            &lt;Route path="/recurring" element={&lt;Navigate to="/transactions/recurring" replace /&gt;} /&gt;
+            &lt;Route path="/loans" element={&lt;Navigate to="/transactions/loans" replace /&gt;} /&gt;
           &lt;/Route&gt;
 &nbsp;
           {/* Default redirect */}
@@ -256,7 +301,7 @@ export default function AppRouter() {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-07-26T09:38:13.228Z
+                at 2026-08-02T07:08:24.617Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

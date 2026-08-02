@@ -120,6 +120,8 @@ export interface Transaction {
   account?: { id: string; name: string; color: string } | null;
   /** Present when the transaction is linked to a loan (disbursement or repayment). */
   loan_info?: TransactionLoanInfo | null;
+  /** Set when this transaction was generated from a recurring rule. */
+  recurring_id?: string | null;
 }
 
 export interface CreateTransactionInput {
@@ -139,6 +141,61 @@ export interface UpdateTransactionInput {
   amount?: number;
   notes?: string;
   date?: string;
+}
+
+// ============================================
+// RECURRING TRANSACTIONS
+// ============================================
+
+export type RecurrenceFrequency = 'weekly' | 'monthly' | 'yearly';
+
+/** Only income/expense can recur — loans have their own disbursement flow. */
+export type RecurringTransactionType = Extract<TransactionType, 'income' | 'expense'>;
+
+export interface RecurringTransaction {
+  id: string;
+  user_id: string;
+  type: RecurringTransactionType;
+  amount: number;
+  notes: string;
+  /** Merged category id (system or user) — resolved by the service layer. */
+  category_id: string | null;
+  account_id: string | null;
+  frequency: RecurrenceFrequency;
+  start_date: string;
+  /** null = repeats indefinitely */
+  end_date: string | null;
+  next_due_date: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  categories?: Category | null;
+  account?: { id: string; name: string; color: string } | null;
+}
+
+export interface CreateRecurringTransactionInput {
+  user_id: string;
+  type: RecurringTransactionType;
+  amount: number;
+  notes: string;
+  category_id?: string | null;
+  account_id?: string | null;
+  frequency: RecurrenceFrequency;
+  start_date: string;
+  end_date?: string | null;
+}
+
+export interface UpdateRecurringTransactionInput {
+  type?: RecurringTransactionType;
+  amount?: number;
+  notes?: string;
+  category_id?: string | null;
+  account_id?: string | null;
+  frequency?: RecurrenceFrequency;
+  start_date?: string;
+  end_date?: string | null;
+  next_due_date?: string;
+  is_active?: boolean;
 }
 
 export interface CreateCategoryInput {

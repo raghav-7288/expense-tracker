@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Button from '@/components/ui/Button';
@@ -32,7 +32,7 @@ export default function AccountForm({ initialData, onSubmit, onCancel, loading =
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     setValue,
     formState: { errors },
   } = useForm<AccountFormData>({
@@ -46,7 +46,7 @@ export default function AccountForm({ initialData, onSubmit, onCancel, loading =
     },
   });
 
-  const selectedColor = watch('color');
+  const selectedColor = useWatch({ control, name: 'color' });
 
   const typeOptions = [
     { value: 'checking', label: 'Checking' },

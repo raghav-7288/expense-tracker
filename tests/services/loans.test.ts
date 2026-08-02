@@ -31,6 +31,12 @@ vi.mock('@/lib/supabase', () => ({
   supabase: { from: (...args: unknown[]) => mockFrom(...args) },
 }));
 
+// createLoan stamps the disbursement with the local calendar date via getToday().
+// Pin it so we can assert the exact value that reaches the transactions insert.
+vi.mock('@/utils/formatDate', () => ({
+  getToday: () => '2026-08-02',
+}));
+
 function rawLoan(overrides: Record<string, unknown> = {}) {
   return {
     id: 'loan-1',
@@ -235,6 +241,42 @@ describe('loans service', () => {
       expect(result.error).toEqual({ message: 'Insert failed' });
       // Should attempt to delete the created loan (rollback)
       expect(mockFrom).toHaveBeenCalledWith('loans');
+    });
+
+    it('stamps the disbursement with the local calendar date (getToday), not a UTC date', async () => {
+      const loan = rawLoan();
+      const txn = { id: 'txn-1', type: 'lent', amount: 5000 };
+      let txnInsertArg: Record<string, unknown> | null = null;
+
+      mockFrom.mockImplementation((table: string) => {
+        if (table === 'loans') {
+          const chain = buildChain({ data: loan, error: null });
+          chain.single = vi.fn().mockResolvedValue({ data: loan, error: null });
+          return chain;
+        }
+        if (table === 'transactions') {
+          const chain = buildChain({ data: txn, error: null });
+          chain.insert = vi.fn().mockImplementation((arg: Record<string, unknown>) => {
+            txnInsertArg = arg;
+            return chain;
+          });
+          chain.single = vi.fn().mockResolvedValue({ data: txn, error: null });
+          return chain;
+        }
+        return buildChain({ data: {}, error: null });
+      });
+
+      await createLoan({
+        user_id: 'user-1',
+        counterparty_name: 'Rahul',
+        type: 'lent',
+        principal_amount: 5000,
+        outstanding_amount: 5000,
+      });
+
+      expect(txnInsertArg).not.toBeNull();
+      // Local date from mocked getToday(), NOT new Date().toISOString() (UTC).
+      expect((txnInsertArg as unknown as { date: string }).date).toBe('2026-08-02');
     });
   });
 

@@ -1,5 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useTransactions, useCreateTransaction } from '@/hooks/useTransactions';
+import { useCreateRecurringTransaction } from '@/hooks/useRecurringTransactions';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import TransactionList from '@/components/transactions/TransactionList';
 import TransactionFilterBar from '@/components/transactions/TransactionFilters';
 import TransactionForm from '@/components/transactions/TransactionForm';
@@ -26,8 +28,19 @@ export default function TransactionsPage() {
   const [showCSVMenu, setShowCSVMenu] = useState(false);
   const csvMenuRef = useRef<HTMLDivElement>(null);
 
-  const { data: transactions, isLoading, isError, refetch } = useTransactions(filters);
+  // Debounce ONLY the search term so typing doesn't fire a Supabase query per
+  // keystroke. Every other filter (type, category, account, date, sort) still
+  // applies immediately. The search box itself stays fully responsive because
+  // it's controlled by `filters` — only the query input is debounced.
+  const debouncedSearch = useDebouncedValue(filters.search, 300);
+  const queryFilters = useMemo(
+    () => ({ ...filters, search: debouncedSearch }),
+    [filters, debouncedSearch],
+  );
+
+  const { data: transactions, isLoading, isError, refetch } = useTransactions(queryFilters);
   const createMutation = useCreateTransaction();
+  const createRecurringMutation = useCreateRecurringTransaction();
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -43,6 +56,23 @@ export default function TransactionsPage() {
   }, [showCSVMenu]);
 
   async function handleCreate(data: Record<string, unknown>) {
+    // When the user toggled "repeat", persist a recurring rule instead of a
+    // one-off transaction. The generator materializes any occurrence due today.
+    if (data.is_recurring) {
+      await createRecurringMutation.mutateAsync({
+        type: data.type as 'income' | 'expense',
+        amount: data.amount as number,
+        notes: data.notes as string,
+        category_id: (data.category_id as string) || null,
+        account_id: (data.account_id as string) || null,
+        frequency: data.frequency as 'weekly' | 'monthly' | 'yearly',
+        start_date: data.date as string,
+        end_date: (data.end_date as string) || null,
+      });
+      setShowForm(false);
+      return;
+    }
+
     await createMutation.mutateAsync({
       type: data.type as 'income' | 'expense' | 'lent' | 'borrowed',
       amount: data.amount as number,
@@ -170,7 +200,8 @@ export default function TransactionsPage() {
         <TransactionForm
           onSubmit={handleCreate}
           onCancel={() => setShowForm(false)}
-          loading={createMutation.isPending}
+          loading={createMutation.isPending || createRecurringMutation.isPending}
+          allowRecurring
         />
       </Modal>
 

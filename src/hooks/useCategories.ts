@@ -14,6 +14,19 @@ import {
 import type { MergedCategory, CreateCategoryInput, UpdateCategoryInput, TransactionType } from '@/types';
 import toast from 'react-hot-toast';
 
+/**
+ * A Postgres unique-violation (SQLSTATE 23505). After migration 012 the
+ * user_categories uniqueness index only covers LIVE rows, so this can only
+ * mean a non-deleted category with the same name+type already exists —
+ * re-creating the name of a soft-deleted category no longer conflicts.
+ */
+function isDuplicateCategory(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const e = error as { code?: string; message?: string };
+  return e.code === '23505' || /duplicate key|already exists/i.test(e.message ?? '');
+}
+
+
 export function useCategories(type?: TransactionType) {
   const { user } = useAuth();
 
@@ -52,12 +65,21 @@ export function useCreateCategory() {
     mutationFn: async (input: Omit<CreateCategoryInput, 'user_id'>) => {
       if (!user) throw new Error('Not authenticated');
       const { data, error } = await createUserCategory({ ...input, user_id: user.id });
-      if (error) throw new Error(typeof error === 'string' ? error : (error as { message?: string }).message ?? 'Failed to create category');
+      if (error) {
+        // A live category with this name+type already exists. Treat it as a
+        // benign, informative outcome — a friendly toast, not a hard failure.
+        if (isDuplicateCategory(error)) {
+          toast(`A category named “${input.name.trim()}” already exists.`, { icon: '⚠️' });
+          return null;
+        }
+        throw new Error(typeof error === 'string' ? error : (error as { message?: string }).message ?? 'Failed to create category');
+      }
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.categories.all });
-      toast.success('Category created');
+      // `data` is null when the create was a no-op (duplicate) — already toasted.
+      if (data) toast.success('Category created');
     },
     onError: (error: Error) => {
       toast.error(error.message || 'Failed to create category');

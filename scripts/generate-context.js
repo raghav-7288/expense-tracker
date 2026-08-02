@@ -362,12 +362,16 @@ function generate() {
   md += `\n`;
 
   // ── Write
-  const outputPath = path.resolve(ROOT, "CONTEXT.md");
+  // CONTEXT.md is developer documentation and lives in docs/ (see docs/README.md).
+  // Writing it here keeps the repo root clean and refreshes the tracked doc in place.
+  const outputDir = path.resolve(ROOT, "docs");
+  fs.mkdirSync(outputDir, { recursive: true });
+  const outputPath = path.resolve(outputDir, "CONTEXT.md");
   fs.writeFileSync(outputPath, md, "utf-8");
 
   const outputLines = md.split("\n").length;
   console.log(
-    `✅ CONTEXT.md generated (${outputLines} lines), ${filesAnalyzed} files analyzed`
+    `✅ docs/CONTEXT.md generated (${outputLines} lines), ${filesAnalyzed} files analyzed`
   );
 }
 
