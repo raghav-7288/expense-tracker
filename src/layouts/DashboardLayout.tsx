@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/hooks/useTheme';
 import { useGenerateDueTransactions } from '@/hooks/useRecurringTransactions';
+import { useBudgetAlerts } from '@/hooks/useBudgetAlerts';
 import {
   LayoutDashboard,
   BarChart3,
@@ -18,6 +19,7 @@ import {
   Moon,
   ChevronRight,
   Landmark,
+  Target,
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import toast from 'react-hot-toast';
@@ -27,6 +29,7 @@ const navItems = [
   { to: '/analytics', icon: BarChart3, label: 'Analytics' },
   { to: '/transactions', icon: ArrowLeftRight, label: 'Transactions' },
   { to: '/accounts', icon: Landmark, label: 'Accounts' },
+  { to: '/budgets', icon: Target, label: 'Budgets' },
   { to: '/categories', icon: Tag, label: 'Categories' },
 ];
 
@@ -39,6 +42,7 @@ const PAGE_TITLES: Record<string, string> = {
   '/transactions/recurring': 'Recurring',
   '/transactions/loans': 'Loans',
   '/accounts': 'Accounts',
+  '/budgets': 'Budgets',
   '/categories': 'Categories',
   '/profile': 'Profile',
 };
@@ -52,6 +56,9 @@ export default function DashboardLayout() {
 
   // Materialize any recurring transactions that came due since last visit.
   useGenerateDueTransactions();
+
+  // Fire toast alerts when budget thresholds are crossed.
+  useBudgetAlerts();
 
   async function handleSignOut() {
     await signOut();

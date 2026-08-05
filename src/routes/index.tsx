@@ -18,6 +18,7 @@ const ProfilePage = lazy(() => import('@/pages/ProfilePage'));
 const AnalyticsPage = lazy(() => import('@/pages/AnalyticsPage'));
 const AccountsPage = lazy(() => import('@/pages/AccountsPage'));
 const LoansPage = lazy(() => import('@/pages/LoansPage'));
+const BudgetsPage = lazy(() => import('@/pages/BudgetsPage'));
 
 function PageFallback() {
   return (
@@ -61,6 +62,7 @@ export default function AppRouter() {
             </Route>
             <Route path="/accounts" element={<AccountsPage />} />
             <Route path="/categories" element={<CategoriesPage />} />
+            <Route path="/budgets" element={<BudgetsPage />} />
             <Route path="/profile" element={<ProfilePage />} />
 
             {/* Back-compat: old top-level routes now live under /transactions */}

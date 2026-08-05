@@ -34,6 +34,7 @@ import MonthlyReport from '@/components/analytics/MonthlyReport';
 import YearlyReport from '@/components/analytics/YearlyReport';
 import CategoryBreakdownTable from '@/components/analytics/CategoryBreakdownTable';
 import InvestmentTracker from '@/components/analytics/InvestmentTracker';
+import BudgetVsActualChart from '@/components/analytics/BudgetVsActualChart';
 
 export default function AnalyticsPage() {
   const [filters, setFilters] = useState<AnalyticsFilters>({
@@ -247,6 +248,12 @@ export default function AnalyticsPage() {
       <section>
         <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">Activity</h2>
         <ExpenseHeatmap data={analytics.heatmapData} currency={currency} />
+      </section>
+
+      {/* Section: Budget vs. Actual */}
+      <section>
+        <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">Budget vs. Actual</h2>
+        <BudgetVsActualChart />
       </section>
 
       {/* Section: Rankings & Top Categories */}

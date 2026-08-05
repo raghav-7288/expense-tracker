@@ -217,6 +217,8 @@ export default function CSVImportModal({ open, onClose }: CSVImportModalProps) {
     queryClient.invalidateQueries({ queryKey: queryKeys.transactions.all });
     queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
     queryClient.invalidateQueries({ queryKey: ['analytics'] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.budgets.all });
+    queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
 
     if (success > 0) {
       toast.success(`Imported ${success} transaction${success > 1 ? 's' : ''}`);

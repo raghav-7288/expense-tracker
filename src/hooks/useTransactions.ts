@@ -22,6 +22,8 @@ function invalidateTransactionRelated(queryClient: QueryClient) {
   // loan views too — otherwise the loans page shows stale data.
   queryClient.invalidateQueries({ queryKey: queryKeys.loans.all });
   queryClient.invalidateQueries({ queryKey: ['analytics'] as const });
+  // Budget progress depends on transaction amounts per category.
+  queryClient.invalidateQueries({ queryKey: queryKeys.budgets.all });
 }
 
 export function useTransactions(filters?: TransactionFilters) {
