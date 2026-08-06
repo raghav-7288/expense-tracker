@@ -63,7 +63,8 @@ export default function AppRouter() {
             <Route path="/categories" element={<CategoriesPage />} />
             <Route path="/profile" element={<ProfilePage />} />
 
-            {/* Back-compat: old top-level routes now live under /transactions */}
+            {/* Back-compat: old top-level routes now live elsewhere */}
+            <Route path="/budgets" element={<Navigate to="/analytics?tab=budgets" replace />} />
             <Route path="/recurring" element={<Navigate to="/transactions/recurring" replace />} />
             <Route path="/loans" element={<Navigate to="/transactions/loans" replace />} />
           </Route>

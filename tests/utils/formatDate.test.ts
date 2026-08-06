@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { formatDate, formatDateShort, getToday, getMonthStart, getMonthEnd, getMonthName } from '@/utils/formatDate';
+import { formatDate, formatDateShort, getToday, getMonthStart, getMonthEnd, getMonthName, getWeekStart, getWeekEnd } from '@/utils/formatDate';
 
 describe('formatDate', () => {
   it('formats a standard date string', () => {
@@ -106,6 +106,80 @@ describe('getMonthName', () => {
 
   it('returns Dec for December', () => {
     expect(getMonthName('2024-12-01')).toBe('Dec');
+  });
+});
+
+describe('getWeekStart', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('returns Monday when today is Monday', () => {
+    // Aug 5, 2026 is a Wednesday — let's pick a Monday: Aug 3, 2026
+    vi.setSystemTime(new Date(2026, 7, 3, 12, 0, 0)); // Monday
+    expect(getWeekStart()).toBe('2026-08-03');
+  });
+
+  it('returns previous Monday when today is Wednesday', () => {
+    vi.setSystemTime(new Date(2026, 7, 5, 12, 0, 0)); // Wednesday
+    expect(getWeekStart()).toBe('2026-08-03');
+  });
+
+  it('returns previous Monday when today is Sunday', () => {
+    vi.setSystemTime(new Date(2026, 7, 9, 12, 0, 0)); // Sunday
+    expect(getWeekStart()).toBe('2026-08-03');
+  });
+
+  it('returns previous Monday when today is Saturday', () => {
+    vi.setSystemTime(new Date(2026, 7, 8, 12, 0, 0)); // Saturday
+    expect(getWeekStart()).toBe('2026-08-03');
+  });
+
+  it('handles week spanning month boundary', () => {
+    vi.setSystemTime(new Date(2026, 8, 2, 12, 0, 0)); // Sep 2 is a Wednesday
+    expect(getWeekStart()).toBe('2026-08-31');
+  });
+});
+
+describe('getWeekEnd', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('returns Sunday when today is Sunday', () => {
+    vi.setSystemTime(new Date(2026, 7, 9, 12, 0, 0)); // Sunday
+    expect(getWeekEnd()).toBe('2026-08-09');
+  });
+
+  it('returns next Sunday when today is Monday', () => {
+    vi.setSystemTime(new Date(2026, 7, 3, 12, 0, 0)); // Monday
+    expect(getWeekEnd()).toBe('2026-08-09');
+  });
+
+  it('returns next Sunday when today is Wednesday', () => {
+    vi.setSystemTime(new Date(2026, 7, 5, 12, 0, 0)); // Wednesday
+    expect(getWeekEnd()).toBe('2026-08-09');
+  });
+
+  it('week end is always >= week start', () => {
+    vi.setSystemTime(new Date(2026, 7, 5, 12, 0, 0));
+    expect(getWeekEnd() >= getWeekStart()).toBe(true);
+  });
+
+  it('week is always 6 days apart (Mon to Sun)', () => {
+    vi.setSystemTime(new Date(2026, 7, 5, 12, 0, 0));
+    const start = new Date(getWeekStart() + 'T00:00:00');
+    const end = new Date(getWeekEnd() + 'T00:00:00');
+    const diffDays = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24);
+    expect(diffDays).toBe(6);
   });
 });
 

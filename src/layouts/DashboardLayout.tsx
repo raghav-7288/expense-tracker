@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/hooks/useTheme';
 import { useGenerateDueTransactions } from '@/hooks/useRecurringTransactions';
+import { useBudgetAlerts } from '@/hooks/useBudgetAlerts';
 import {
   LayoutDashboard,
   BarChart3,
@@ -52,6 +53,9 @@ export default function DashboardLayout() {
 
   // Materialize any recurring transactions that came due since last visit.
   useGenerateDueTransactions();
+
+  // Fire toast alerts when budget thresholds are crossed.
+  useBudgetAlerts();
 
   async function handleSignOut() {
     await signOut();

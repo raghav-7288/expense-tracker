@@ -334,3 +334,51 @@ export interface LoanSummary {
   activeLoansCount: number;
   settledLoansCount: number;
 }
+
+// ============================================
+// BUDGETS
+// ============================================
+
+export type BudgetPeriod = 'weekly' | 'monthly';
+
+export type BudgetStatus = 'on_track' | 'warning' | 'exceeded';
+
+export interface Budget {
+  id: string;
+  user_id: string;
+  category_id: string;
+  category_source: CategorySource;
+  amount: number;
+  period: BudgetPeriod;
+  alert_threshold: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  /** Joined category info (resolved in the service layer) */
+  category?: MergedCategory | null;
+}
+
+export interface CreateBudgetInput {
+  user_id: string;
+  category_id: string;
+  category_source: CategorySource;
+  amount: number;
+  period: BudgetPeriod;
+  alert_threshold?: number;
+}
+
+export interface UpdateBudgetInput {
+  amount?: number;
+  period?: BudgetPeriod;
+  alert_threshold?: number;
+  is_active?: boolean;
+}
+
+export interface BudgetProgress {
+  budget: Budget;
+  spent: number;
+  remaining: number;
+  percentage: number;
+  status: BudgetStatus;
+}
+

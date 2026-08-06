@@ -29,6 +29,8 @@ function invalidateRecurringRelated(queryClient: QueryClient) {
   queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.all });
   queryClient.invalidateQueries({ queryKey: queryKeys.accounts.all });
   queryClient.invalidateQueries({ queryKey: ['analytics'] as const });
+  // Budget progress depends on transaction sums that recurring rules generate.
+  queryClient.invalidateQueries({ queryKey: queryKeys.budgets.all });
 }
 
 export function useRecurringTransactions() {

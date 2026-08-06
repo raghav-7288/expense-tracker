@@ -44,3 +44,22 @@ export function getMonthName(dateString: string): string {
   return new Intl.DateTimeFormat('en-US', { month: 'short' }).format(parseLocalDate(dateString));
 }
 
+/** Get the start of the current week (Monday). */
+export function getWeekStart(): string {
+  const now = new Date();
+  const day = now.getDay();
+  // Shift so Monday = 0
+  const diff = (day === 0 ? 6 : day - 1);
+  const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - diff);
+  return toISODate(monday);
+}
+
+/** Get the end of the current week (Sunday). */
+export function getWeekEnd(): string {
+  const now = new Date();
+  const day = now.getDay();
+  const diff = day === 0 ? 0 : 7 - day;
+  const sunday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diff);
+  return toISODate(sunday);
+}
+

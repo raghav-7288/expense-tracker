@@ -72,5 +72,36 @@ describe('queryKeys', () => {
       expect(queryKeys.dashboard.categories('u1')).toEqual(['dashboard', 'categories', 'u1']);
     });
   });
+
+  describe('budgets', () => {
+    it('all returns base key', () => {
+      expect(queryKeys.budgets.all).toEqual(['budgets']);
+    });
+
+    it('list includes userId', () => {
+      expect(queryKeys.budgets.list('u1')).toEqual(['budgets', 'u1']);
+    });
+
+    it('list with undefined userId', () => {
+      expect(queryKeys.budgets.list(undefined)).toEqual(['budgets', undefined]);
+    });
+
+    it('progress includes userId', () => {
+      expect(queryKeys.budgets.progress('u1')).toEqual(['budgets', 'progress', 'u1']);
+    });
+
+    it('progress with undefined userId', () => {
+      expect(queryKeys.budgets.progress(undefined)).toEqual(['budgets', 'progress', undefined]);
+    });
+
+    it('all key is a prefix of list and progress keys', () => {
+      const allKey = queryKeys.budgets.all;
+      const listKey = queryKeys.budgets.list('u1');
+      const progressKey = queryKeys.budgets.progress('u1');
+      // React Query uses prefix matching for invalidation
+      expect(listKey[0]).toBe(allKey[0]);
+      expect(progressKey[0]).toBe(allKey[0]);
+    });
+  });
 });
 

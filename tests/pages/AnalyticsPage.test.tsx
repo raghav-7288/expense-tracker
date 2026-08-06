@@ -65,6 +65,9 @@ vi.mock('@/components/analytics/MonthlyReport', () => ({ default: () => <div dat
 vi.mock('@/components/analytics/YearlyReport', () => ({ default: () => <div data-testid="yearly-report" /> }));
 vi.mock('@/components/analytics/CategoryBreakdownTable', () => ({ default: () => <div data-testid="breakdown-table" /> }));
 vi.mock('@/components/analytics/InvestmentTracker', () => ({ default: () => <div data-testid="investment-tracker" /> }));
+// Budgets tab content — mocked so switching tabs doesn't hit react-query/Supabase
+vi.mock('@/components/analytics/BudgetVsActualChart', () => ({ default: () => <div data-testid="budget-vs-actual-chart" /> }));
+vi.mock('@/components/budgets/BudgetsPanel', () => ({ default: () => <div data-testid="budgets-panel" /> }));
 
 import { useAnalytics } from '@/hooks/useAnalytics';
 const mockUseAnalytics = vi.mocked(useAnalytics);
@@ -214,6 +217,76 @@ describe('AnalyticsPage', () => {
 
     // The All Time button is now the active preset
     expect(screen.getByText('All Time')).toHaveAttribute('aria-pressed', 'true');
+  });
+});
+
+describe('AnalyticsPage — Insights / Budgets tabs', () => {
+  it('renders both the Insights and Budgets tabs', () => {
+    mockUseAnalytics.mockReturnValue(mockAnalytics as never);
+    renderWithProviders(<AnalyticsPage />);
+    expect(screen.getByRole('tab', { name: /insights/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /budgets/i })).toBeInTheDocument();
+  });
+
+  it('defaults to the Insights tab', () => {
+    mockUseAnalytics.mockReturnValue(mockAnalytics as never);
+    renderWithProviders(<AnalyticsPage />);
+
+    expect(screen.getByRole('tab', { name: /insights/i })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: /budgets/i })).toHaveAttribute('aria-selected', 'false');
+
+    // Insights content is visible; budgets panel is not mounted
+    expect(screen.getByTestId('investment-tracker')).toBeInTheDocument();
+    expect(screen.queryByTestId('budgets-panel')).not.toBeInTheDocument();
+  });
+
+  it('switches to the Budgets tab on click and mounts the budget panel + chart', () => {
+    mockUseAnalytics.mockReturnValue(mockAnalytics as never);
+    renderWithProviders(<AnalyticsPage />);
+
+    fireEvent.click(screen.getByRole('tab', { name: /budgets/i }));
+
+    expect(screen.getByRole('tab', { name: /budgets/i })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByTestId('budgets-panel')).toBeInTheDocument();
+    expect(screen.getByTestId('budget-vs-actual-chart')).toBeInTheDocument();
+
+    // Insights sections are no longer rendered
+    expect(screen.queryByText('Trends')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('investment-tracker')).not.toBeInTheDocument();
+  });
+
+  it('deep-links straight to the Budgets tab via ?tab=budgets', () => {
+    mockUseAnalytics.mockReturnValue(mockAnalytics as never);
+    renderWithProviders(<AnalyticsPage />, { route: '/analytics?tab=budgets' });
+
+    expect(screen.getByRole('tab', { name: /budgets/i })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByTestId('budgets-panel')).toBeInTheDocument();
+    expect(screen.queryByText('Trends')).not.toBeInTheDocument();
+  });
+
+  it('switches back to Insights from the Budgets tab', () => {
+    mockUseAnalytics.mockReturnValue(mockAnalytics as never);
+    renderWithProviders(<AnalyticsPage />, { route: '/analytics?tab=budgets' });
+
+    // Start on budgets
+    expect(screen.getByTestId('budgets-panel')).toBeInTheDocument();
+
+    // Back to insights
+    fireEvent.click(screen.getByRole('tab', { name: /insights/i }));
+    expect(screen.getByRole('tab', { name: /insights/i })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByTestId('investment-tracker')).toBeInTheDocument();
+    expect(screen.queryByTestId('budgets-panel')).not.toBeInTheDocument();
+  });
+
+  it('still shows the analytics error state (Insights tab) when analytics fails', () => {
+    mockUseAnalytics.mockReturnValue({ ...mockAnalytics, isError: true, summary: null } as never);
+    renderWithProviders(<AnalyticsPage />);
+    expect(screen.getByText('Failed to load analytics')).toBeInTheDocument();
+
+    // The Budgets tab remains reachable even when analytics errors
+    fireEvent.click(screen.getByRole('tab', { name: /budgets/i }));
+    expect(screen.getByTestId('budgets-panel')).toBeInTheDocument();
+    expect(screen.queryByText('Failed to load analytics')).not.toBeInTheDocument();
   });
 });
 

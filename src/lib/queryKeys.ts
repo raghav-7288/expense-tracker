@@ -44,5 +44,10 @@ export const queryKeys = {
     transactions: (loanId: string) => ['loans', 'transactions', loanId] as const,
     summary: (userId: string | undefined) => ['loans', 'summary', userId] as const,
   },
+  budgets: {
+    all: ['budgets'] as const,
+    list: (userId: string | undefined) => ['budgets', userId] as const,
+    progress: (userId: string | undefined) => ['budgets', 'progress', userId] as const,
+  },
 } as const;
 
