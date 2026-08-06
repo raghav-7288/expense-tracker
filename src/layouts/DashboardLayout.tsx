@@ -19,7 +19,6 @@ import {
   Moon,
   ChevronRight,
   Landmark,
-  Target,
 } from 'lucide-react';
 import { cn } from '@/utils/cn';
 import toast from 'react-hot-toast';
@@ -29,7 +28,6 @@ const navItems = [
   { to: '/analytics', icon: BarChart3, label: 'Analytics' },
   { to: '/transactions', icon: ArrowLeftRight, label: 'Transactions' },
   { to: '/accounts', icon: Landmark, label: 'Accounts' },
-  { to: '/budgets', icon: Target, label: 'Budgets' },
   { to: '/categories', icon: Tag, label: 'Categories' },
 ];
 
@@ -42,7 +40,6 @@ const PAGE_TITLES: Record<string, string> = {
   '/transactions/recurring': 'Recurring',
   '/transactions/loans': 'Loans',
   '/accounts': 'Accounts',
-  '/budgets': 'Budgets',
   '/categories': 'Categories',
   '/profile': 'Profile',
 };

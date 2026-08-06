@@ -33,7 +33,7 @@ function BudgetVsActualChart() {
           </div>
           <p className="text-xs text-gray-500 mb-1">No budgets configured</p>
           <Link
-            to="/budgets"
+            to="/analytics?tab=budgets"
             className="text-xs font-medium text-primary-600 hover:text-primary-700"
           >
             Set up budgets →

@@ -25,7 +25,7 @@ function BudgetProgressWidget() {
             Set spending limits for your categories to track your budget
           </p>
           <Link
-            to="/budgets"
+            to="/analytics?tab=budgets"
             className="text-xs font-medium text-primary-600 hover:text-primary-700 flex items-center gap-1"
           >
             Set up a budget <ArrowRight size={12} />
@@ -46,7 +46,7 @@ function BudgetProgressWidget() {
           <p className="text-xs text-gray-400 mt-0.5">Current period spending</p>
         </div>
         <Link
-          to="/budgets"
+          to="/analytics?tab=budgets"
           className="text-xs text-gray-500 hover:text-gray-700 flex items-center gap-1 transition-colors"
         >
           Manage <ArrowRight size={12} />

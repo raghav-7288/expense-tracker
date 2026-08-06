@@ -12,7 +12,13 @@ import BudgetForm from '@/components/budgets/BudgetForm';
 import { Target, Plus, Pencil, Trash2, X, AlertTriangle } from 'lucide-react';
 import type { Budget, BudgetProgress, CreateBudgetInput, UpdateBudgetInput } from '@/types';
 
-export default function BudgetsPage() {
+/**
+ * Budget management surface (create / edit / delete + progress cards).
+ *
+ * Rendered inside the Analytics page "Budgets" tab. Keeps a lightweight header
+ * (h2) because the page-level heading is owned by the Analytics PageHeader.
+ */
+export default function BudgetsPanel() {
   const { data: progress, isLoading, isError, refetch } = useBudgetProgress();
   const currency = useCurrency();
   const [showForm, setShowForm] = useState(false);
@@ -54,12 +60,12 @@ export default function BudgetsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">Budgets</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Set spending limits and track your progress</p>
+          <h2 className="text-base font-semibold text-gray-900">Your Budgets</h2>
+          <p className="text-xs text-gray-500 mt-0.5">Set spending limits and track your progress per category</p>
         </div>
         <Button onClick={() => { setShowForm(true); setEditingBudget(null); }} size="sm">
           <Plus size={14} />
@@ -78,9 +84,9 @@ export default function BudgetsPage() {
             className="bg-white rounded-xl border border-gray-200 shadow-sm p-5"
           >
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-semibold text-gray-900">
+              <h3 className="text-sm font-semibold text-gray-900">
                 {editingBudget ? 'Edit Budget' : 'New Budget'}
-              </h2>
+              </h3>
               <button
                 onClick={() => { setShowForm(false); setEditingBudget(null); }}
                 className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400"
@@ -278,5 +284,4 @@ function BudgetCard({ item, currency, onEdit, onDelete, deleting, confirmingDele
     </motion.div>
   );
 }
-
 

@@ -1,4 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { BarChart3, Target } from 'lucide-react';
 import { useAnalytics, useCurrency } from '@/hooks/useAnalytics';
 import { useCategories } from '@/hooks/useCategories';
 import { useAccounts } from '@/hooks/useAccounts';
@@ -7,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/queryKeys';
 import { getTransactions } from '@/services/transactions';
+import { cn } from '@/utils/cn';
 
 import PageHeader from '@/components/ui/PageHeader';
 import ErrorState from '@/components/ui/ErrorState';
@@ -35,8 +38,19 @@ import YearlyReport from '@/components/analytics/YearlyReport';
 import CategoryBreakdownTable from '@/components/analytics/CategoryBreakdownTable';
 import InvestmentTracker from '@/components/analytics/InvestmentTracker';
 import BudgetVsActualChart from '@/components/analytics/BudgetVsActualChart';
+import BudgetsPanel from '@/components/budgets/BudgetsPanel';
+
+type AnalyticsTab = 'insights' | 'budgets';
+
+const TABS: { id: AnalyticsTab; label: string; icon: typeof BarChart3 }[] = [
+  { id: 'insights', label: 'Insights', icon: BarChart3 },
+  { id: 'budgets', label: 'Budgets', icon: Target },
+];
 
 export default function AnalyticsPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab: AnalyticsTab = searchParams.get('tab') === 'budgets' ? 'budgets' : 'insights';
+
   const [filters, setFilters] = useState<AnalyticsFilters>({
     preset: 'allTime',
     type: 'all',
@@ -99,27 +113,15 @@ export default function AnalyticsPage() {
     [],
   );
 
+  const handleTabChange = useCallback(
+    (tab: AnalyticsTab) => {
+      setSearchParams(tab === 'budgets' ? { tab: 'budgets' } : {}, { replace: true });
+    },
+    [setSearchParams],
+  );
+
   const hasActiveCategoryFilter =
     filters.categoryIds !== undefined && filters.categoryIds !== null;
-
-  if (analytics.isError) {
-    return (
-      <ErrorState
-        title="Failed to load analytics"
-        description="We couldn't compute your financial data. Please try again."
-        retry={() => { analytics.refetch(); }}
-      />
-    );
-  }
-
-  if (analytics.isLoading) {
-    return (
-      <div className="space-y-6">
-        <PageHeader title="Analytics" description="Deep insights into your financial behavior" />
-        <AnalyticsSkeleton />
-      </div>
-    );
-  }
 
   return (
     <AnimatedPage className="space-y-6">
@@ -129,6 +131,48 @@ export default function AnalyticsPage() {
         description="Deep insights into your financial behavior"
       />
 
+      {/* Tab bar */}
+      <div className="border-b border-gray-200">
+        <nav className="flex gap-1 -mb-px overflow-x-auto" role="tablist" aria-label="Analytics views">
+          {TABS.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => handleTabChange(tab.id)}
+                className={cn(
+                  'inline-flex items-center gap-1.5 px-3 sm:px-4 py-2.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap touch-manipulation',
+                  isActive
+                    ? 'border-primary-600 text-primary-700'
+                    : 'border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300',
+                )}
+              >
+                <tab.icon size={15} className="flex-shrink-0" />
+                {tab.label}
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+
+      {activeTab === 'budgets' ? (
+        <div className="space-y-6">
+          <BudgetsPanel />
+          <BudgetVsActualChart />
+        </div>
+      ) : analytics.isError ? (
+        <ErrorState
+          title="Failed to load analytics"
+          description="We couldn't compute your financial data. Please try again."
+          retry={() => { analytics.refetch(); }}
+        />
+      ) : analytics.isLoading ? (
+        <AnalyticsSkeleton />
+      ) : (
+      <>
       {/* Filters */}
       <div className="space-y-3">
         <TimeRangeFilter
@@ -250,12 +294,6 @@ export default function AnalyticsPage() {
         <ExpenseHeatmap data={analytics.heatmapData} currency={currency} />
       </section>
 
-      {/* Section: Budget vs. Actual */}
-      <section>
-        <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">Budget vs. Actual</h2>
-        <BudgetVsActualChart />
-      </section>
-
       {/* Section: Rankings & Top Categories */}
       <section>
         <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">Rankings</h2>
@@ -292,6 +330,8 @@ export default function AnalyticsPage() {
         <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3">Detailed Breakdown</h2>
         <CategoryBreakdownTable data={analytics.expenseCategories} currency={currency} />
       </section>
+      </>
+      )}
       </>
       )}
     </AnimatedPage>
