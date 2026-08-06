@@ -19,6 +19,8 @@
 - Monthly income vs. expenses chart
 - Category breakdown pie chart
 - Recent transactions feed
+- Per-account balances overview
+- Budget progress widget (top budgets ranked by urgency)
 
 ### Transactions Hub
 - A single hub at `/transactions` with three sub-tabs — **All · Recurring · Loans**
@@ -45,6 +47,7 @@
 - Track money **lent** and **borrowed** with a counterparty name
 - Record repayments; outstanding balance and status update automatically
 - Status lifecycle: `active` → `partially_paid` → `settled`
+- Filter loans by type, status, and search
 - Loan events are backed by real transactions (disbursement + repayments)
 - Loan summary card on the Dashboard
 
@@ -55,6 +58,9 @@
 - Activate/deactivate and reorder accounts
 
 ### Analytics (20+ charts & insights)
+
+Organized into two tabs — **Insights** (all charts below) and **Budgets** (manage budgets + budget-vs-actual).
+
 - Income vs. Expense trends
 - Cash flow analysis
 - Savings trend tracking
@@ -62,12 +68,22 @@
 - Expense heatmap
 - Category pie charts & comparison
 - Financial health score
+- Budget vs. actual comparison
 - Smart insights engine
 - Spending pattern analysis
 - Largest/smallest transaction rankings
 - Top categories breakdown table
 - Monthly & yearly reports
 - Investment tracker
+
+### Budgets
+- Set per-category spending limits for a **weekly** or **monthly** period
+- Live progress bars — spent, remaining, and % used against the current period window
+- Status lifecycle: `on_track` → `warning` (at your alert threshold) → `exceeded`
+- Configurable alert threshold per budget (default 80%)
+- In-app toast alerts fire when a budget crosses its warning/exceeded threshold
+- Dashboard widget surfaces the most urgent budgets; a "Budgets" tab lives under Analytics
+- Only expense spending counts toward a budget
 
 ### Categories
 - System categories (global defaults, read-only)
@@ -92,7 +108,7 @@
 - Smooth page transitions (Framer Motion)
 - Accessible — ARIA labels, keyboard navigation, skip links
 - Skeleton loaders, empty states, and error states
-- Toast notifications (theme-aware) via react-hot-toast
+- Toast notifications (theme-aware) via react-hot-toast — including budget threshold alerts
 
 ---
 
@@ -179,6 +195,7 @@ Run the migration files **in order** in your Supabase SQL Editor:
 | 010 | `010_audit_followups.sql` | Audit follow-up fixes |
 | 011 | `011_recurring_transactions.sql` | Recurring rules + `recurring_id` link |
 | 012 | `012_fix_user_category_unique.sql` | Partial unique index for soft delete |
+| 013 | `013_budgets.sql` | Per-category budgets (weekly/monthly) + RLS |
 
 See [docs/DATABASE_SETUP.md](docs/DATABASE_SETUP.md) for detailed instructions.
 
@@ -234,7 +251,7 @@ npm run test:coverage
 npm run test:watch
 ```
 
-**Current status:** 101 test files · 1,272 passing tests · ~82% statement coverage
+**Current status:** 104 test files · 1,409 passing tests · ~79% statement / ~81% line coverage
 
 ---
 
@@ -263,8 +280,9 @@ expense-tracker/
 │   │   ├── accounts/        # Account list, form, cards
 │   │   ├── analytics/       # Chart & insight components
 │   │   ├── auth/            # Auth forms, Google sign-in, protected route
+│   │   ├── budgets/         # Budget form & progress panel
 │   │   ├── categories/      # Category list, form, management
-│   │   ├── dashboard/       # Stat cards, charts, recent transactions
+│   │   ├── dashboard/       # Stat cards, charts, account & budget widgets
 │   │   ├── loans/           # Loan list, form, repayment, summary
 │   │   ├── recurring/       # Recurring list & form
 │   │   ├── transactions/    # Transaction list, form, filters, CSV import/export
@@ -282,7 +300,7 @@ expense-tracker/
 │   ├── types/               # TypeScript type definitions
 │   └── utils/               # Pure utilities (cn, formatCurrency, formatDate, …)
 ├── supabase/
-│   └── migrations/          # SQL migration files (001–012)
+│   └── migrations/          # SQL migration files (001–013)
 ├── tests/                   # Test files (mirrors src/ structure)
 └── docs/                    # Architecture docs, AI context, reports/
 ```
@@ -304,6 +322,7 @@ expense-tracker/
 | `loans` | Lending / borrowing records with outstanding + status |
 | `loan_transactions` | Junction linking loans to their disbursement/repayment transactions |
 | `recurring_transactions` | Recurring rules that materialize transactions |
+| `budgets` | Per-category spending limits (weekly/monthly) with alert thresholds |
 
 > A legacy `categories` table remains from `001` for backward compatibility; the app
 > reads from `system_categories` / `user_categories`.
@@ -329,10 +348,9 @@ All tables have **Row Level Security (RLS)** enabled — users can only access t
 - [ ] Server-side recurring generation (Edge Function + `pg_cron`) so transactions
       appear without the user opening the app
 - [ ] `UNIQUE(recurring_id, date)` guard + `upsert` for defense-in-depth idempotency
-- [ ] Budget goals and spending limits
 - [ ] Multi-currency support with live exchange rates
 - [ ] Receipt photo upload (Supabase Storage)
-- [ ] Push notifications for budget alerts
+- [ ] Push notifications (budget alerts are currently in-app toasts only)
 - [ ] Export to PDF reports
 - [ ] Shared household accounts
 - [ ] Mobile app (React Native)

@@ -12,10 +12,10 @@
 
 ExpenseTracker is a personal finance SPA for tracking income and expenses, managing
 categories and accounts, scheduling recurring transactions, tracking loans (money
-lent/borrowed), and visualizing spending through 20+ analytics charts. It is a
-client-side React app backed by Supabase (Postgres + Auth + Row Level Security).
-There is no custom backend server — the browser talks to Supabase directly, and
-**RLS is the authorization boundary**.
+lent/borrowed), setting per-category budgets, and visualizing spending through 20+
+analytics charts. It is a client-side React app backed by Supabase (Postgres + Auth +
+Row Level Security). There is no custom backend server — the browser talks to Supabase
+directly, and **RLS is the authorization boundary**.
 
 - **Frontend:** React 19 + TypeScript 6 (strict) + Vite 8
 - **Backend:** Supabase (Postgres, Auth, RLS, RPC functions)
@@ -65,12 +65,15 @@ utils/     pure helpers (formatCurrency, formatDate, cn)
 - Public (under `AuthLayout`): `/login`, `/signup`, `/forgot-password`, `/reset-password`
 - Protected (under `ProtectedRoute` → `DashboardLayout`):
   - `/dashboard`, `/analytics`, `/accounts`, `/categories`, `/profile`
+  - `/analytics` renders two tabs selected by a `?tab=` query param: **Insights** (default)
+    and **Budgets** (`?tab=budgets`)
   - `/transactions` is a **hub** (`TransactionsLayout`) with nested tabs:
     - index → All transactions
     - `recurring` → Recurring
     - `loans` → Loans
     - `*` → redirect back to `/transactions` (stays in hub)
-  - Legacy redirects: `/recurring` → `/transactions/recurring`, `/loans` → `/transactions/loans`
+  - Legacy redirects: `/recurring` → `/transactions/recurring`, `/loans` → `/transactions/loans`,
+    `/budgets` → `/analytics?tab=budgets`
 - Catch-all `*` → `/dashboard`
 
 **Sidebar** (`DashboardLayout`) has 5 items: Dashboard, Analytics, Transactions,
@@ -87,26 +90,27 @@ src/
 │   ├── accounts/      # account list, form, cards
 │   ├── analytics/     # chart & insight components
 │   ├── auth/          # auth forms, Google sign-in, ProtectedRoute
+│   ├── budgets/       # BudgetForm, BudgetsPanel
 │   ├── categories/    # category list, form, management
-│   ├── dashboard/     # StatCard, charts, recent transactions
+│   ├── dashboard/     # StatCard, charts, AccountBalances, BudgetProgressWidget
 │   ├── loans/         # loan list, form, repayment, summary card
 │   ├── recurring/     # RecurringList, RecurringForm
-│   ├── transactions/  # TransactionList, TransactionForm, filters, CSV import/export
+│   ├── transactions/  # TransactionList, TransactionForm, filters, CSVImportModal
 │   ├── ui/            # reusable primitives (Button, Modal, Input, Select, …)
 │   └── ErrorBoundary.tsx
 ├── context/           # AuthContext, ThemeContext
 ├── engines/           # analytics.ts (pure computation + CSV generation)
-├── hooks/             # React Query wrappers + useAuth/useTheme/useCurrency/useDebouncedValue
+├── hooks/             # React Query wrappers + useAuth/useTheme/useCurrency/useDebouncedValue/useBudgetAlerts
 ├── layouts/           # AuthLayout, DashboardLayout, TransactionsLayout
 ├── lib/               # supabase.ts, queryClient.ts, queryKeys.ts
 ├── pages/             # lazy-loaded route components
 ├── routes/            # AppRouter
-├── services/          # accounts, categories, loans, profiles, recurring, transactions
+├── services/          # accounts, budgets, categories, loans, profiles, recurring, transactions
 ├── styles/            # index.css (design tokens + dark-mode overrides)
 ├── test/              # setup + renderWithProviders
 ├── types/             # index.ts (all shared types)
 └── utils/             # cn, constants, formatCurrency, formatDate, animations
-supabase/migrations/   # 001–012 SQL migrations
+supabase/migrations/   # 001–013 SQL migrations
 tests/                 # mirrors src/ structure
 ```
 
@@ -114,7 +118,7 @@ tests/                 # mirrors src/ structure
 
 ## Database Schema Overview
 
-10 tables (RLS on all). Migrations `001`–`012` in `supabase/migrations/`.
+11 tables (RLS on all). Migrations `001`–`013` in `supabase/migrations/`.
 
 | Table | Key columns | Notes |
 |---|---|---|
@@ -127,6 +131,7 @@ tests/                 # mirrors src/ structure
 | `loans` | `id`, `user_id`, `counterparty_name`, `type`, `principal_amount`, `outstanding_amount`, `status`, `due_date` | `type` ∈ lent/borrowed |
 | `loan_transactions` | `loan_id`, `transaction_id`, `event_type` | `event_type` ∈ disbursement/repayment |
 | `recurring_transactions` | `id`, `user_id`, template fields, `frequency`, `start_date`, `end_date`, `next_due_date`, `is_active` | Rule rows |
+| `budgets` | `id`, `user_id`, `category_id`, `category_source`, `amount`, `period`, `alert_threshold`, `is_active` | `period` ∈ weekly/monthly; `category_source` ∈ system/user |
 | `categories` (legacy) | — | Retained from `001` for back-compat; app uses system/user categories |
 
 **Foreign keys of note:**
@@ -141,6 +146,10 @@ tests/                 # mirrors src/ structure
 
 **Uniqueness (`012`):** `user_categories` uses a **partial** unique index
 `(user_id, name, type) WHERE deleted_at IS NULL` so a soft-deleted name can be reused.
+
+**Uniqueness (`013`):** `budgets` has `UNIQUE(user_id, category_id, category_source, period)`
+— a category can have at most one budget per period; a duplicate raises `23505`, surfaced
+by `useCreateBudget` as a friendly "already exists" toast.
 
 ---
 
@@ -213,6 +222,26 @@ tests/                 # mirrors src/ structure
 
 ---
 
+## Budget Flow
+
+1. A budget (`budgets`) sets a spending limit (`amount`) on one category
+   (`category_id` + `category_source`) over a `period` (`weekly` or `monthly`), with an
+   `alert_threshold` (default `0.80`).
+2. `useBudgets` + `services/budgets.ts` do CRUD; `getBudgetProgress` computes each budget's
+   progress by summing **expense** transactions in the current period window
+   (`getMonthStart/End` or `getWeekStart/End`) for that category.
+3. Progress yields `spent`, `remaining`, `percentage`, and a `status`:
+   `on_track` → `warning` (≥ `alert_threshold`) → `exceeded` (≥ 100%).
+4. `useBudgetProgress` refetches every 5 min; `useBudgetAlerts` (mounted once in
+   `DashboardLayout`) fires a warning/exceeded **toast** the first time each budget reaches a
+   new status per session (ref-guarded so it doesn't re-toast on refetch/re-render).
+5. Budgets surface in two places: the **Budgets tab** of `/analytics`
+   (`BudgetsPanel` + `BudgetVsActualChart`) and a **`BudgetProgressWidget`** on the Dashboard
+   (top budgets by urgency). There is no dedicated page or sidebar item.
+6. Only **expense** spending counts toward a budget; income and loan transactions are ignored.
+
+---
+
 ## Analytics Flow
 
 1. `useAnalytics` fetches the user's transactions once; `engines/analytics.ts` (pure)
@@ -220,6 +249,8 @@ tests/                 # mirrors src/ structure
 2. Because the engine is pure and I/O-free, it is exhaustively unit-testable.
 3. Filters (date range, type, category) are applied before/within the engine; charts
    are Recharts components.
+4. `AnalyticsPage` splits its content into two tabs driven by a `?tab=` query param:
+   **Insights** (all the charts above) and **Budgets** (`BudgetsPanel` + `BudgetVsActualChart`).
 
 ---
 
@@ -227,8 +258,9 @@ tests/                 # mirrors src/ structure
 
 - **Export:** `generateCSV` (analytics engine) serializes transactions to CSV. Generated
   and loan transactions are ordinary rows, so they export with no special-casing.
-- **Import:** `ImportModal` (in `components/transactions/`) parses a CSV, validates rows,
-  and bulk-inserts via the transactions service.
+- **Import:** `CSVImportModal` (in `components/transactions/`) parses a CSV, validates rows,
+  and bulk-inserts via the transactions service (invalidating transactions, accounts, and
+  budgets caches afterward).
 
 ---
 
@@ -246,7 +278,8 @@ Plus `components/ErrorBoundary.tsx`.
 
 `src/hooks/`: `useAuth`, `useTheme`, `useCurrency`, `useDebouncedValue`,
 `useTransactions`, `useRecurringTransactions`, `useCategories`, `useAccounts`,
-`useLoans`, `useProfile`, `useDashboard`, `useAnalytics`.
+`useLoans`, `useBudgets` (+ `useBudgetProgress`), `useBudgetAlerts`, `useProfile`,
+`useDashboard`, `useAnalytics`.
 Data hooks are thin React Query wrappers that own cache keys, invalidation, and toasts.
 
 ---
@@ -254,7 +287,7 @@ Data hooks are thin React Query wrappers that own cache keys, invalidation, and 
 ## Shared Services
 
 `src/services/` (all return `{ data, error }`, never throw): `transactions`,
-`recurring`, `categories`, `accounts`, `loans`, `profiles`. The Supabase client is
+`recurring`, `categories`, `accounts`, `loans`, `budgets`, `profiles`. The Supabase client is
 `src/lib/supabase.ts`; query keys are centralized in `src/lib/queryKeys.ts`.
 
 ---
@@ -289,6 +322,11 @@ Data hooks are thin React Query wrappers that own cache keys, invalidation, and 
 - **Currency:** stored on `profiles.currency`; `formatCurrency(amount, currency)` is
   always called with the user's currency (via `useCurrency`). Never hardcode a symbol.
 - **Analytics filtering** excludes loan (lent/borrowed) transactions from income/expense series.
+- **Budgets** track **expense** spending only, within the current weekly/monthly period window.
+  Status is `on_track` → `warning` (≥ `alert_threshold`, default 80%) → `exceeded` (≥ 100%).
+  At most one budget per `(category, category_source, period)`; a duplicate raises `23505`,
+  surfaced as a friendly toast. Budget alerts are **in-app toasts**, fired once per status
+  change per browser session.
 - **Soft delete:** deleting a user category hides it from pickers but historical
   transactions keep their label (the FK join does not filter `deleted_at`).
 - **RLS assumption:** the client trusts Postgres RLS for authorization; every table
@@ -318,7 +356,7 @@ Data hooks are thin React Query wrappers that own cache keys, invalidation, and 
 - Setup: `src/test/setup.ts`; shared `renderWithProviders` wraps Query/Theme/Auth.
 - Supabase and hooks are mocked at the module boundary; services are tested against a
   mocked client; the analytics engine and recurring scheduler are tested as pure functions.
-- Current status: **101 test files · 1,272 passing · ~82% statement coverage.**
+- Current status: **104 test files · 1,409 passing · ~79% statement / ~81% line coverage.**
 - Run: `npm test`, `npm run test:coverage`, `npm run test:watch`.
 - **Add tests for every new feature and every fixed bug** (regression test pinning the bug).
 
@@ -333,6 +371,7 @@ Data hooks are thin React Query wrappers that own cache keys, invalidation, and 
 - **`React.memo`** on propless dashboard subtrees (`MonthlyChart`, `CategoryChart`, `StatCard`).
 - **Server-side aggregation RPCs** avoid full transaction fetches for balances.
 - **React Query config:** 5 min stale, 15 min gc, no refetch-on-focus.
+- **Budget progress** polls every 5 min (`refetchInterval`) so status/alerts stay current.
 - **Debounced search** avoids a query per keystroke.
 
 ---
@@ -364,6 +403,9 @@ Data hooks are thin React Query wrappers that own cache keys, invalidation, and 
   `upsert` before moving generation server-side.
 - **Balance semantics:** account-less transactions are in the dashboard total but in no
   per-account balance — a product decision, documented here so it isn't "fixed" blindly.
+- **Budget progress is computed client-side** — `getBudgetProgress` fetches the period's
+  expense transactions and sums them per category in JS (fine for personal-finance volumes).
+  Budget alerts are in-app toasts only and reset each browser session (no push/email).
 - **Legacy `categories` table** from `001` still exists; the app uses system/user categories.
 - **Duplicate index name** `idx_user_categories_active` is created in both `002` and `003`
   (`IF NOT EXISTS` makes `003` silently skip) — latent perf nit, not a correctness bug.
